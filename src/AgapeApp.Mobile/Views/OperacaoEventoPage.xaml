@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:AgapeApp.Mobile.Models"
+             x:Class="AgapeApp.Mobile.Views.OperacaoEventoPage"
+             Title="Operação"
+             Shell.NavBarIsVisible="False">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20,24,20,24" Spacing="16">
+
+            <!-- Cabeçalho -->
+            <Grid ColumnDefinitions="44,*" ColumnSpacing="12">
+                <Border WidthRequest="40"
+                        HeightRequest="40"
+                        VerticalOptions="Start"
+                        Stroke="{StaticResource Borda}"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 12"
+                        BackgroundColor="{StaticResource Superficie}">
+                    <Label Text="&#xf060;" FontFamily="fa" FontSize="15"
+                           TextColor="{StaticResource TextoPrimario}"
+                           HorizontalOptions="Center" VerticalOptions="Center">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding VoltarCommand}" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                </Border>
+                <VerticalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
+                    <Label Text="{Binding EventoNome}"
+                           Style="{StaticResource Subtitulo}"
+                           LineBreakMode="TailTruncation" />
+                    <Border Style="{StaticResource Badge}"
+                            BackgroundColor="{StaticResource PrimaryContainer}"
+                            HorizontalOptions="Start">
+                        <Label Text="{Binding SetorNome}"
+                               Style="{StaticResource LegendaPequena}"
+                               TextColor="{StaticResource OnPrimaryContainer}" />
+                    </Border>
+                </VerticalStackLayout>
+            </Grid>
+
+            <Label Text="O que você vai fazer?" Style="{StaticResource TituloGrande}" Margin="0,8,0,0" />
+            <Label Text="Leia o cartão do cliente e escolha a operação — tudo fica registrado no evento."
+                   Style="{StaticResource Corpo}"
+                   TextColor="{StaticResource TextoSecundario}" />
+
+            <!-- Recarregar -->
+            <Border Style="{StaticResource Card}">
+                <Grid ColumnDefinitions="48,*,20" ColumnSpacing="14">
+                    <Border WidthRequest="48" HeightRequest="48"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 14"
+                            BackgroundColor="{StaticResource DestaqueContainer}">
+                        <Label Text="&#xf0d6;" FontFamily="fa" FontSize="18"
+                               TextColor="{StaticResource OnDestaqueContainer}"
+                               HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+                    <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                        <Label Text="Recarregar cartão" Style="{StaticResource SubtituloPequeno}" />
+                        <Label Text="Recebe crédito em dinheiro ou Pix" Style="{StaticResource LegendaPequena}" />
+                    </VerticalStackLayout>
+                    <Label Grid.Column="2" Text="&#xf054;" FontFamily="fa" FontSize="14"
+                           TextColor="{StaticResource TextoMudo}" VerticalOptions="Center" />
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding RecarregarCommand}" />
+                    </Border.GestureRecognizers>
+                </Grid>
+            </Border>
+
+            <!-- Vender -->
+            <Border Style="{StaticResource Card}">
+                <Grid ColumnDefinitions="48,*,20" ColumnSpacing="14">
+                    <Border WidthRequest="48" HeightRequest="48"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 14"
+                            BackgroundColor="{StaticResource SucessoContainer}">
+                        <Label Text="&#xf07a;" FontFamily="fa" FontSize="18"
+                               TextColor="{StaticResource OnSucessoContainer}"
+                               HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+                    <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                        <Label Text="Vender no setor" Style="{StaticResource SubtituloPequeno}" />
+                        <Label Text="Debita o saldo do cartão no ato" Style="{StaticResource LegendaPequena}" />
+                    </VerticalStackLayout>
+                    <Label Grid.Column="2" Text="&#xf054;" FontFamily="fa" FontSize="14"
+                           TextColor="{StaticResource TextoMudo}" VerticalOptions="Center" />
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding VenderCommand}" />
+                    </Border.GestureRecognizers>
+                </Grid>
+            </Border>
+
+            <!-- Saldo -->
+            <Border Style="{StaticResource Card}">
+                <Grid ColumnDefinitions="48,*,20" ColumnSpacing="14">
+                    <Border WidthRequest="48" HeightRequest="48"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 14"
+                            BackgroundColor="{StaticResource PrimaryContainer}">
+                        <Label Text="&#xf09d;" FontFamily="fa" FontSize="18"
+                               TextColor="{StaticResource OnPrimaryContainer}"
+                               HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+                    <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                        <Label Text="Consultar saldo" Style="{StaticResource SubtituloPequeno}" />
+                        <Label Text="Mostra o saldo do cartão no evento" Style="{StaticResource LegendaPequena}" />
+                    </VerticalStackLayout>
+                    <Label Grid.Column="2" Text="&#xf054;" FontFamily="fa" FontSize="14"
+                           TextColor="{StaticResource TextoMudo}" VerticalOptions="Center" />
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ConsultarSaldoCommand}" />
+                    </Border.GestureRecognizers>
+                </Grid>
+            </Border>
+
+            <!-- Últimas operações deste aparelho -->
+            <VerticalStackLayout Spacing="8" IsVisible="{Binding TemRecentes}">
+                <Label Text="Últimas neste aparelho"
+                       Style="{StaticResource SubtituloPequeno}"
+                       Margin="4,8,0,0" />
+                <VerticalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding Recentes}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="models:OperacaoRecente">
+                            <Border Style="{StaticResource Card}" Padding="12">
+                                <Grid ColumnDefinitions="34,*,Auto" ColumnSpacing="10">
+                                    <Border WidthRequest="32" HeightRequest="32"
+                                            StrokeThickness="0"
+                                            StrokeShape="RoundRectangle 9"
+                                            BackgroundColor="{Binding Fundo}"
+                                            VerticalOptions="Center">
+                                        <Label Text="{Binding Icone}"
+                                               FontFamily="fa"
+                                               FontSize="12"
+                                               TextColor="{Binding Cor}"
+                                               HorizontalOptions="Center" VerticalOptions="Center" />
+                                    </Border>
+
+                                    <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                        <HorizontalStackLayout Spacing="6">
+                                            <Label Text="{Binding Tipo}"
+                                                   FontFamily="InterSemiBold"
+                                                   FontSize="13" />
+                                            <Label Text="{Binding CartaoCodigo}"
+                                                   Style="{StaticResource LegendaPequena}"
+                                                   FontSize="12"
+                                                   VerticalOptions="Center" />
+                                        </HorizontalStackLayout>
+                                        <Label Text="{Binding Detalhe}"
+                                               Style="{StaticResource LegendaPequena}"
+                                               FontSize="11"
+                                               LineBreakMode="TailTruncation" />
+                                    </VerticalStackLayout>
+
+                                    <VerticalStackLayout Grid.Column="2" Spacing="2" HorizontalOptions="End">
+                                        <Label Text="{Binding ValorTexto}"
+                                               FontFamily="InterBold"
+                                               FontSize="13"
+                                               TextColor="{Binding Cor}"
+                                               HorizontalTextAlignment="End" />
+                                        <Label Text="{Binding HoraTexto}"
+                                               Style="{StaticResource LegendaPequena}"
+                                               FontSize="11"
+                                               HorizontalTextAlignment="End" />
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+
+            <!-- Info -->
+            <Border BackgroundColor="{StaticResource SuperficieTint}"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 12"
+                    Padding="12,10">
+                <Grid ColumnDefinitions="20,*" ColumnSpacing="8">
+                    <Label Text="&#xf05a;" FontFamily="fa" FontSize="14"
+                           TextColor="{StaticResource Primary}" VerticalOptions="Center" />
+                    <Label Grid.Column="1"
+                           Text="As operações valem enquanto o evento estiver aberto. Se a internet cair, tente de novo: nada é cobrado duas vezes."
+                           Style="{StaticResource LegendaPequena}" />
+                </Grid>
+            </Border>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

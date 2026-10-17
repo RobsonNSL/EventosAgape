@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AgapeApp.Mobile.Views.SaldoPage"
+             Title="Saldo do cartão"
+             Shell.NavBarIsVisible="False">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20,24,20,24" Spacing="16">
+
+            <!-- Cabeçalho -->
+            <Grid ColumnDefinitions="44,*" ColumnSpacing="12">
+                <Border WidthRequest="40"
+                        HeightRequest="40"
+                        VerticalOptions="Start"
+                        Stroke="{StaticResource Borda}"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 12"
+                        BackgroundColor="{StaticResource Superficie}">
+                    <Label Text="&#xf060;" FontFamily="fa" FontSize="15"
+                           TextColor="{StaticResource TextoPrimario}"
+                           HorizontalOptions="Center" VerticalOptions="Center">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding VoltarCommand}" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                </Border>
+                <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                    <Label Text="Saldo do cartão" Style="{StaticResource TituloMedio}" />
+                    <Label Style="{StaticResource LegendaPequena}">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="{Binding EventoNome}" />
+                                <Span Text=" · " />
+                                <Span Text="{Binding SetorNome}" />
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                </VerticalStackLayout>
+            </Grid>
+
+            <!-- Saldo -->
+            <Border Style="{StaticResource Card}" Padding="20">
+                <VerticalStackLayout Spacing="10">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="{Binding TextoCartao}" Style="{StaticResource Legenda}" VerticalOptions="Center" />
+                        <Border Grid.Column="1"
+                                Style="{StaticResource Badge}"
+                                BackgroundColor="{Binding StatusFundo}">
+                            <Label Text="{Binding StatusTexto}"
+                                   Style="{StaticResource LegendaPequena}"
+                                   TextColor="{Binding StatusCor}" />
+                        </Border>
+                    </Grid>
+
+                    <Label Text="Saldo disponível no evento"
+                           Style="{StaticResource LegendaPequena}"
+                           Margin="0,6,0,0" />
+                    <Label Text="{Binding TextoSaldo}"
+                           Style="{StaticResource ValorGrande}"
+                           TextColor="{StaticResource Sucesso}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Cartão bloqueado -->
+            <Border IsVisible="{Binding MostrarBloqueio}"
+                    BackgroundColor="{StaticResource PerigoContainer}"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 12"
+                    Padding="12,10">
+                <Grid ColumnDefinitions="20,*" ColumnSpacing="8">
+                    <Label Text="&#xf071;" FontFamily="fa" FontSize="14"
+                           TextColor="{StaticResource OnPerigoContainer}" VerticalOptions="Center" />
+                    <Label Grid.Column="1"
+                           Text="Este cartão está bloqueado. Encaminhe o cliente à administração do evento."
+                           Style="{StaticResource Corpo}"
+                           TextColor="{StaticResource OnPerigoContainer}" />
+                </Grid>
+            </Border>
+
+            <!-- Erro -->
+            <Border IsVisible="{Binding TemErro}"
+                    BackgroundColor="{StaticResource PerigoContainer}"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 12"
+                    Padding="12,10">
+                <Grid ColumnDefinitions="20,*" ColumnSpacing="8">
+                    <Label Text="&#xf071;" FontFamily="fa" FontSize="14"
+                           TextColor="{StaticResource OnPerigoContainer}" VerticalOptions="Center" />
+                    <Label Grid.Column="1"
+                           Text="{Binding MensagemErro}"
+                           Style="{StaticResource Corpo}"
+                           TextColor="{StaticResource OnPerigoContainer}" />
+                </Grid>
+            </Border>
+
+            <Button Text="Recarregar este cartão"
+                    Style="{StaticResource BotaoDestaque}"
+                    Command="{Binding RecarregarCommand}"
+                    IsEnabled="{Binding PodeOperar}" />
+
+            <Button Text="Vender com este cartão"
+                    Style="{StaticResource BotaoSucesso}"
+                    Command="{Binding VenderCommand}"
+                    IsEnabled="{Binding PodeOperar}" />
+
+            <Button Text="Ler outro cartão"
+                    Style="{StaticResource BotaoContorno}"
+                    Command="{Binding LerOutroCartaoCommand}" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

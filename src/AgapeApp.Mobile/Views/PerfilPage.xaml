@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AgapeApp.Mobile.Views.PerfilPage"
+             Title="Perfil"
+             Shell.NavBarIsVisible="False">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20,28,20,24" Spacing="14">
+
+            <Label Text="Perfil" Style="{StaticResource TituloGrande}" />
+
+            <!-- Usuário -->
+            <Border Style="{StaticResource Card}">
+                <Grid ColumnDefinitions="64,*" ColumnSpacing="14">
+                    <Border WidthRequest="64"
+                            HeightRequest="64"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 20"
+                            BackgroundColor="{StaticResource Primary}">
+                        <Label Text="{Binding Iniciais}"
+                               FontFamily="InterBold"
+                               FontSize="22"
+                               TextColor="{StaticResource Superficie}"
+                               HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+                    <VerticalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
+                        <Label Text="{Binding Nome}" Style="{StaticResource Subtitulo}" />
+                        <Label Text="{Binding Email}" Style="{StaticResource LegendaPequena}" />
+                        <Border Style="{StaticResource Badge}"
+                                BackgroundColor="{Binding FundoPerfil}"
+                                HorizontalOptions="Start">
+                            <Label Text="{Binding Perfil}"
+                                   Style="{StaticResource LegendaPequena}"
+                                   TextColor="{Binding CorPerfil}" />
+                        </Border>
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
+
+            <!-- Conta -->
+            <Label Text="Conta" Style="{StaticResource Legenda}" Margin="4,8,0,0" />
+            <Border Style="{StaticResource Card}">
+                <Grid ColumnDefinitions="24,*,20" ColumnSpacing="12">
+                    <Label Text="&#xf084;" FontFamily="fa" FontSize="16"
+                           TextColor="{StaticResource TextoPrimario}" VerticalOptions="Center" />
+                    <Label Grid.Column="1"
+                           Text="Alterar minha senha"
+                           Style="{StaticResource CorpoGrande}"
+                           VerticalOptions="Center" />
+                    <Label Grid.Column="2" Text="&#xf054;" FontFamily="fa" FontSize="13"
+                           TextColor="{StaticResource TextoMudo}" VerticalOptions="Center" />
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding AlterarSenhaCommand}" />
+                    </Border.GestureRecognizers>
+                </Grid>
+            </Border>
+
+            <!-- Entrada por biometria -->
+            <Label Text="Entrada"
+                   Style="{StaticResource Legenda}"
+                   Margin="4,8,0,0"
+                   IsVisible="{Binding BiometriaDisponivel}" />
+            <Border Style="{StaticResource Card}" IsVisible="{Binding BiometriaDisponivel}">
+                <Grid ColumnDefinitions="24,*,Auto" ColumnSpacing="12">
+                    <Label Text="&#xf130;" FontFamily="fa" FontSize="16"
+                           TextColor="{StaticResource Primary}" VerticalOptions="Center" />
+                    <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                        <Label Text="Entrar com biometria"
+                               Style="{StaticResource CorpoGrande}" />
+                        <Label Text="Usa a digital ou o Face ID no lugar da senha."
+                               Style="{StaticResource LegendaPequena}" />
+                    </VerticalStackLayout>
+                    <Switch Grid.Column="2"
+                            IsToggled="{Binding BiometriaAtiva}"
+                            OnColor="{StaticResource Primary}"
+                            VerticalOptions="Center" />
+                </Grid>
+            </Border>
+
+            <!-- Sessão -->
+            <Label Text="Sessão" Style="{StaticResource Legenda}" Margin="4,8,0,0" />
+            <Border Style="{StaticResource Card}">
+                <Grid ColumnDefinitions="24,*,20" ColumnSpacing="12">
+                    <Label Text="&#xf2f5;" FontFamily="fa" FontSize="16"
+                           TextColor="{StaticResource Perigo}" VerticalOptions="Center" />
+                    <Label Grid.Column="1"
+                           Text="Sair da conta"
+                           Style="{StaticResource CorpoGrande}"
+                           TextColor="{StaticResource Perigo}"
+                           VerticalOptions="Center" />
+                    <Label Grid.Column="2" Text="&#xf054;" FontFamily="fa" FontSize="13"
+                           TextColor="{StaticResource TextoMudo}" VerticalOptions="Center" />
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="AoSair" />
+                    </Border.GestureRecognizers>
+                </Grid>
+            </Border>
+
+            <Label Text="AgapeApp v1.0 · Paróquia e quermesses"
+                   Style="{StaticResource LegendaPequena}"
+                   TextColor="{StaticResource TextoMudo}"
+                   HorizontalTextAlignment="Center"
+                   Margin="0,16,0,0" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

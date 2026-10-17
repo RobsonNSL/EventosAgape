@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AgapeApp.Mobile.Views.LeituraQrPage"
+             Title="Ler cartão"
+             Shell.NavBarIsVisible="False">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20,24,20,24" Spacing="16">
+
+            <!-- Cabeçalho -->
+            <Grid ColumnDefinitions="44,*" ColumnSpacing="12">
+                <Border WidthRequest="40"
+                        HeightRequest="40"
+                        VerticalOptions="Start"
+                        Stroke="{StaticResource Borda}"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 12"
+                        BackgroundColor="{StaticResource Superficie}">
+                    <Label Text="&#xf060;" FontFamily="fa" FontSize="15"
+                           TextColor="{StaticResource TextoPrimario}"
+                           HorizontalOptions="Center" VerticalOptions="Center">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding VoltarCommand}" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                </Border>
+                <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                    <Label Text="{Binding TituloAcao}" Style="{StaticResource TituloMedio}" />
+                    <Label Style="{StaticResource LegendaPequena}">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="{Binding EventoNome}" />
+                                <Span Text=" · " />
+                                <Span Text="{Binding SetorNome}" />
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                </VerticalStackLayout>
+            </Grid>
+
+            <!-- Câmera -->
+            <Border BackgroundColor="{StaticResource TextoPrimario}"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 16"
+                    HeightRequest="280">
+                <Grid>
+                    <!-- O leitor é criado e descartado no código, para a câmera parar
+                         de verdade quando a tela sai de cena. -->
+                    <ContentView x:Name="CameraHost" />
+
+                    <!-- Instrução -->
+                    <Border BackgroundColor="#CC0F172A"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 10"
+                            Padding="10,6"
+                            Margin="12"
+                            HorizontalOptions="Center"
+                            VerticalOptions="End">
+                        <Label Text="Aponte para o QR do cartão"
+                               FontFamily="InterMedium"
+                               FontSize="12"
+                               TextColor="{StaticResource Superficie}" />
+                    </Border>
+
+                    <!-- Lanterna -->
+                    <Border WidthRequest="44"
+                            HeightRequest="44"
+                            Margin="12"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 12"
+                            BackgroundColor="#CC0F172A"
+                            HorizontalOptions="End"
+                            VerticalOptions="Start">
+                        <Label Text="&#xf0eb;" FontFamily="fa" FontSize="17"
+                               TextColor="{StaticResource Superficie}"
+                               HorizontalOptions="Center" VerticalOptions="Center">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="AoAlternarLanterna" />
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <Label x:Name="StatusCamera"
+                   Text="Preparando a câmera..."
+                   Style="{StaticResource LegendaPequena}"
+                   HorizontalTextAlignment="Center" />
+
+            <!-- Digitação manual -->
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="14">
+                    <Grid ColumnDefinitions="38,*" ColumnSpacing="10">
+                        <Border WidthRequest="36" HeightRequest="36"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 10"
+                                BackgroundColor="{StaticResource PrimaryContainer}"
+                                VerticalOptions="Center">
+                            <Label Text="&#xf11c;" FontFamily="fa" FontSize="14"
+                                   TextColor="{StaticResource OnPrimaryContainer}"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                        <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                            <Label Text="Ou digite o código" Style="{StaticResource SubtituloPequeno}" />
+                            <Label Text="O código também está impresso no cartão."
+                                   Style="{StaticResource LegendaPequena}" />
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <Border Style="{StaticResource MolduraCampo}">
+                        <Grid ColumnDefinitions="24,*" ColumnSpacing="10">
+                            <Label Text="&#xf09d;" FontFamily="fa" FontSize="16"
+                                   TextColor="{StaticResource TextoMudo}" VerticalOptions="Center" />
+                            <Entry Grid.Column="1"
+                                   Text="{Binding Codigo}"
+                                   Placeholder="Ex.: CART-000123"
+                                   ReturnType="Go"
+                                   ReturnCommand="{Binding ConfirmarCommand}" />
+                        </Grid>
+                    </Border>
+
+                    <!-- Erro -->
+                    <Border IsVisible="{Binding TemErro}"
+                            BackgroundColor="{StaticResource PerigoContainer}"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 12"
+                            Padding="12,10">
+                        <Grid ColumnDefinitions="20,*" ColumnSpacing="8">
+                            <Label Text="&#xf071;" FontFamily="fa" FontSize="14"
+                                   TextColor="{StaticResource OnPerigoContainer}" VerticalOptions="Center" />
+                            <Label Grid.Column="1"
+                                   Text="{Binding MensagemErro}"
+                                   Style="{StaticResource Corpo}"
+                                   TextColor="{StaticResource OnPerigoContainer}" />
+                        </Grid>
+                    </Border>
+
+                    <Grid>
+                        <Button Text="Confirmar código" Command="{Binding ConfirmarCommand}" />
+                        <ActivityIndicator IsVisible="{Binding EstaCarregando}"
+                                           IsRunning="{Binding EstaCarregando}"
+                                           Color="{StaticResource Superficie}"
+                                           WidthRequest="22"
+                                           HeightRequest="22"
+                                           HorizontalOptions="End"
+                                           VerticalOptions="Center"
+                                           Margin="0,0,18,0" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

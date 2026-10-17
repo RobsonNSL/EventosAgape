@@ -1,0 +1,168 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<?xaml-comp compile="true" ?>
+<!--
+    Estilos do "Agape Direct" (design system do Stitch/DESIGN.md).
+    Botões com 52px de altura e raio 12; cards com raio 16 — pensado para uso
+    em pé, com uma mão, durante o evento.
+-->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <!-- ===== Tipografia (Inter, pesos como famílias separadas) ===== -->
+    <Style TargetType="Label">
+        <Setter Property="FontFamily" Value="Inter" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="TextColor" Value="{StaticResource TextoPrimario}" />
+    </Style>
+
+    <Style x:Key="TituloGrande" TargetType="Label">
+        <Setter Property="FontFamily" Value="InterBold" />
+        <Setter Property="FontSize" Value="28" />
+        <Setter Property="TextColor" Value="{StaticResource TextoPrimario}" />
+    </Style>
+
+    <Style x:Key="TituloMedio" TargetType="Label">
+        <Setter Property="FontFamily" Value="InterBold" />
+        <Setter Property="FontSize" Value="24" />
+        <Setter Property="TextColor" Value="{StaticResource TextoPrimario}" />
+    </Style>
+
+    <Style x:Key="Subtitulo" TargetType="Label">
+        <Setter Property="FontFamily" Value="InterSemiBold" />
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="TextColor" Value="{StaticResource TextoPrimario}" />
+    </Style>
+
+    <Style x:Key="SubtituloPequeno" TargetType="Label">
+        <Setter Property="FontFamily" Value="InterSemiBold" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="TextColor" Value="{StaticResource TextoPrimario}" />
+    </Style>
+
+    <Style x:Key="CorpoGrande" TargetType="Label">
+        <Setter Property="FontFamily" Value="Inter" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="TextColor" Value="{StaticResource TextoPrimario}" />
+    </Style>
+
+    <Style x:Key="Corpo" TargetType="Label">
+        <Setter Property="FontFamily" Value="Inter" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="TextColor" Value="{StaticResource TextoPrimario}" />
+    </Style>
+
+    <Style x:Key="Legenda" TargetType="Label">
+        <Setter Property="FontFamily" Value="InterMedium" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="TextColor" Value="{StaticResource TextoSecundario}" />
+    </Style>
+
+    <Style x:Key="LegendaPequena" TargetType="Label">
+        <Setter Property="FontFamily" Value="InterMedium" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="TextColor" Value="{StaticResource TextoSecundario}" />
+    </Style>
+
+    <Style x:Key="ValorGrande" TargetType="Label">
+        <Setter Property="FontFamily" Value="InterExtraBold" />
+        <Setter Property="FontSize" Value="36" />
+        <Setter Property="TextColor" Value="{StaticResource TextoPrimario}" />
+    </Style>
+
+    <Style x:Key="ValorMedio" TargetType="Label">
+        <Setter Property="FontFamily" Value="InterBold" />
+        <Setter Property="FontSize" Value="24" />
+        <Setter Property="TextColor" Value="{StaticResource TextoPrimario}" />
+    </Style>
+
+    <!-- ===== Página ===== -->
+    <Style TargetType="ContentPage" ApplyToDerivedTypes="True">
+        <Setter Property="BackgroundColor" Value="{StaticResource Fundo}" />
+    </Style>
+
+    <!-- ===== Botões — altura 52, raio 12 ===== -->
+    <Style x:Key="BotaoBase" TargetType="Button">
+        <Setter Property="FontFamily" Value="InterSemiBold" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="HeightRequest" Value="52" />
+        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
+        <Setter Property="TextColor" Value="{StaticResource Superficie}" />
+        <Setter Property="Padding" Value="18,0" />
+    </Style>
+
+    <Style TargetType="Button" BasedOn="{StaticResource BotaoBase}" />
+
+    <Style x:Key="BotaoPrimario" TargetType="Button" BasedOn="{StaticResource BotaoBase}" />
+
+    <Style x:Key="BotaoSucesso" TargetType="Button" BasedOn="{StaticResource BotaoBase}">
+        <Setter Property="BackgroundColor" Value="{StaticResource Sucesso}" />
+    </Style>
+
+    <Style x:Key="BotaoDestaque" TargetType="Button" BasedOn="{StaticResource BotaoBase}">
+        <Setter Property="BackgroundColor" Value="{StaticResource Destaque}" />
+        <Setter Property="TextColor" Value="{StaticResource TextoPrimario}" />
+    </Style>
+
+    <Style x:Key="BotaoContorno" TargetType="Button" BasedOn="{StaticResource BotaoBase}">
+        <Setter Property="BackgroundColor" Value="{StaticResource Superficie}" />
+        <Setter Property="TextColor" Value="{StaticResource TextoPrimario}" />
+        <Setter Property="BorderColor" Value="{StaticResource Borda}" />
+        <Setter Property="BorderWidth" Value="1.5" />
+    </Style>
+
+    <Style x:Key="BotaoTexto" TargetType="Button" BasedOn="{StaticResource BotaoBase}">
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="TextColor" Value="{StaticResource Primary}" />
+        <Setter Property="HeightRequest" Value="42" />
+        <Setter Property="FontSize" Value="14" />
+    </Style>
+
+    <!-- ===== Cards ===== -->
+    <Style x:Key="Card" TargetType="Border">
+        <Setter Property="BackgroundColor" Value="{StaticResource Superficie}" />
+        <Setter Property="Stroke" Value="{StaticResource Borda}" />
+        <Setter Property="StrokeThickness" Value="1" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 16" />
+        <Setter Property="Padding" Value="16" />
+        <Setter Property="Shadow">
+            <Setter.Value>
+                <Shadow Brush="#0F172A" Offset="0,2" Radius="6" Opacity="0.06" />
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ===== Campos de texto ===== -->
+    <Style x:Key="MolduraCampo" TargetType="Border">
+        <Setter Property="BackgroundColor" Value="{StaticResource Superficie}" />
+        <Setter Property="Stroke" Value="{StaticResource Borda}" />
+        <Setter Property="StrokeThickness" Value="1.5" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 12" />
+        <Setter Property="Padding" Value="14,0" />
+        <Setter Property="HeightRequest" Value="56" />
+    </Style>
+
+    <Style TargetType="Entry">
+        <Setter Property="FontFamily" Value="Inter" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="TextColor" Value="{StaticResource TextoPrimario}" />
+        <Setter Property="PlaceholderColor" Value="{StaticResource TextoMudo}" />
+        <Setter Property="BackgroundColor" Value="Transparent" />
+    </Style>
+
+    <!-- ===== Chips e badges ===== -->
+    <Style x:Key="Chip" TargetType="Border">
+        <Setter Property="BackgroundColor" Value="{StaticResource Superficie}" />
+        <Setter Property="Stroke" Value="{StaticResource Borda}" />
+        <Setter Property="StrokeThickness" Value="1" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 12" />
+        <Setter Property="Padding" Value="14,9" />
+    </Style>
+
+    <Style x:Key="Badge" TargetType="Border">
+        <Setter Property="StrokeThickness" Value="0" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 8" />
+        <Setter Property="Padding" Value="10,4" />
+    </Style>
+
+</ResourceDictionary>

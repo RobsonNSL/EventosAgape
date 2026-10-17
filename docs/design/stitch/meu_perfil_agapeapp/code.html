@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_stack" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;background-color:#faf8ff;}body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "secondary": "#006e2d", "secondary-fixed": "#7ffc97", "on-tertiary": "#ffffff", "surface-container": "#eaedff", "error": "#ba1a1a", "surface-variant": "#dae2fd", "primary-fixed": "#dbe1ff", "on-tertiary-fixed-variant": "#653e00", "surface-container-lowest": "#ffffff", "on-tertiary-fixed": "#2a1700", "on-background": "#131b2e", "surface-container-low": "#f2f3ff", "on-primary-fixed-variant": "#003ea8", "on-surface-variant": "#434655", "primary-fixed-dim": "#b4c5ff", "secondary-fixed-dim": "#62df7d", "on-primary-fixed": "#00174b", "primary-container": "#2563eb", "surface-container-highest": "#dae2fd", "surface": "#faf8ff", "on-secondary": "#ffffff", "error-container": "#ffdad6", "on-surface": "#131b2e", "primary": "#004ac6", "surface-dim": "#d2d9f4", "tertiary": "#784b00", "on-secondary-fixed-variant": "#005320", "on-error": "#ffffff", "inverse-primary": "#b4c5ff", "inverse-on-surface": "#eef0ff", "tertiary-container": "#996100", "on-error-container": "#93000a", "on-secondary-container": "#007230", "background": "#faf8ff", "secondary-container": "#7cf994", "surface-tint": "#0053db", "outline": "#737686", "tertiary-fixed-dim": "#ffb95f", "tertiary-fixed": "#ffddb8", "on-primary": "#ffffff", "on-tertiary-container": "#ffeedd", "outline-variant": "#c3c6d7", "on-secondary-fixed": "#002109", "surface-bright": "#faf8ff", "inverse-surface": "#283044", "on-primary-container": "#eeefff", "surface-container-high": "#e2e7ff" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-md": "1rem", "space-lg": "1.5rem", "space-xs": "0.25rem", "gutter": "1rem", "space-xl": "2rem", "margin": "1rem", "space-sm": "0.5rem" }, "fontFamily": { "headline-sm": ["Inter"], "headline-md": ["Inter"], "body-md": ["Inter"], "body-lg": ["Inter"], "display-currency": ["Inter"], "title-md": ["Inter"], "title-sm": ["Inter"], "label-md": ["Inter"], "label-sm": ["Inter"], "label-lg": ["Inter"], "headline-lg": ["Inter"] }, "fontSize": { "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}], "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}], "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}], "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}], "display-currency": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.03em", "fontWeight": "800"}], "title-md": ["18px", {"lineHeight": "24px", "fontWeight": "600"}], "title-sm": ["16px", {"lineHeight": "22px", "fontWeight": "600"}], "label-md": ["14px", {"lineHeight": "18px", "fontWeight": "500"}], "label-sm": ["13px", {"lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500"}], "label-lg": ["16px", {"lineHeight": "20px", "fontWeight": "600"}], "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700"}] } } } }</script></head><body class="bg-surface font-body-md text-on-surface flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-space-sm flex items-center justify-between"><div class="flex items-center gap-space-sm"><button aria-label="Voltar" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface hover:bg-surface-variant/40 transition-colors" onclick="history.back()" type="button"><span class="material-symbols-outlined text-[24px]">arrow_back</span></button><h1 class="font-title-md text-title-md text-on-surface tracking-tight truncate">Perfil</h1></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0 mr-space-sm"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></header><main class="flex flex-col relative w-full pt-16 pb-safe bg-surface px-margin"><div class="flex flex-col w-full pb-space-xl">
+<!-- Perfil do Usuário & Card de Credencial -->
+<div class="relative bg-surface-container-lowest rounded-xl shadow-sm p-space-md mt-space-sm mb-space-lg flex flex-col items-center text-center">
+<div class="relative mb-space-sm">
+<div class="w-20 h-20 rounded-full bg-primary flex items-center justify-center text-on-primary font-headline-md text-headline-md shadow-md ring-4 ring-primary-fixed">
+        AS
+      </div>
+<div class="absolute -bottom-1 -right-1 w-7 h-7 bg-secondary rounded-full flex items-center justify-center text-on-secondary shadow-sm">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Ana Souza</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-space-sm">ana.souza@agapeapp.com.br</p>
+<!-- Badges de Função e Status -->
+<div class="flex items-center gap-space-xs flex-wrap justify-center mb-space-md">
+<span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]">badge</span>
+        Operador
+      </span>
+<span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm">
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+        Sessão Ativa
+      </span>
+</div>
+<!-- Contexto Operacional / Terminal -->
+<div class="w-full bg-surface-container-low rounded-lg p-space-sm flex items-center justify-between text-left">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-9 h-9 rounded-lg bg-surface-container-high flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[20px]">storefront</span>
+</div>
+<div class="min-w-0">
+<p class="font-label-sm text-label-sm text-on-surface truncate">Festa da Padroeira 2025</p>
+<p class="font-body-md text-body-md text-on-surface-variant truncate">Terminal #04 (Barraca Pastel)</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline text-[18px] shrink-0">check_circle</span>
+</div>
+</div>
+<!-- Seção de Segurança: Alteração de Senha -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-md mb-space-lg flex flex-col">
+<div class="flex items-center gap-space-sm mb-space-md">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[22px]">lock_reset</span>
+</div>
+<div>
+<h3 class="font-title-sm text-title-sm text-on-surface">Segurança &amp; Acesso</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Altere sua senha de operador</p>
+</div>
+</div>
+<form class="flex flex-col gap-space-md" id="password-form" onsubmit="event.preventDefault(); handlePasswordUpdate();">
+<!-- Campo: Senha Atual -->
+<div class="flex flex-col gap-space-xs">
+<label class="font-label-sm text-label-sm text-on-surface" for="current-password">Senha atual</label>
+<div class="relative flex items-center">
+<input class="w-full h-14 bg-surface-container-lowest rounded-lg px-4 pr-12 text-on-surface placeholder:text-outline text-body-lg focus:outline-none focus:ring-2 focus:ring-primary shadow-sm" id="current-password" name="current-password" placeholder="Digite a senha atual" required="" type="password"/>
+<button aria-label="Alternar exibição da senha atual" class="absolute right-2 w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface rounded-full transition-colors" onclick="togglePasswordVisibility('current-password', 'eye-curr')" type="button">
+<span class="material-symbols-outlined text-[20px]" id="eye-curr">visibility</span>
+</button>
+</div>
+</div>
+<!-- Campo: Nova Senha -->
+<div class="flex flex-col gap-space-xs">
+<label class="font-label-sm text-label-sm text-on-surface" for="new-password">Nova senha</label>
+<div class="relative flex items-center">
+<input class="w-full h-14 bg-surface-container-lowest rounded-lg px-4 pr-12 text-on-surface placeholder:text-outline text-body-lg focus:outline-none focus:ring-2 focus:ring-primary shadow-sm" id="new-password" name="new-password" placeholder="Mínimo de 6 caracteres" required="" type="password"/>
+<button aria-label="Alternar exibição da nova senha" class="absolute right-2 w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface rounded-full transition-colors" onclick="togglePasswordVisibility('new-password', 'eye-new')" type="button">
+<span class="material-symbols-outlined text-[20px]" id="eye-new">visibility</span>
+</button>
+</div>
+<div class="flex items-center gap-1 mt-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[15px] text-primary">info</span>
+<span class="font-label-sm text-label-sm">Use no mínimo 6 dígitos ou letras legíveis.</span>
+</div>
+</div>
+<!-- Campo: Confirmar Nova Senha -->
+<div class="flex flex-col gap-space-xs">
+<label class="font-label-sm text-label-sm text-on-surface" for="confirm-password">Confirmar nova senha</label>
+<div class="relative flex items-center">
+<input class="w-full h-14 bg-surface-container-lowest rounded-lg px-4 pr-12 text-on-surface placeholder:text-outline text-body-lg focus:outline-none focus:ring-2 focus:ring-primary shadow-sm" id="confirm-password" name="confirm-password" placeholder="Repita a nova senha" required="" type="password"/>
+<button aria-label="Alternar exibição da confirmação de senha" class="absolute right-2 w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface rounded-full transition-colors" onclick="togglePasswordVisibility('confirm-password', 'eye-conf')" type="button">
+<span class="material-symbols-outlined text-[20px]" id="eye-conf">visibility</span>
+</button>
+</div>
+</div>
+<!-- Feedback de Sucesso/Alerta -->
+<div class="hidden rounded-lg p-space-sm items-center gap-space-sm bg-secondary-fixed text-on-secondary-fixed" id="password-feedback">
+<span class="material-symbols-outlined text-[20px]">check_circle</span>
+<span class="font-label-md text-label-md">Senha alterada com sucesso!</span>
+</div>
+<!-- Botão de Ação Salvar -->
+<button class="h-14 w-full bg-primary-container text-on-primary font-label-lg text-label-lg rounded-xl flex items-center justify-center gap-space-sm shadow-md active:opacity-90 transition-all mt-space-xs" type="submit">
+<span class="material-symbols-outlined text-[20px]">save</span>
+        Salvar nova senha
+      </button>
+</form>
+</div>
+<!-- Card de Informações da Sessão & App -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-md mb-space-lg flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">cell_tower</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface">Conectividade PDV</span>
+</div>
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+        Sincronizado
+      </div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">offline_bolt</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface">Modo de Operação</span>
+</div>
+<span class="font-label-sm text-label-sm text-secondary font-semibold">Offline Ready (Ativo)</span>
+</div>
+<div class="pt-space-sm flex items-center justify-between text-on-surface-variant">
+<span class="font-label-sm text-label-sm">Versão do App</span>
+<span class="font-label-sm text-label-sm font-medium">AgapeApp v2.4.1 (Build 108)</span>
+</div>
+</div>
+<!-- Botão de Logout / Encerramento -->
+<div class="flex flex-col gap-space-sm">
+<button class="h-14 w-full bg-error-container text-on-error-container font-label-lg text-label-lg rounded-xl flex items-center justify-center gap-space-sm shadow-sm active:bg-error active:text-on-error transition-colors" onclick="document.getElementById('logout-modal').classList.remove('hidden');" type="button">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+      Sair da conta
+    </button>
+<p class="font-label-sm text-label-sm text-on-surface-variant text-center">
+      Encerra o turno de caixa local neste aparelho
+    </p>
+</div>
+<!-- Modal de Confirmação de Logout -->
+<div class="hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-space-md bg-inverse-surface/60 backdrop-blur-sm" id="logout-modal">
+<div class="bg-surface-container-lowest w-full max-w-sm rounded-xl p-space-lg flex flex-col gap-space-md shadow-xl">
+<div class="w-12 h-12 rounded-full bg-error-container text-on-error-container flex items-center justify-center mx-auto">
+<span class="material-symbols-outlined text-[28px]">warning</span>
+</div>
+<div class="text-center">
+<h4 class="font-title-md text-title-md text-on-surface mb-1">Encerrar sessão?</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">
+          Certifique-se de que todas as vendas e fichas foram transmitidas antes de fechar o turno.
+        </p>
+</div>
+<div class="flex flex-col gap-space-sm mt-space-xs">
+<button class="h-13 py-3 w-full bg-error text-on-error font-label-lg text-label-lg rounded-lg flex items-center justify-center gap-space-sm shadow-sm" onclick="history.back()" type="button">
+          Confirmar saída
+        </button>
+<button class="h-13 py-3 w-full bg-surface-container text-on-surface font-label-lg text-label-lg rounded-lg flex items-center justify-center" onclick="document.getElementById('logout-modal').classList.add('hidden');" type="button">
+          Cancelar
+        </button>
+</div>
+</div>
+</div>
+</div>
+<script>
+  function togglePasswordVisibility(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon = document.getElementById(iconId);
+    if (!input || !icon) return;
+
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.textContent = 'visibility_off';
+    } else {
+      input.type = 'password';
+      icon.textContent = 'visibility';
+    }
+  }
+
+  function handlePasswordUpdate() {
+    const feedback = document.getElementById('password-feedback');
+    const form = document.getElementById('password-form');
+    if (!feedback || !form) return;
+
+    const newPass = document.getElementById('new-password').value;
+    const confPass = document.getElementById('confirm-password').value;
+
+    if (newPass !== confPass) {
+      alert('A confirmação da senha não confere com a nova senha digitada.');
+      return;
+    }
+
+    feedback.classList.remove('hidden');
+    feedback.classList.add('flex');
+
+    setTimeout(() => {
+      form.reset();
+      feedback.classList.add('hidden');
+      feedback.classList.remove('flex');
+    }, 3000);
+  }
+</script></main></body></html>

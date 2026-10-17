@@ -3,7 +3,7 @@
 > Acompanha a execução do [`plano-projeto-eventos.md`](plano-projeto-eventos.md) (decisões).
 > Atualizado em: 17/10/2026
 > Legenda: `[x]` concluído · `[ ]` pendente
-> **Situação:** fases 1–4 implementadas na API (build sem avisos; 51 testes de domínio + 3 de aplicação + 6 de infraestrutura). Migrations 0001–0016.
+> **Situação:** fases 1–4 implementadas na API (build sem avisos; 68 testes verdes). Migrations 0001–0016. App mobile (Fase 5) avançado: login (com biometria) → meus eventos → recarga/venda/saldo (QR pela câmera) → perfil → **telas do admin** (dashboard ao vivo, saldos e auditoria), com cache SQLite de leitura — tudo com o design do Google Stitch.
 
 ---
 
@@ -87,12 +87,16 @@
 
 ## 🚀 Fase 5 — Clientes & publicação
 
-### App mobile (.NET MAUI)
-- [ ] Login + biometria (depois do 1º login)
-- [ ] Seleção entre os eventos em que o operador está designado
-- [ ] Recarga e venda com leitura de QR (digitação manual como fallback)
-- [ ] Cache SQLite de leitura (produtos, preços, setores, últimas operações)
-- [ ] Dashboard do admin no app (consome o resumo + SignalR)
+### App mobile (.NET MAUI) — projeto `src/AgapeApp.Mobile` (fora da `AgapeApp.slnx`)
+- [x] Design no **Google Stitch** ("Agape Direct", Material 3) — export em `docs/design/stitch/`; tokens (cores, Inter, componentes) aplicados em `Colors.xaml`/`Styles.xaml`
+- [x] Login (e-mail/senha) + entrada por biometria depois do primeiro login (chave no perfil)
+- [x] Seleção entre os eventos em que o operador está designado (busca + filtros por situação)
+- [x] Recarga e venda com valores/produtos do setor e confirmação idempotente nos retries
+- [x] Saldo do cartão, confirmações de operação e perfil (com troca da própria senha)
+- [x] Leitura do QR pela câmera (`ZXing.Net.Maui.Controls`) — lanterna e confirmação automática
+- [x] Cache SQLite de leitura (eventos, produtos do setor e últimas operações do aparelho; aviso de "dados salvos" sem internet)
+- [x] Dashboard do admin no app (resumo em tempo real via SignalR + saldos em circulação + auditoria paginada)
+- [x] APK autônomo (assemblies embutidas) para instalar por `adb install`/arquivo
 
 ### Publicação
 - [ ] Painel web do admin (futuro, mesma API)
@@ -106,7 +110,8 @@
 
 - [ ] Contrato completo dos endpoints da API (rotas em português) — passo 4 do plano
 - [ ] Mapa de telas e fluxos (operador e admin) — passo 3 do plano
-- [ ] Confirmar fluxo de renovação de token no app
+- [ ] Validar o app em aparelho físico: câmera (QR), biometria, SignalR do dashboard e cache offline
+- [ ] Confirmar fluxo de renovação de token no app — implementado (`SessaoService` renova sozinho); falta validar em aparelho real
 - [ ] Renomear variáveis locais dos testes para inglês (`validador` → `validator` etc.) — oferta em aberto
 - [ ] Avaliar limpeza periódica de tokens de renovação expirados
 - [x] ~~Smoke ponta a ponta das fases 2–4~~ — **concluído em 17/10/2026**: cadastros → operador → abrir evento → recarga idempotente → venda (saldo + estoque) → erros em português → relatórios → Excel. Achou e corrigiu 1 bug real (ordem de INSERT da venda no EF) e validou tudo contra o SQL Server. Estendido no mesmo dia com o **fechamento da fase 2**: editar usuário, e-mail duplicado (409), desativar a si mesmo e rebaixar o último administrador (400), desativar/reativar com login e renovação bloqueados (sessões revogadas), redefinir e trocar a própria senha com restauração dos valores originais.

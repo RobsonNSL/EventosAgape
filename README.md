@@ -166,12 +166,61 @@ src/
   AgapeApp.Application     → casos de uso (CQRS/MediatR), validações (FluentValidation)
   AgapeApp.Infrastructure  → EF Core + SQL Server, FluentMigrator, Argon2, JWT, export Excel
   AgapeApp.Api             → controllers, autenticação, SignalR, Swagger
+  AgapeApp.Mobile          → app .NET MAUI (Android + iPhone) — build próprio, fora da .slnx
 tests/
   AgapeApp.Domain.Tests
   AgapeApp.Application.Tests
   AgapeApp.Infrastructure.Tests
   AgapeApp.Api.IntegrationTests
 ```
+
+## App mobile (AgapeApp.Mobile)
+
+App do operador em **.NET MAUI** — um único projeto para **Android e iPhone** (`src/AgapeApp.Mobile`).
+Fica **fora** da `AgapeApp.slnx` de propósito: o build/teste da API não depende do toolchain mobile (útil no dia do deploy).
+
+```
+dotnet build src/AgapeApp.Mobile -f net10.0-android   # APK autônomo em bin/Debug/net10.0-android
+dotnet build src/AgapeApp.Mobile -f net10.0-ios       # requer Mac (ou Mac pareado)
+```
+
+O build de Debug já gera um **APK autônomo** (as DLLs vão embutidas; `EmbedAssembliesIntoApk` no `.csproj`).
+Para instalar no aparelho conectado por USB:
+
+```
+adb install -r src/AgapeApp.Mobile/bin/Debug/net10.0-android/com.agapeapp.mobile-Signed.apk
+```
+
+O APK fica em torno de **93 MB** no Debug porque leva as arquiteturas **arm64-v8a** (aparelho) e
+**x86_64** (emulador) com símbolos. Com o aparelho plugado, `dotnet build src/AgapeApp.Mobile -f net10.0-android -t:Run`
+compila, instala e abre o app de uma vez.
+
+- **Design:** design system "Agape Direct" (Material 3) gerado no Google Stitch, salvo em `docs/design/stitch/`.
+  Tokens aplicados em `Resources/Styles/Colors.xaml` e `Styles.xaml` (primária `#2563EB`, dinheiro `#16A34A`,
+  recarga `#F59E0B`, fonte Inter, botões 52px/raio 12, cards raio 16).
+- **Telas:** login (com biometria), meus eventos (busca + filtros; o admin alterna entre os dele e todos),
+  operação do evento (com as últimas operações deste aparelho), leitura do QR do cartão **pela câmera**,
+  recarga (valores rápidos + valor livre), confirmação de recarga, venda (catálogo do setor com quantidades),
+  confirmação de venda, saldo do cartão, perfil e troca de senha, além das telas do **administrador**:
+  dashboard do evento (totais + ao vivo pelo SignalR), saldos em circulação e auditoria paginada.
+- **Câmera e biometria:** leitura do QR/código de barras com `ZXing.Net.Maui.Controls` (lanterna e digitação
+  manual como reserva); entrada por biometria com `Plugin.Maui.Biometric` — ativada no primeiro login,
+  ligável/desligável no perfil e desligada ao sair da conta. `minSdk` do Android: **26** (exigência do AndroidX/biometria).
+- **Cache local:** SQLite (`sqlite-net-pcl`) guarda eventos do operador, produtos do setor e as últimas operações
+  deste aparelho; sem internet, as listas aparecem com o aviso "dados salvos" (a **escrita continua exigindo internet**).
+- **Arquitetura:** MVVM (`CommunityToolkit.Mvvm`), Shell para navegação, `ApiClient` + `SessaoService`
+  (tokens no SecureStorage com renovação automática); mensagens de erro vêm da ProblemDetails da API, já em português.
+  O dashboard usa `Microsoft.AspNetCore.SignalR.Client` no hub `/hubs/dashboard` (evento `operacao`).
+- **Endereço da API:** emulador Android usa `http://10.0.2.2:5180`; simulador iOS usa `http://localhost:5180`.
+  Em aparelho físico, toque em **"Configurar endereço do servidor"** na tela de login (só em DEBUG) e rode a API
+  aceitando a rede, com a porta 5180 liberada no firewall:
+
+  ```
+  dotnet run --project src/AgapeApp.Api -- --urls "http://0.0.0.0:5180"
+  ```
+- **Idempotência:** retries de recarga e venda reenviam o mesmo `idOperacaoCliente` — nada é cobrado duas vezes.
+- **Pendências do app:** validar em aparelho físico (câmera, biometria e SignalR), build iOS (requer Mac)
+  e o painel web do administrador (futuro, mesma API).
 
 ## Observações
 

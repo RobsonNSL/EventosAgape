@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AgapeApp.Mobile.Views.LoginPage"
+             Title="Entrar"
+             Shell.NavBarIsVisible="False">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="24,56,24,24" Spacing="0">
+
+            <!-- Marca -->
+            <Image Source="logo_agape.svg"
+                   HeightRequest="84"
+                   WidthRequest="84"
+                   HorizontalOptions="Center" />
+            <Label Text="AgapeApp"
+                   Style="{StaticResource TituloGrande}"
+                   HorizontalOptions="Center"
+                   Margin="0,14,0,0" />
+            <Label Text="Cartão pré-pago dos eventos da igreja"
+                   Style="{StaticResource CorpoGrande}"
+                   TextColor="{StaticResource TextoSecundario}"
+                   HorizontalOptions="Center"
+                   Margin="0,4,0,0" />
+
+            <Border Style="{StaticResource Chip}" HorizontalOptions="Center" Margin="0,16,0,0">
+                <HorizontalStackLayout Spacing="8">
+                    <Label Text="&#xf54e;" FontFamily="fa" FontSize="14"
+                           TextColor="{StaticResource Primary}" VerticalOptions="Center" />
+                    <Label Text="Terminal do operador" Style="{StaticResource Legenda}"
+                           TextColor="{StaticResource Primary}" />
+                </HorizontalStackLayout>
+            </Border>
+
+            <!-- Formulário -->
+            <Border Style="{StaticResource Card}" Margin="0,28,0,0">
+                <VerticalStackLayout Spacing="18">
+
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="E-mail" Style="{StaticResource Legenda}" />
+                        <Border Style="{StaticResource MolduraCampo}">
+                            <Grid ColumnDefinitions="24,*" ColumnSpacing="10">
+                                <Label Text="&#xf0e0;" FontFamily="fa" FontSize="16"
+                                       TextColor="{StaticResource TextoMudo}" VerticalOptions="Center" />
+                                <Entry Grid.Column="1"
+                                       Text="{Binding Email}"
+                                       Keyboard="Email"
+                                       Placeholder="voce@paroquia.com.br"
+                                       ReturnType="Next" />
+                            </Grid>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Senha" Style="{StaticResource Legenda}" />
+                        <Border Style="{StaticResource MolduraCampo}">
+                            <Grid ColumnDefinitions="24,*,40" ColumnSpacing="10">
+                                <Label Text="&#xf023;" FontFamily="fa" FontSize="16"
+                                       TextColor="{StaticResource TextoMudo}" VerticalOptions="Center" />
+                                <Entry Grid.Column="1"
+                                       Text="{Binding Senha}"
+                                       IsPassword="{Binding SenhaEhSecreta}"
+                                       Placeholder="Sua senha"
+                                       ReturnType="Go"
+                                       ReturnCommand="{Binding EntrarCommand}" />
+                                <Label Grid.Column="2"
+                                       Text="{Binding IconeOlho}"
+                                       FontFamily="fa"
+                                       FontSize="16"
+                                       TextColor="{StaticResource TextoSecundario}"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding AlternarVisibilidadeSenhaCommand}" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+                            </Grid>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Erro -->
+                    <Border IsVisible="{Binding TemErro}"
+                            BackgroundColor="{StaticResource PerigoContainer}"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 12"
+                            Padding="12,10">
+                        <Grid ColumnDefinitions="20,*" ColumnSpacing="8">
+                            <Label Text="&#xf071;" FontFamily="fa" FontSize="14"
+                                   TextColor="{StaticResource OnPerigoContainer}" VerticalOptions="Center" />
+                            <Label Grid.Column="1"
+                                   Text="{Binding MensagemErro}"
+                                   Style="{StaticResource Corpo}"
+                                   TextColor="{StaticResource OnPerigoContainer}" />
+                        </Grid>
+                    </Border>
+
+                    <!-- Entrar -->
+                    <Grid>
+                        <Button Text="Entrar"
+                                Command="{Binding EntrarCommand}"
+                                IsEnabled="{Binding NaoEstaCarregando}" />
+                        <ActivityIndicator IsVisible="{Binding EstaCarregando}"
+                                           IsRunning="{Binding EstaCarregando}"
+                                           Color="{StaticResource Superficie}"
+                                           WidthRequest="22"
+                                           HeightRequest="22"
+                                           HorizontalOptions="End"
+                                           VerticalOptions="Center"
+                                           Margin="0,0,18,0" />
+                    </Grid>
+
+                    <Button Text="Entrar com biometria"
+                            Style="{StaticResource BotaoContorno}"
+                            IsVisible="{Binding BiometriaDisponivel}"
+                            Command="{Binding EntrarComBiometriaCommand}" />
+                    <Label Text="A biometria fica disponível após o primeiro login neste aparelho."
+                           Style="{StaticResource LegendaPequena}"
+                           IsVisible="{Binding SemBiometria}"
+                           HorizontalTextAlignment="Center"
+                           Margin="0,-8,0,0" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Label Text="Esqueceu a senha? Procure um administrador do sistema."
+                   Style="{StaticResource LegendaPequena}"
+                   HorizontalTextAlignment="Center"
+                   Margin="0,20,0,0" />
+
+            <Button Text="Configurar endereço do servidor"
+                    Style="{StaticResource BotaoTexto}"
+                    IsVisible="{Binding MostrarConfiguracaoServidor}"
+                    Clicked="AoConfigurarServidor"
+                    Margin="0,8,0,0" />
+
+            <Label Text="AgapeApp v1.0 · Paróquia e quermesses"
+                   Style="{StaticResource LegendaPequena}"
+                   TextColor="{StaticResource TextoMudo}"
+                   HorizontalTextAlignment="Center"
+                   Margin="0,4,0,0" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

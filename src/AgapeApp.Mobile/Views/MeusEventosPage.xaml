@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:AgapeApp.Mobile.Models"
+             x:Class="AgapeApp.Mobile.Views.MeusEventosPage"
+             Title="Eventos"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,Auto,*">
+
+        <!-- Cabeçalho -->
+        <VerticalStackLayout Grid.Row="0" Padding="20,24,20,12" Spacing="14">
+
+            <Grid ColumnDefinitions="*,Auto">
+                <VerticalStackLayout Spacing="2">
+                    <Label Text="Meus Eventos" Style="{StaticResource TituloGrande}" />
+                    <Label Style="{StaticResource Legenda}">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="Olá, " />
+                                <Span Text="{Binding NomeUsuario}" FontFamily="InterSemiBold" />
+                                <Span Text=" · " />
+                                <Span Text="{Binding PerfilUsuario}" />
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                </VerticalStackLayout>
+
+                <Border Grid.Column="1"
+                        WidthRequest="44"
+                        HeightRequest="44"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 14"
+                        BackgroundColor="{StaticResource Primary}"
+                        VerticalOptions="Center">
+                    <Label Text="{Binding Iniciais}"
+                           FontFamily="InterSemiBold"
+                           FontSize="15"
+                           TextColor="{StaticResource Superficie}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding AbrirPerfilCommand}" />
+                    </Border.GestureRecognizers>
+                </Border>
+            </Grid>
+
+            <!-- Busca -->
+            <Border Style="{StaticResource MolduraCampo}" HeightRequest="48">
+                <Grid ColumnDefinitions="20,*" ColumnSpacing="8">
+                    <Label Text="&#xf002;" FontFamily="fa" FontSize="14"
+                           TextColor="{StaticResource TextoMudo}" VerticalOptions="Center" />
+                    <Entry Grid.Column="1"
+                           Text="{Binding Busca}"
+                           Placeholder="Buscar evento ou setor"
+                           FontSize="14" />
+                </Grid>
+            </Border>
+
+            <!-- Visão do administrador: meus eventos × todos os eventos -->
+            <Border IsVisible="{Binding EhAdministrador}"
+                    BackgroundColor="{StaticResource CinzaContainer}"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 12"
+                    Padding="4">
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="4">
+                    <Border Padding="10,9"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 9"
+                            BackgroundColor="Transparent">
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding FonteMeusSelecionada}" Value="True">
+                                <Setter Property="BackgroundColor" Value="{StaticResource Superficie}" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                        <Label Text="Meus eventos"
+                               HorizontalTextAlignment="Center"
+                               FontFamily="InterMedium"
+                               FontSize="13"
+                               TextColor="{StaticResource TextoSecundario}">
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding FonteMeusSelecionada}" Value="True">
+                                    <Setter Property="FontFamily" Value="InterSemiBold" />
+                                    <Setter Property="TextColor" Value="{StaticResource Primary}" />
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SelecionarFonteCommand}" CommandParameter="meus" />
+                        </Border.GestureRecognizers>
+                    </Border>
+
+                    <Border Grid.Column="1"
+                            Padding="10,9"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 9"
+                            BackgroundColor="Transparent">
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding FonteTodosSelecionada}" Value="True">
+                                <Setter Property="BackgroundColor" Value="{StaticResource Superficie}" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                        <Label Text="Todos os eventos"
+                               HorizontalTextAlignment="Center"
+                               FontFamily="InterMedium"
+                               FontSize="13"
+                               TextColor="{StaticResource TextoSecundario}">
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding FonteTodosSelecionada}" Value="True">
+                                    <Setter Property="FontFamily" Value="InterSemiBold" />
+                                    <Setter Property="TextColor" Value="{StaticResource Primary}" />
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SelecionarFonteCommand}" CommandParameter="todos" />
+                        </Border.GestureRecognizers>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- Aviso de modo offline (cache local) -->
+            <Border IsVisible="{Binding ModoOffline}"
+                    BackgroundColor="{StaticResource DestaqueContainer}"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 12"
+                    Padding="12,10">
+                <Grid ColumnDefinitions="20,*" ColumnSpacing="8">
+                    <Label Text="&#xf071;" FontFamily="fa" FontSize="14"
+                           TextColor="{StaticResource OnDestaqueContainer}" VerticalOptions="Center" />
+                    <Label Grid.Column="1"
+                           Text="Sem conexão com o servidor. Mostrando os eventos salvos neste aparelho."
+                           Style="{StaticResource LegendaPequena}"
+                           TextColor="{StaticResource OnDestaqueContainer}" />
+                </Grid>
+            </Border>
+
+            <!-- Erro -->
+            <Border IsVisible="{Binding TemErro}"
+                    BackgroundColor="{StaticResource PerigoContainer}"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 12"
+                    Padding="12,10">
+                <Grid ColumnDefinitions="20,*" ColumnSpacing="8">
+                    <Label Text="&#xf071;" FontFamily="fa" FontSize="14"
+                           TextColor="{StaticResource OnPerigoContainer}" VerticalOptions="Center" />
+                    <Label Grid.Column="1"
+                           Text="{Binding MensagemErro}"
+                           Style="{StaticResource Corpo}"
+                           TextColor="{StaticResource OnPerigoContainer}" />
+                </Grid>
+            </Border>
+        </VerticalStackLayout>
+
+        <!-- Filtros -->
+        <ScrollView Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalScrollBarVisibility="Never"
+                    Padding="20,0,20,10">
+            <HorizontalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding Filtros}">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate x:DataType="models:FiltroChip">
+                        <Border Style="{StaticResource Chip}" Padding="14,8">
+                            <Border.Triggers>
+                                <DataTrigger TargetType="Border" Binding="{Binding Selecionado}" Value="True">
+                                    <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
+                                    <Setter Property="Stroke" Value="{StaticResource Primary}" />
+                                </DataTrigger>
+                            </Border.Triggers>
+                            <Label Text="{Binding Texto}" Style="{StaticResource Legenda}">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding Selecionado}" Value="True">
+                                        <Setter Property="TextColor" Value="{StaticResource Superficie}" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelecionarFiltroCommand}"
+                                    CommandParameter="{Binding .}" />
+                            </Border.GestureRecognizers>
+                        </Border>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </HorizontalStackLayout>
+        </ScrollView>
+
+        <!-- Lista -->
+        <RefreshView Grid.Row="2"
+                     Command="{Binding AtualizarCommand}"
+                     IsRefreshing="{Binding EstaCarregando}"
+                     RefreshColor="{StaticResource Primary}">
+            <CollectionView ItemsSource="{Binding Eventos}"
+                            SelectionMode="None"
+                            VerticalScrollBarVisibility="Never">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="12" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout Padding="40,60" Spacing="10">
+                        <Label Text="&#xf073;" FontFamily="fa" FontSize="34"
+                               TextColor="{StaticResource TextoMudo}"
+                               HorizontalOptions="Center" />
+                        <Label Text="{Binding TituloListaVazia}"
+                               Style="{StaticResource SubtituloPequeno}"
+                               HorizontalTextAlignment="Center" />
+                        <Label Text="{Binding TextoListaVazia}"
+                               Style="{StaticResource Corpo}"
+                               TextColor="{StaticResource TextoSecundario}"
+                               HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:EventoCartao">
+                        <Border Style="{StaticResource Card}" Margin="20,0">
+                            <Grid ColumnDefinitions="4,*" ColumnSpacing="14">
+                                <BoxView Color="{Binding SituacaoCor}"
+                                         WidthRequest="4"
+                                         CornerRadius="2"
+                                         VerticalOptions="Fill" />
+                                <VerticalStackLayout Grid.Column="1" Spacing="10">
+
+                                    <HorizontalStackLayout Spacing="8">
+                                        <Border Style="{StaticResource Badge}" BackgroundColor="{Binding SituacaoFundo}">
+                                            <Label Text="{Binding SituacaoTexto}"
+                                                   Style="{StaticResource LegendaPequena}"
+                                                   TextColor="{Binding SituacaoCor}" />
+                                        </Border>
+                                        <Border Style="{StaticResource Badge}" BackgroundColor="{StaticResource PrimaryContainer}"
+                                                IsVisible="{Binding MostrarSetor}">
+                                            <Label Text="{Binding SetorNome}"
+                                                   Style="{StaticResource LegendaPequena}"
+                                                   TextColor="{StaticResource OnPrimaryContainer}" />
+                                        </Border>
+                                        <Border Style="{StaticResource Badge}"
+                                                BackgroundColor="{StaticResource CinzaContainer}"
+                                                IsVisible="{Binding MostrarAvisoLiberacao}">
+                                            <Label Text="Aguardando liberação"
+                                                   Style="{StaticResource LegendaPequena}"
+                                                   TextColor="{StaticResource Cinza}" />
+                                        </Border>
+                                    </HorizontalStackLayout>
+
+                                    <Label Text="{Binding Nome}" Style="{StaticResource Subtitulo}" />
+
+                                    <HorizontalStackLayout Spacing="6">
+                                        <Label Text="&#xf073;" FontFamily="fa" FontSize="13"
+                                               TextColor="{StaticResource TextoSecundario}" VerticalOptions="Center" />
+                                        <Label Text="{Binding DataTexto}" Style="{StaticResource Legenda}" />
+                                    </HorizontalStackLayout>
+
+                                    <Button Text="{Binding TextoBotao}"
+                                            IsVisible="{Binding MostrarOperar}"
+                                            IsEnabled="{Binding PodeOperar}"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.OperarCommand}"
+                                            CommandParameter="{Binding .}" />
+
+                                    <Button Text="Abrir dashboard"
+                                            Style="{StaticResource BotaoContorno}"
+                                            IsVisible="{Binding MostrarDashboard}"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.AbrirDashboardCommand}"
+                                            CommandParameter="{Binding .}" />
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+    </Grid>
+</ContentPage>

@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:helpers="clr-namespace:AgapeApp.Mobile.Helpers"
+             xmlns:models="clr-namespace:AgapeApp.Mobile.Models"
+             x:Class="AgapeApp.Mobile.Views.DashboardPage"
+             Title="Dashboard"
+             Shell.NavBarIsVisible="False">
+
+    <ContentPage.Resources>
+        <helpers:MoedaConverter x:Key="Moeda" />
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Cabeçalho + status do tempo real -->
+        <VerticalStackLayout Grid.Row="0" Padding="20,24,20,8" Spacing="12">
+            <Grid ColumnDefinitions="44,*,Auto" ColumnSpacing="12">
+                <Border WidthRequest="40"
+                        HeightRequest="40"
+                        VerticalOptions="Start"
+                        Stroke="{StaticResource Borda}"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 12"
+                        BackgroundColor="{StaticResource Superficie}">
+                    <Label Text="&#xf060;" FontFamily="fa" FontSize="15"
+                           TextColor="{StaticResource TextoPrimario}"
+                           HorizontalOptions="Center" VerticalOptions="Center">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding VoltarCommand}" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                </Border>
+                <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                    <Label Text="Dashboard" Style="{StaticResource TituloMedio}" />
+                    <Label Text="{Binding EventoNome}"
+                           Style="{StaticResource LegendaPequena}"
+                           LineBreakMode="TailTruncation" />
+                </VerticalStackLayout>
+
+                <Border Grid.Column="2"
+                        Style="{StaticResource Badge}"
+                        BackgroundColor="{Binding FundoTempoReal}"
+                        VerticalOptions="Center">
+                    <HorizontalStackLayout Spacing="6">
+                        <BoxView WidthRequest="8"
+                                 HeightRequest="8"
+                                 CornerRadius="4"
+                                 Color="{Binding CorTempoReal}"
+                                 VerticalOptions="Center" />
+                        <Label Text="{Binding TextoTempoReal}"
+                               FontFamily="InterSemiBold"
+                               FontSize="11"
+                               TextColor="{Binding CorTempoReal}" />
+                    </HorizontalStackLayout>
+                </Border>
+            </Grid>
+        </VerticalStackLayout>
+
+        <RefreshView Grid.Row="1"
+                     Command="{Binding AtualizarCommand}"
+                     IsRefreshing="{Binding EstaCarregando}"
+                     RefreshColor="{StaticResource Primary}">
+            <ScrollView>
+                <VerticalStackLayout Padding="20,4,20,24" Spacing="14">
+
+                    <Label Text="{Binding TextoAtualizacao}"
+                           Style="{StaticResource LegendaPequena}"
+                           HorizontalTextAlignment="Center" />
+
+                    <!-- Erro -->
+                    <Border IsVisible="{Binding TemErro}"
+                            BackgroundColor="{StaticResource PerigoContainer}"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 12"
+                            Padding="12,10">
+                        <Grid ColumnDefinitions="20,*" ColumnSpacing="8">
+                            <Label Text="&#xf071;" FontFamily="fa" FontSize="14"
+                                   TextColor="{StaticResource OnPerigoContainer}" VerticalOptions="Center" />
+                            <Label Grid.Column="1"
+                                   Text="{Binding MensagemErro}"
+                                   Style="{StaticResource Corpo}"
+                                   TextColor="{StaticResource OnPerigoContainer}" />
+                        </Grid>
+                    </Border>
+
+                    <!-- Recargas × vendas -->
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                        <Border Style="{StaticResource Card}" Padding="14">
+                            <VerticalStackLayout Spacing="6">
+                                <Border WidthRequest="36" HeightRequest="36"
+                                        StrokeThickness="0"
+                                        StrokeShape="RoundRectangle 10"
+                                        BackgroundColor="{StaticResource DestaqueContainer}"
+                                        HorizontalOptions="Start">
+                                    <Label Text="&#xf0d6;" FontFamily="fa" FontSize="15"
+                                           TextColor="{StaticResource OnDestaqueContainer}"
+                                           HorizontalOptions="Center" VerticalOptions="Center" />
+                                </Border>
+                                <Label Text="Recargas" Style="{StaticResource LegendaPequena}" />
+                                <Label Text="{Binding TextoRecargas}"
+                                       FontFamily="InterBold"
+                                       FontSize="20" />
+                                <Label Text="{Binding TextoQuantidadeRecargas}"
+                                       Style="{StaticResource LegendaPequena}" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <Border Grid.Column="1" Style="{StaticResource Card}" Padding="14">
+                            <VerticalStackLayout Spacing="6">
+                                <Border WidthRequest="36" HeightRequest="36"
+                                        StrokeThickness="0"
+                                        StrokeShape="RoundRectangle 10"
+                                        BackgroundColor="{StaticResource SucessoContainer}"
+                                        HorizontalOptions="Start">
+                                    <Label Text="&#xf07a;" FontFamily="fa" FontSize="15"
+                                           TextColor="{StaticResource OnSucessoContainer}"
+                                           HorizontalOptions="Center" VerticalOptions="Center" />
+                                </Border>
+                                <Label Text="Vendas" Style="{StaticResource LegendaPequena}" />
+                                <Label Text="{Binding TextoVendas}"
+                                       FontFamily="InterBold"
+                                       FontSize="20" />
+                                <Label Text="{Binding TextoQuantidadeVendas}"
+                                       Style="{StaticResource LegendaPequena}" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </Grid>
+
+                    <!-- Saldo em circulação -->
+                    <Border Style="{StaticResource Card}"
+                            BackgroundColor="{StaticResource SuperficieTint}"
+                            StrokeThickness="0">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Saldo em circulação" Style="{StaticResource Legenda}" />
+                            <Label Text="{Binding TextoSaldoEmCirculacao}"
+                                   FontFamily="InterExtraBold"
+                                   FontSize="32"
+                                   TextColor="{StaticResource Sucesso}" />
+                            <Label Text="Recargas menos vendas: o que ainda está nos cartões dos clientes."
+                                   Style="{StaticResource LegendaPequena}" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Atalhos -->
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                        <Button Text="Ver saldos"
+                                Style="{StaticResource BotaoContorno}"
+                                Command="{Binding AbrirSaldosCommand}" />
+                        <Button Grid.Column="1"
+                                Text="Ver auditoria"
+                                Style="{StaticResource BotaoContorno}"
+                                Command="{Binding AbrirAuditoriaCommand}" />
+                    </Grid>
+
+                    <!-- Por setor -->
+                    <VerticalStackLayout Spacing="8" IsVisible="{Binding TemPorSetor}">
+                        <Label Text="Por setor" Style="{StaticResource SubtituloPequeno}" Margin="4,8,0,0" />
+                        <VerticalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding PorSetor}">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="models:ResumoPorSetorDTO">
+                                    <Border Style="{StaticResource Card}" Padding="14">
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                            <Label Text="{Binding SetorNome}"
+                                                   Style="{StaticResource SubtituloPequeno}"
+                                                   VerticalOptions="Center" />
+                                            <VerticalStackLayout Grid.Column="1" Spacing="2" HorizontalOptions="End">
+                                                <HorizontalStackLayout Spacing="4" HorizontalOptions="End">
+                                                    <Label Text="Recargas" Style="{StaticResource LegendaPequena}" FontSize="11" />
+                                                    <Label Text="{Binding TotalRecargas, Converter={StaticResource Moeda}}"
+                                                           FontFamily="InterSemiBold"
+                                                           FontSize="12"
+                                                           TextColor="{StaticResource OnDestaqueContainer}" />
+                                                </HorizontalStackLayout>
+                                                <HorizontalStackLayout Spacing="4" HorizontalOptions="End">
+                                                    <Label Text="Vendas" Style="{StaticResource LegendaPequena}" FontSize="11" />
+                                                    <Label Text="{Binding TotalVendas, Converter={StaticResource Moeda}}"
+                                                           FontFamily="InterSemiBold"
+                                                           FontSize="12"
+                                                           TextColor="{StaticResource OnSucessoContainer}" />
+                                                </HorizontalStackLayout>
+                                            </VerticalStackLayout>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+
+                    <!-- Por operador -->
+                    <VerticalStackLayout Spacing="8" IsVisible="{Binding TemPorOperador}">
+                        <Label Text="Por operador" Style="{StaticResource SubtituloPequeno}" Margin="4,8,0,0" />
+                        <VerticalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding PorOperador}">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="models:ResumoPorOperadorDTO">
+                                    <Border Style="{StaticResource Card}" Padding="14">
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                            <Label Text="{Binding UsuarioNome}"
+                                                   Style="{StaticResource SubtituloPequeno}"
+                                                   VerticalOptions="Center"
+                                                   LineBreakMode="TailTruncation" />
+                                            <VerticalStackLayout Grid.Column="1" Spacing="2" HorizontalOptions="End">
+                                                <HorizontalStackLayout Spacing="4" HorizontalOptions="End">
+                                                    <Label Text="Recargas" Style="{StaticResource LegendaPequena}" FontSize="11" />
+                                                    <Label Text="{Binding TotalRecargas, Converter={StaticResource Moeda}}"
+                                                           FontFamily="InterSemiBold"
+                                                           FontSize="12"
+                                                           TextColor="{StaticResource OnDestaqueContainer}" />
+                                                </HorizontalStackLayout>
+                                                <HorizontalStackLayout Spacing="4" HorizontalOptions="End">
+                                                    <Label Text="Vendas" Style="{StaticResource LegendaPequena}" FontSize="11" />
+                                                    <Label Text="{Binding TotalVendas, Converter={StaticResource Moeda}}"
+                                                           FontFamily="InterSemiBold"
+                                                           FontSize="12"
+                                                           TextColor="{StaticResource OnSucessoContainer}" />
+                                                </HorizontalStackLayout>
+                                            </VerticalStackLayout>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+
+                    <!-- Por produto -->
+                    <VerticalStackLayout Spacing="8" IsVisible="{Binding TemPorProduto}">
+                        <Label Text="Vendas por produto" Style="{StaticResource SubtituloPequeno}" Margin="4,8,0,0" />
+                        <VerticalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding PorProduto}">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="models:ResumoPorProdutoDTO">
+                                    <Border Style="{StaticResource Card}" Padding="14">
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                            <VerticalStackLayout Spacing="2" VerticalOptions="Center">
+                                                <Label Text="{Binding ProdutoNome}"
+                                                       Style="{StaticResource SubtituloPequeno}"
+                                                       LineBreakMode="TailTruncation" />
+                                                <Label Text="Quantidade vendida"
+                                                       Style="{StaticResource LegendaPequena}" FontSize="11" />
+                                            </VerticalStackLayout>
+                                            <VerticalStackLayout Grid.Column="1" Spacing="2" HorizontalOptions="End">
+                                                <Label Text="{Binding TotalVendido, Converter={StaticResource Moeda}}"
+                                                       FontFamily="InterSemiBold"
+                                                       FontSize="13"
+                                                       TextColor="{StaticResource OnSucessoContainer}"
+                                                       HorizontalTextAlignment="End" />
+                                                <Label Text="{Binding QuantidadeVendida}"
+                                                       Style="{StaticResource LegendaPequena}"
+                                                       HorizontalTextAlignment="End" />
+                                            </VerticalStackLayout>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+
+                    <!-- Dica -->
+                    <Border BackgroundColor="{StaticResource SuperficieTint}"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 12"
+                            Padding="12,10">
+                        <Grid ColumnDefinitions="20,*" ColumnSpacing="8">
+                            <Label Text="&#xf0e7;" FontFamily="fa" FontSize="14"
+                                   TextColor="{StaticResource Primary}" VerticalOptions="Center" />
+                            <Label Grid.Column="1"
+                                   Text="Os números se atualizam sozinhos a cada recarga ou venda registrada no evento."
+                                   Style="{StaticResource LegendaPequena}" />
+                        </Grid>
+                    </Border>
+                </VerticalStackLayout>
+            </ScrollView>
+        </RefreshView>
+    </Grid>
+</ContentPage>

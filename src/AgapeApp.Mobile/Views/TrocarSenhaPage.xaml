@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AgapeApp.Mobile.Views.TrocarSenhaPage"
+             Title="Alterar senha"
+             Shell.NavBarIsVisible="False">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20,24,20,24" Spacing="16">
+
+            <!-- Cabeçalho -->
+            <Grid ColumnDefinitions="44,*" ColumnSpacing="12">
+                <Border WidthRequest="40"
+                        HeightRequest="40"
+                        VerticalOptions="Start"
+                        Stroke="{StaticResource Borda}"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 12"
+                        BackgroundColor="{StaticResource Superficie}">
+                    <Label Text="&#xf060;" FontFamily="fa" FontSize="15"
+                           TextColor="{StaticResource TextoPrimario}"
+                           HorizontalOptions="Center" VerticalOptions="Center">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding VoltarCommand}" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                </Border>
+                <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                    <Label Text="Alterar minha senha" Style="{StaticResource TituloMedio}" />
+                    <Label Text="Sua conta de operador" Style="{StaticResource LegendaPequena}" />
+                </VerticalStackLayout>
+            </Grid>
+
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="16">
+
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Senha atual" Style="{StaticResource Legenda}" />
+                        <Border Style="{StaticResource MolduraCampo}">
+                            <Grid ColumnDefinitions="24,*" ColumnSpacing="10">
+                                <Label Text="&#xf023;" FontFamily="fa" FontSize="16"
+                                       TextColor="{StaticResource TextoMudo}" VerticalOptions="Center" />
+                                <Entry Grid.Column="1"
+                                       Text="{Binding SenhaAtual}"
+                                       IsPassword="True"
+                                       Placeholder="Sua senha de hoje" />
+                            </Grid>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Nova senha" Style="{StaticResource Legenda}" />
+                        <Border Style="{StaticResource MolduraCampo}">
+                            <Grid ColumnDefinitions="24,*" ColumnSpacing="10">
+                                <Label Text="&#xf084;" FontFamily="fa" FontSize="16"
+                                       TextColor="{StaticResource TextoMudo}" VerticalOptions="Center" />
+                                <Entry Grid.Column="1"
+                                       Text="{Binding NovaSenha}"
+                                       IsPassword="True"
+                                       Placeholder="Pelo menos 8 caracteres" />
+                            </Grid>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Confirmar nova senha" Style="{StaticResource Legenda}" />
+                        <Border Style="{StaticResource MolduraCampo}">
+                            <Grid ColumnDefinitions="24,*" ColumnSpacing="10">
+                                <Label Text="&#xf084;" FontFamily="fa" FontSize="16"
+                                       TextColor="{StaticResource TextoMudo}" VerticalOptions="Center" />
+                                <Entry Grid.Column="1"
+                                       Text="{Binding ConfirmacaoNovaSenha}"
+                                       IsPassword="True"
+                                       Placeholder="Repita a nova senha" />
+                            </Grid>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Erro -->
+                    <Border IsVisible="{Binding TemErro}"
+                            BackgroundColor="{StaticResource PerigoContainer}"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 12"
+                            Padding="12,10">
+                        <Grid ColumnDefinitions="20,*" ColumnSpacing="8">
+                            <Label Text="&#xf071;" FontFamily="fa" FontSize="14"
+                                   TextColor="{StaticResource OnPerigoContainer}" VerticalOptions="Center" />
+                            <Label Grid.Column="1"
+                                   Text="{Binding MensagemErro}"
+                                   Style="{StaticResource Corpo}"
+                                   TextColor="{StaticResource OnPerigoContainer}" />
+                        </Grid>
+                    </Border>
+
+                    <Grid>
+                        <Button Text="Salvar nova senha" Command="{Binding SalvarCommand}" />
+                        <ActivityIndicator IsVisible="{Binding EstaCarregando}"
+                                           IsRunning="{Binding EstaCarregando}"
+                                           Color="{StaticResource Superficie}"
+                                           WidthRequest="22"
+                                           HeightRequest="22"
+                                           HorizontalOptions="End"
+                                           VerticalOptions="Center"
+                                           Margin="0,0,18,0" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <Border BackgroundColor="{StaticResource SuperficieTint}"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 12"
+                    Padding="12,10">
+                <Grid ColumnDefinitions="20,*" ColumnSpacing="8">
+                    <Label Text="&#xf05a;" FontFamily="fa" FontSize="14"
+                           TextColor="{StaticResource Primary}" VerticalOptions="Center" />
+                    <Label Grid.Column="1"
+                           Text="Ao trocar a senha, os aparelhos conectados precisarão entrar de novo. Este aparelho continua ativo por até 30 minutos."
+                           Style="{StaticResource LegendaPequena}" />
+                </Grid>
+            </Border>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:AgapeApp.Mobile.Models"
+             x:Class="AgapeApp.Mobile.Views.SaldosPage"
+             Title="Saldos em circulação"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <VerticalStackLayout Grid.Row="0" Padding="20,24,20,12" Spacing="12">
+            <Grid ColumnDefinitions="44,*" ColumnSpacing="12">
+                <Border WidthRequest="40"
+                        HeightRequest="40"
+                        VerticalOptions="Start"
+                        Stroke="{StaticResource Borda}"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 12"
+                        BackgroundColor="{StaticResource Superficie}">
+                    <Label Text="&#xf060;" FontFamily="fa" FontSize="15"
+                           TextColor="{StaticResource TextoPrimario}"
+                           HorizontalOptions="Center" VerticalOptions="Center">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding VoltarCommand}" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                </Border>
+                <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                    <Label Text="Saldos em circulação" Style="{StaticResource TituloMedio}" />
+                    <Label Text="{Binding EventoNome}"
+                           Style="{StaticResource LegendaPequena}"
+                           LineBreakMode="TailTruncation" />
+                </VerticalStackLayout>
+            </Grid>
+
+            <Border Style="{StaticResource Card}"
+                    BackgroundColor="{StaticResource SuperficieTint}"
+                    StrokeThickness="0">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                    <VerticalStackLayout Spacing="2">
+                        <Label Text="Total em circulação" Style="{StaticResource Legenda}" />
+                        <Label Text="{Binding TextoTotal}"
+                               FontFamily="InterExtraBold"
+                               FontSize="28"
+                               TextColor="{StaticResource Sucesso}" />
+                    </VerticalStackLayout>
+                    <Border Grid.Column="1"
+                            Style="{StaticResource Badge}"
+                            BackgroundColor="{StaticResource SucessoContainer}"
+                            VerticalOptions="Center">
+                        <Label Text="{Binding TextoQuantidade}"
+                               Style="{StaticResource LegendaPequena}"
+                               TextColor="{StaticResource OnSucessoContainer}" />
+                    </Border>
+                </Grid>
+            </Border>
+
+            <Label Text="Só aparecem cartões com saldo maior que zero."
+                   Style="{StaticResource LegendaPequena}" />
+
+            <!-- Erro -->
+            <Border IsVisible="{Binding TemErro}"
+                    BackgroundColor="{StaticResource PerigoContainer}"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 12"
+                    Padding="12,10">
+                <Grid ColumnDefinitions="20,*" ColumnSpacing="8">
+                    <Label Text="&#xf071;" FontFamily="fa" FontSize="14"
+                           TextColor="{StaticResource OnPerigoContainer}" VerticalOptions="Center" />
+                    <Label Grid.Column="1"
+                           Text="{Binding MensagemErro}"
+                           Style="{StaticResource Corpo}"
+                           TextColor="{StaticResource OnPerigoContainer}" />
+                </Grid>
+            </Border>
+        </VerticalStackLayout>
+
+        <RefreshView Grid.Row="1"
+                     Command="{Binding AtualizarCommand}"
+                     IsRefreshing="{Binding EstaCarregando}"
+                     RefreshColor="{StaticResource Primary}">
+            <CollectionView ItemsSource="{Binding Cartoes}"
+                            SelectionMode="None"
+                            VerticalScrollBarVisibility="Never"
+                            Margin="20,0">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout Padding="40,50" Spacing="10">
+                        <Label Text="&#xf09d;" FontFamily="fa" FontSize="34"
+                               TextColor="{StaticResource TextoMudo}"
+                               HorizontalOptions="Center" />
+                        <Label Text="Nenhum cartão com saldo"
+                               Style="{StaticResource SubtituloPequeno}"
+                               HorizontalTextAlignment="Center" />
+                        <Label Text="Todo o valor recarregado no evento já foi gasto (ou ainda não houve recargas)."
+                               Style="{StaticResource Corpo}"
+                               TextColor="{StaticResource TextoSecundario}"
+                               HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:CartaoSaldoItem">
+                        <Border Style="{StaticResource Card}" Padding="14">
+                            <Grid ColumnDefinitions="38,*,Auto" ColumnSpacing="12">
+                                <Border WidthRequest="36" HeightRequest="36"
+                                        StrokeThickness="0"
+                                        StrokeShape="RoundRectangle 10"
+                                        BackgroundColor="{StaticResource PrimaryContainer}"
+                                        VerticalOptions="Center">
+                                    <Label Text="&#xf09d;" FontFamily="fa" FontSize="14"
+                                           TextColor="{StaticResource OnPrimaryContainer}"
+                                           HorizontalOptions="Center" VerticalOptions="Center" />
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                    <Label Text="Cartão" Style="{StaticResource LegendaPequena}" FontSize="11" />
+                                    <Label Text="{Binding CartaoCodigo}" Style="{StaticResource SubtituloPequeno}" />
+                                </VerticalStackLayout>
+                                <Label Grid.Column="2"
+                                       Text="{Binding TextoSaldo}"
+                                       FontFamily="InterBold"
+                                       FontSize="16"
+                                       TextColor="{StaticResource Sucesso}"
+                                       VerticalOptions="Center" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+    </Grid>
+</ContentPage>

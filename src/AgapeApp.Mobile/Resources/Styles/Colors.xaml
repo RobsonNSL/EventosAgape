@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<?xaml-comp compile="true" ?>
+<!--
+    Paleta "Agape Direct" — extraída do design system gerado no Stitch (DESIGN.md).
+    Modo claro exclusivo: pensado para operação em pé, sob luz forte.
+-->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <!-- Ações principais / navegação -->
+    <Color x:Key="Primary">#2563EB</Color>
+    <Color x:Key="PrimaryEscuro">#004AC6</Color>
+    <Color x:Key="PrimaryContainer">#DBE1FF</Color>
+    <Color x:Key="OnPrimaryContainer">#00174B</Color>
+
+    <!-- Dinheiro / saldo positivo / sucesso -->
+    <Color x:Key="Sucesso">#16A34A</Color>
+    <Color x:Key="SucessoContainer">#DCFCE7</Color>
+    <Color x:Key="OnSucessoContainer">#166534</Color>
+
+    <!-- Recarga / destaque / atenção -->
+    <Color x:Key="Destaque">#F59E0B</Color>
+    <Color x:Key="DestaqueContainer">#FEF3C7</Color>
+    <Color x:Key="OnDestaqueContainer">#92400E</Color>
+
+    <!-- Erro / saldo insuficiente / ações destrutivas -->
+    <Color x:Key="Perigo">#DC2626</Color>
+    <Color x:Key="PerigoContainer">#FEE2E2</Color>
+    <Color x:Key="OnPerigoContainer">#991B1B</Color>
+
+    <!-- Superfícies e textos -->
+    <Color x:Key="Fundo">#F8FAFC</Color>
+    <Color x:Key="Superficie">#FFFFFF</Color>
+    <Color x:Key="SuperficieTint">#F2F3FF</Color>
+    <Color x:Key="TextoPrimario">#0F172A</Color>
+    <Color x:Key="TextoSecundario">#64748B</Color>
+    <Color x:Key="TextoMudo">#94A3B8</Color>
+    <Color x:Key="Borda">#E2E8F0</Color>
+    <Color x:Key="BordaForte">#CBD5E1</Color>
+    <Color x:Key="Cinza">#475569</Color>
+    <Color x:Key="CinzaContainer">#F1F5F9</Color>
+
+</ResourceDictionary>

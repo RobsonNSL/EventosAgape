@@ -11,4 +11,5 @@
     <Project Path="tests/AgapeApp.Domain.Tests/AgapeApp.Domain.Tests.csproj" />
     <Project Path="tests/AgapeApp.Infrastructure.Tests/AgapeApp.Infrastructure.Tests.csproj" />
   </Folder>
+  <Project Path="src/AgapeApp.Mobile/AgapeApp.Mobile.csproj" />
 </Solution>
