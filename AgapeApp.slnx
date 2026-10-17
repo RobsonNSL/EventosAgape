@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/AgapeApp.Api/AgapeApp.Api.csproj" />
+    <Project Path="src/AgapeApp.Aplicacao/AgapeApp.Aplicacao.csproj" />
+    <Project Path="src/AgapeApp.Dominio/AgapeApp.Dominio.csproj" />
+    <Project Path="src/AgapeApp.Infraestrutura/AgapeApp.Infraestrutura.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/AgapeApp.Api.TestesIntegracao/AgapeApp.Api.TestesIntegracao.csproj" />
+    <Project Path="tests/AgapeApp.Aplicacao.Testes/AgapeApp.Aplicacao.Testes.csproj" />
+    <Project Path="tests/AgapeApp.Dominio.Testes/AgapeApp.Dominio.Testes.csproj" />
+    <Project Path="tests/AgapeApp.Infraestrutura.Testes/AgapeApp.Infraestrutura.Testes.csproj" />
+  </Folder>
+</Solution>
