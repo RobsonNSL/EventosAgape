@@ -2,13 +2,17 @@ namespace AgapeApp.Mobile.Config;
 
 /// <summary>
 /// Endereço da API e identificação do aparelho.
-/// Desenvolvimento: o emulador Android enxerga o PC como 10.0.2.2; o simulador
-/// iOS usa localhost. Aparelho físico (ou produção): defina a URL real do
-/// servidor na tela de login ("Configurar endereço do servidor", em DEBUG).
+/// Desenvolvimento no aparelho físico: a API local é exposta por um túnel ngrok
+/// (HTTPS) — com o túnel ativo, o celular alcança o PC de qualquer rede.
+/// Para apontar para outro servidor (emulador, homologação), use
+/// "Configurar endereço do servidor" na tela de login (DEBUG).
 /// </summary>
 public static class AppConfig
 {
     private const string ChaveApiBaseUrl = "agape.api_base_url";
+
+    /// <summary>Túnel ngrok que expõe a API local (atualize se o endereço mudar).</summary>
+    private const string ApiBaseUrlPadrao = "https://spathic-nonanachronistically-velia.ngrok-free.dev";
 
     public static string ApiBaseUrl
     {
@@ -18,11 +22,7 @@ public static class AppConfig
             if (!string.IsNullOrWhiteSpace(personalizada))
                 return personalizada;
 
-#if ANDROID
-            return "http://10.0.2.2:5180";
-#else
-            return "http://localhost:5180";
-#endif
+            return ApiBaseUrlPadrao;
         }
     }
 

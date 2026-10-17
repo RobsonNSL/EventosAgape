@@ -211,9 +211,13 @@ compila, instala e abre o app de uma vez.
 - **Arquitetura:** MVVM (`CommunityToolkit.Mvvm`), Shell para navegação, `ApiClient` + `SessaoService`
   (tokens no SecureStorage com renovação automática); mensagens de erro vêm da ProblemDetails da API, já em português.
   O dashboard usa `Microsoft.AspNetCore.SignalR.Client` no hub `/hubs/dashboard` (evento `operacao`).
-- **Endereço da API:** emulador Android usa `http://10.0.2.2:5180`; simulador iOS usa `http://localhost:5180`.
-  Em aparelho físico, toque em **"Configurar endereço do servidor"** na tela de login (só em DEBUG) e rode a API
-  aceitando a rede, com a porta 5180 liberada no firewall:
+- **Endereço da API:** o app usa por padrão o **túnel ngrok** que expõe a API local em HTTPS
+  (`AppConfig.ApiBaseUrlPadrao`, em `src/AgapeApp.Mobile/Config/AppConfig.cs`) — funciona no aparelho físico em
+  qualquer rede, sem liberar firewall. Fluxo: rode a API local (`dotnet run --project src/AgapeApp.Api`) e, em
+  outro terminal, `ngrok http 5180`; se o endereço do túnel mudar, atualize a constante **ou** toque em
+  **"Configurar endereço do servidor"** na tela de login (só em DEBUG), que grava a URL no aparelho.
+  Sem ngrok (mesma rede): emulador Android `http://10.0.2.2:5180`, simulador iOS `http://localhost:5180`,
+  aparelho físico `http://IP-DO-PC:5180` com a porta liberada:
 
   ```
   dotnet run --project src/AgapeApp.Api -- --urls "http://0.0.0.0:5180"

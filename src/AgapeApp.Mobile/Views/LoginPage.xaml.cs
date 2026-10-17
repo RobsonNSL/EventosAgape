@@ -24,7 +24,7 @@ public partial class LoginPage : ContentPage
     {
         var url = await DisplayPromptAsync(
             "Servidor",
-            "Endereço da API (ex.: http://192.168.0.10:5180)",
+            "Endereço da API (ex.: https://xxxx.ngrok-free.dev)",
             initialValue: AppConfig.ApiBaseUrl,
             keyboard: Keyboard.Url);
 

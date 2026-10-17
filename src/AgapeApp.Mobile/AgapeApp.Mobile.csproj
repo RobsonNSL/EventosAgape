@@ -53,11 +53,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<!-- App Icon -->
-		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#2563EB" />
+		<!-- App Icon: brasão da paróquia em medalhão circular (gerado de Images\logo.jpg);
+		     o foreground ocupa a zona segura das máscaras do Android. -->
+		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appicon_brasao.png" Color="#CCCCCC" />
 
-		<!-- Splash Screen -->
-		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#2563EB" BaseSize="128,128" />
+		<!-- Splash Screen: recorte da imagem de fundo (cantos arredondados) sobre
+		     o mesmo tom escuro da tela de login, criado a partir de Images\background.jpg. -->
+		<MauiSplashScreen Include="Resources\Splash\splash.png" Color="#0B0F1A" />
 
 		<!-- Images -->
 		<MauiImage Include="Resources\Images\*" />

@@ -69,6 +69,10 @@ public class ApiClient
         if (!string.IsNullOrWhiteSpace(token))
             requisicao.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
+        // Com o túnel ngrok (plano gratuito) o navegador vê uma página de aviso;
+        // este cabeçalho garante que o app receba sempre o JSON da API.
+        requisicao.Headers.TryAddWithoutValidation("ngrok-skip-browser-warning", "true");
+
         try
         {
             return await _http.SendAsync(requisicao, ct);

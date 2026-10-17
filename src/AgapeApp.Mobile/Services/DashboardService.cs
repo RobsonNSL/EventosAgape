@@ -30,6 +30,9 @@ public class DashboardService : IAsyncDisposable
                 {
                     // No WebSocket o servidor lê o token da query string (?access_token=...).
                     opcoes.AccessTokenProvider = async () => await _sessao.ObterTokenValidoAsync() ?? string.Empty;
+
+                    // Mesmo motivo do ApiClient: evita a página de aviso do ngrok gratuito.
+                    opcoes.Headers["ngrok-skip-browser-warning"] = "true";
                 })
                 .WithAutomaticReconnect()
                 .Build();
