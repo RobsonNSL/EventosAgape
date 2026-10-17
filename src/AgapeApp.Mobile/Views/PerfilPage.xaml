@@ -97,7 +97,7 @@
                 </Grid>
             </Border>
 
-            <Label Text="AgapeApp v1.0 · Paróquia e quermesses"
+            <Label Text="AgapeApp v1.0 · Paróquia Maria Imaculada"
                    Style="{StaticResource LegendaPequena}"
                    TextColor="{StaticResource TextoMudo}"
                    HorizontalTextAlignment="Center"

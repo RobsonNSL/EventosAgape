@@ -205,7 +205,7 @@
                         Clicked="AoConfigurarServidor"
                         Margin="0,8,0,0" />
 
-                <Label Text="AgapeApp v1.0 · Paróquia e quermesses"
+                <Label Text="AgapeApp v1.0 · Paróquia Maria Imaculada"
                        Style="{StaticResource LegendaPequena}"
                        TextColor="{StaticResource LoginTextoFraco}"
                        HorizontalTextAlignment="Center"
