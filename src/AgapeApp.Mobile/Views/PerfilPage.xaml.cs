@@ -16,6 +16,7 @@ public partial class PerfilPage : ContentPage
     {
         base.OnAppearing();
         _vm.Carregar();
+        await _vm.CarregarFotoAsync();
         await _vm.PrepararBiometriaAsync();
     }
 

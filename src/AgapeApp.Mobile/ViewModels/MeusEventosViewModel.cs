@@ -15,14 +15,20 @@ namespace AgapeApp.Mobile.ViewModels;
 public partial class MeusEventosViewModel : BaseViewModel
 {
     private readonly CacheService _cache;
+    private readonly FotoUsuarioService _fotos;
 
     private IReadOnlyList<MeuEventoDTO> _meus = [];
     private IReadOnlyList<EventoDTO> _todos = [];
     private string _filtro = "todos";
 
-    public MeusEventosViewModel(ApiClient api, SessaoService sessao, CacheService cache) : base(api, sessao)
+    public MeusEventosViewModel(
+        ApiClient api,
+        SessaoService sessao,
+        CacheService cache,
+        FotoUsuarioService fotos) : base(api, sessao)
     {
         _cache = cache;
+        _fotos = fotos;
     }
 
     public ObservableCollection<EventoCartao> Eventos { get; } = [];
@@ -44,6 +50,15 @@ public partial class MeusEventosViewModel : BaseViewModel
 
     [ObservableProperty]
     private string iniciais = string.Empty;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TemFoto), nameof(SemFoto))]
+    private ImageSource? foto;
+
+    /// <summary>Há foto de perfil (o avatar mostra a imagem no lugar das iniciais).</summary>
+    public bool TemFoto => Foto is not null;
+
+    public bool SemFoto => Foto is null;
 
     [ObservableProperty]
     private string perfilUsuario = string.Empty;
@@ -68,6 +83,7 @@ public partial class MeusEventosViewModel : BaseViewModel
             NomeUsuario = usuario?.Nome.Split(' ')[0] ?? "voluntário";
             Iniciais = Formatos.Iniciais(usuario?.Nome);
             PerfilUsuario = usuario?.Perfil ?? string.Empty;
+            Foto = await _fotos.CarregarAsync(usuario?.CaminhoFoto);
 
             try
             {
@@ -133,10 +149,56 @@ public partial class MeusEventosViewModel : BaseViewModel
         if (cartao is null || !cartao.PodeOperar || Shell.Current is null)
             return;
 
-        await Shell.Current.GoToAsync(
-            $"operacao?eventoId={cartao.EventoId}&setorId={cartao.SetorId}" +
-            $"&eventoNome={Uri.EscapeDataString(cartao.Nome)}&setorNome={Uri.EscapeDataString(cartao.SetorNome)}");
+        // Operador já tem o setor da designação; abre o terminal direto.
+        if (!cartao.VisaoAdmin)
+        {
+            await AbrirOperacaoAsync(cartao.EventoId, cartao.SetorId, cartao.Nome, cartao.SetorNome);
+            return;
+        }
+
+        // Administrador opera em qualquer setor: escolhe o setor antes de abrir o terminal.
+        await ExecutarAsync(async () =>
+        {
+            var setores = await Api.GetAsync<List<SetorDTO>>($"api/eventos/{cartao.EventoId}/setores");
+
+            if (setores.Count == 0)
+            {
+                MensagemErro = "Este evento ainda não tem setores. Cadastre um setor para operar.";
+                return;
+            }
+
+            var setor = setores.Count == 1
+                ? setores[0]
+                : await EscolherSetorAsync(setores);
+
+            if (setor is null)
+                return;
+
+            await AbrirOperacaoAsync(cartao.EventoId, setor.Id, cartao.Nome, setor.Nome);
+        });
     }
+
+    private static async Task<SetorDTO?> EscolherSetorAsync(IReadOnlyList<SetorDTO> setores)
+    {
+        if (Shell.Current is null)
+            return null;
+
+        var escolhido = await Shell.Current.DisplayActionSheetAsync(
+            "Operar em qual setor?",
+            "Cancelar",
+            null,
+            setores.Select(setor => setor.Nome).ToArray());
+
+        if (string.IsNullOrWhiteSpace(escolhido) || escolhido == "Cancelar")
+            return null;
+
+        return setores.FirstOrDefault(setor => setor.Nome == escolhido);
+    }
+
+    private static Task AbrirOperacaoAsync(Guid eventoId, Guid setorId, string eventoNome, string setorNome)
+        => Shell.Current!.GoToAsync(
+            $"operacao?eventoId={eventoId}&setorId={setorId}" +
+            $"&eventoNome={Uri.EscapeDataString(eventoNome)}&setorNome={Uri.EscapeDataString(setorNome)}");
 
     [RelayCommand]
     private async Task AbrirDashboardAsync(EventoCartao? cartao)

@@ -18,11 +18,20 @@
                             StrokeThickness="0"
                             StrokeShape="RoundRectangle 20"
                             BackgroundColor="{StaticResource Primary}">
-                        <Label Text="{Binding Iniciais}"
-                               FontFamily="InterBold"
-                               FontSize="22"
-                               TextColor="{StaticResource Superficie}"
-                               HorizontalOptions="Center" VerticalOptions="Center" />
+                        <Grid>
+                            <Label Text="{Binding Iniciais}"
+                                   FontFamily="InterBold"
+                                   FontSize="22"
+                                   TextColor="{StaticResource Superficie}"
+                                   IsVisible="{Binding SemFoto}"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                            <Image Source="{Binding Foto}"
+                                   Aspect="AspectFill"
+                                   IsVisible="{Binding TemFoto}" />
+                        </Grid>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding AlterarFotoCommand}" />
+                        </Border.GestureRecognizers>
                     </Border>
                     <VerticalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
                         <Label Text="{Binding Nome}" Style="{StaticResource Subtitulo}" />
@@ -40,6 +49,39 @@
 
             <!-- Conta -->
             <Label Text="Conta" Style="{StaticResource Legenda}" Margin="4,8,0,0" />
+            <Border Style="{StaticResource Card}">
+                <Grid ColumnDefinitions="24,*,20" ColumnSpacing="12">
+                    <Label Text="&#xf030;" FontFamily="fa" FontSize="16"
+                           TextColor="{StaticResource TextoPrimario}" VerticalOptions="Center" />
+                    <Label Grid.Column="1"
+                           Text="Alterar minha foto"
+                           Style="{StaticResource CorpoGrande}"
+                           VerticalOptions="Center" />
+                    <Label Grid.Column="2" Text="&#xf054;" FontFamily="fa" FontSize="13"
+                           TextColor="{StaticResource TextoMudo}" VerticalOptions="Center" />
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding AlterarFotoCommand}" />
+                    </Border.GestureRecognizers>
+                </Grid>
+            </Border>
+
+            <Border Style="{StaticResource Card}" IsVisible="{Binding TemFoto}">
+                <Grid ColumnDefinitions="24,*,20" ColumnSpacing="12">
+                    <Label Text="&#xf2ed;" FontFamily="fa" FontSize="16"
+                           TextColor="{StaticResource Perigo}" VerticalOptions="Center" />
+                    <Label Grid.Column="1"
+                           Text="Remover minha foto"
+                           Style="{StaticResource CorpoGrande}"
+                           TextColor="{StaticResource Perigo}"
+                           VerticalOptions="Center" />
+                    <Label Grid.Column="2" Text="&#xf054;" FontFamily="fa" FontSize="13"
+                           TextColor="{StaticResource TextoMudo}" VerticalOptions="Center" />
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding RemoverFotoCommand}" />
+                    </Border.GestureRecognizers>
+                </Grid>
+            </Border>
+
             <Border Style="{StaticResource Card}">
                 <Grid ColumnDefinitions="24,*,20" ColumnSpacing="12">
                     <Label Text="&#xf084;" FontFamily="fa" FontSize="16"

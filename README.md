@@ -48,6 +48,8 @@ Na primeira execução a API:
 | POST | `/api/autenticacao/sair` | Autenticado |
 | GET | `/api/autenticacao/eu` | Autenticado |
 | POST | `/api/autenticacao/alterar-senha` | Autenticado (exige a senha atual) |
+| POST | `/api/autenticacao/minha-foto` | Autenticado (só a própria foto; `multipart/form-data`, campo `arquivo`) |
+| DELETE | `/api/autenticacao/minha-foto` | Autenticado (só a própria foto) |
 | POST | `/api/usuarios` | Administrador |
 | GET | `/api/usuarios` | Administrador |
 | PUT | `/api/usuarios/{id}` | Administrador |
@@ -199,10 +201,16 @@ compila, instala e abre o app de uma vez.
   Tokens aplicados em `Resources/Styles/Colors.xaml` e `Styles.xaml` (primária `#2563EB`, dinheiro `#16A34A`,
   recarga `#F59E0B`, fonte Inter, botões 52px/raio 12, cards raio 16).
 - **Telas:** login (com biometria), meus eventos (busca + filtros; o admin alterna entre os dele e todos),
-  operação do evento (com as últimas operações deste aparelho), leitura do QR do cartão **pela câmera**,
-  recarga (valores rápidos + valor livre), confirmação de recarga, venda (catálogo do setor com quantidades),
-  confirmação de venda, saldo do cartão, perfil e troca de senha, além das telas do **administrador**:
-  dashboard do evento (totais + ao vivo pelo SignalR), saldos em circulação e auditoria paginada.
+  operação do evento (com as últimas operações deste aparelho; o admin escolhe o setor antes de abrir),
+  leitura do QR do cartão **pela câmera**, recarga (valores rápidos + valor livre), confirmação de recarga,
+  venda (catálogo do setor com quantidades), confirmação de venda, saldo do cartão, perfil (com a **foto de perfil**)
+  e troca de senha, além das telas do **administrador**: dashboard do evento (totais + ao vivo pelo SignalR),
+  saldos em circulação e auditoria paginada.
+- **Aba Gestão (só para o administrador):** o operador vê apenas Eventos e Perfil; o admin ganha a aba **Gestão**
+  com usuários, produtos, eventos e cartões (criar/editar/ativar/desativar). Em **detalhes do evento**: setores,
+  produtos do evento (vincular ao setor, preço e estoque com **entrada** e **baixa**) e operadores designados,
+  além de **abrir/encerrar** o evento. O admin também pode **operar o terminal** em qualquer setor de qualquer
+  evento aberto (regra que já existe na API).
 - **Câmera e biometria:** leitura do QR/código de barras com `ZXing.Net.Maui.Controls` (lanterna e digitação
   manual como reserva); entrada por biometria com `Plugin.Maui.Biometric` — ativada no primeiro login,
   ligável/desligável no perfil e desligada ao sair da conta. `minSdk` do Android: **26** (exigência do AndroidX/biometria).
@@ -223,8 +231,8 @@ compila, instala e abre o app de uma vez.
   dotnet run --project src/AgapeApp.Api -- --urls "http://0.0.0.0:5180"
   ```
 - **Idempotência:** retries de recarga e venda reenviam o mesmo `idOperacaoCliente` — nada é cobrado duas vezes.
-- **Pendências do app:** validar em aparelho físico (câmera, biometria e SignalR), build iOS (requer Mac)
-  e o painel web do administrador (futuro, mesma API).
+- **Pendências do app:** validar em aparelho físico (câmera, biometria, SignalR, foto de perfil e as telas de
+  gestão), build iOS (requer Mac) e o painel web do administrador (futuro, mesma API).
 
 ## Observações
 
@@ -239,6 +247,9 @@ compila, instala e abre o app de uma vez.
 - **Chave JWT:** o valor de `Autenticacao:ChaveSecreta` é derivado via SHA-256 para virar a chave de assinatura —
   funciona com qualquer tamanho de segredo (em produção use um segredo longo e aleatório).
 - **Datas:** armazenadas em UTC (`datetimeoffset`).
+- **Fotos de perfil:** gravadas em `src/AgapeApp.Api/wwwroot/imagens/` (coluna `caminho_foto`, migration 0017)
+  e servidas como arquivos estáticos em `{apiBase}/imagens/{arquivo}`. Aceita jpg/jpeg/png/webp até 5 MB
+  (tipo conferido pelos *magic bytes*, não pela extensão); só o próprio usuário troca/remove a sua foto.
 - **Mensagens de erro:** centralizadas em `src/AgapeApp.Domain/Resources/MensagensErro.resx`
   (acesso tipado por `MensagensErro.NomeDaChave`), usadas pelo domínio, validators, handlers e tratador global.
   Campos ausentes e falhas de JSON/binding também devolvem ProblemDetails em português.

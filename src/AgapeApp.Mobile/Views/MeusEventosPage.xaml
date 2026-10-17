@@ -33,12 +33,18 @@
                         StrokeShape="RoundRectangle 14"
                         BackgroundColor="{StaticResource Primary}"
                         VerticalOptions="Center">
-                    <Label Text="{Binding Iniciais}"
-                           FontFamily="InterSemiBold"
-                           FontSize="15"
-                           TextColor="{StaticResource Superficie}"
-                           HorizontalOptions="Center"
-                           VerticalOptions="Center" />
+                    <Grid>
+                        <Label Text="{Binding Iniciais}"
+                               FontFamily="InterSemiBold"
+                               FontSize="15"
+                               TextColor="{StaticResource Superficie}"
+                               IsVisible="{Binding SemFoto}"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+                        <Image Source="{Binding Foto}"
+                               Aspect="AspectFill"
+                               IsVisible="{Binding TemFoto}" />
+                    </Grid>
                     <Border.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding AbrirPerfilCommand}" />
                     </Border.GestureRecognizers>

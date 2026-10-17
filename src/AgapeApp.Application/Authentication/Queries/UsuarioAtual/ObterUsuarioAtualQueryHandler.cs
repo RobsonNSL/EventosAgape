@@ -20,6 +20,6 @@ public class ObterUsuarioAtualQueryHandler : IRequestHandler<ObterUsuarioAtualQu
         var usuario = await _usuarioRepository.ObterPorIdAsync(consulta.UsuarioId, cancellationToken)
             ?? throw new NaoEncontradoException(MensagensErro.UsuarioNaoEncontrado);
 
-        return new UsuarioAutenticadoDTO(usuario.Id, usuario.Nome, usuario.Email, usuario.Perfil.ToString());
+        return new UsuarioAutenticadoDTO(usuario.Id, usuario.Nome, usuario.Email, usuario.Perfil.ToString(), usuario.CaminhoFoto);
     }
 }

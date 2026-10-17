@@ -61,6 +61,7 @@ public class AlterarAtivacaoUsuarioCommandHandler
             usuario.Email,
             usuario.Perfil.ToString(),
             usuario.Ativo,
-            usuario.CriadoEm);
+            usuario.CriadoEm,
+            usuario.CaminhoFoto);
     }
 }

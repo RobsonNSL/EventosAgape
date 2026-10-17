@@ -1,9 +1,9 @@
 # AgapeApp — Documento de Decisões
 
-> **Versão:** 1.10 · **Data:** 17/10/2026
+> **Versão:** 1.11 · **Data:** 17/10/2026
 >
 > Documento vivo: atualizar a cada decisão nova. Nenhuma linha de código começa antes deste documento estar fechado.
-> **Status:** domínio fechado · técnico fechado · **nome definido: AgapeApp** · estrutura + autenticação + migrations **concluídas e validadas localmente (SQL Server — banco `dbAgape`)**.
+> **Status:** domínio fechado · técnico fechado · **nome definido: AgapeApp** · estrutura + autenticação + migrations **concluídas e validadas localmente (SQL Server — banco `dbAgape`)** · fases 1–4 da API e **fase 5 do app (operador + admin) implementadas** — falta validar no aparelho físico e publicar.
 
 ---
 
@@ -128,7 +128,7 @@ Aplicativo para a **pastoral de eventos da igreja**, baseado em **cartão pré-p
 Colunas comuns: `id`, `criado_em`, `atualizado_em`. Cadastros com **exclusão lógica** (`ativo`) — nada é apagado de verdade.
 
 **Cadastros**
-- `usuarios` — nome, email (único), senha_hash (Argon2id), perfil (`Administrador` | `Operador`), ativo.
+- `usuarios` — nome, email (único), senha_hash (Argon2id), perfil (`Administrador` | `Operador`), ativo, caminho_foto (opcional, foto de perfil em `wwwroot/imagens`).
 - `tokens_renovacao` — sessões / refresh tokens (hash do token, expiração, revogação, dispositivo).
 - `cartoes` — codigo (único, ex. `CARD-0001`), ativo.
 - `produtos` — nome, preco_padrao (opcional, para pré-preencher no evento), ativo.
@@ -189,7 +189,7 @@ Fluxo de dependência: `Api → Application → Domain`; `Infrastructure` e `Mob
 2. ~~Estrutura do repositório + autenticação + migrations~~ → **concluído (API)** ✅ — solução DDD, login/renovação/saída, Argon2id, JWT + refresh com rotação, FluentMigrator forward-only (`usuarios`, `tokens_renovacao`) e criação do primeiro administrador na inicialização.
 3. **Mapa de telas e fluxos** (operador e admin).
 4. **Detalhamento dos casos de uso / endpoints** (contrato completo da API).
-5. ~~Plano de implementação faseado~~ → **fases 2–4 concluídas na API** ✅, **fase 2 fechada com usuários completos** ✅ (editar, ativar/desativar, redefinir/trocar senha) — cadastros base, operações (recarga e venda idempotentes com saldo/estoque), relatórios com exportação Excel e notificações em tempo real (SignalR). Falta o app MAUI (fase 5).
+5. ~~Plano de implementação faseado~~ → **fases 2–4 concluídas na API** ✅, **fase 2 fechada com usuários completos** ✅ (editar, ativar/desativar, redefinir/trocar senha) — cadastros base, operações (recarga e venda idempotentes com saldo/estoque), relatórios com exportação Excel e notificações em tempo real (SignalR). **Fase 5 (app MAUI) implementada** ✅ — fluxo do operador completo, telas do administrador + **aba Gestão** (usuários, produtos, eventos e cartões; detalhes do evento com setores, produtos e operadores) e **foto de perfil**; falta validar no aparelho físico e publicar.
 6. **Hospedagem**: definir provedor de nuvem (API + banco de dados).
 
 ### Pontos em aberto registrados

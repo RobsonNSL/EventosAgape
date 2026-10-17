@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:AgapeApp.Mobile.Models"
+             x:Class="AgapeApp.Mobile.Views.EventoDetalhePage"
+             Title="Evento"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Cabeçalho -->
+        <VerticalStackLayout Grid.Row="0" Padding="20,24,20,12" Spacing="12">
+            <Grid ColumnDefinitions="44,*,Auto" ColumnSpacing="12">
+                <Border WidthRequest="40"
+                        HeightRequest="40"
+                        VerticalOptions="Start"
+                        Stroke="{StaticResource Borda}"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 12"
+                        BackgroundColor="{StaticResource Superficie}">
+                    <Label Text="&#xf060;" FontFamily="fa" FontSize="15"
+                           TextColor="{StaticResource TextoPrimario}"
+                           HorizontalOptions="Center" VerticalOptions="Center">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding VoltarCommand}" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                </Border>
+                <VerticalStackLayout Grid.Column="1" Spacing="3" VerticalOptions="Center">
+                    <Label Text="{Binding EventoNome}"
+                           Style="{StaticResource TituloMedio}"
+                           LineBreakMode="TailTruncation" />
+                    <Label Text="{Binding DataTexto}" Style="{StaticResource LegendaPequena}" />
+                </VerticalStackLayout>
+                <Border Grid.Column="2"
+                        Style="{StaticResource Badge}"
+                        BackgroundColor="{Binding SituacaoFundo}"
+                        VerticalOptions="Center">
+                    <Label Text="{Binding SituacaoTexto}"
+                           Style="{StaticResource LegendaPequena}"
+                           FontSize="11"
+                           TextColor="{Binding SituacaoCor}" />
+                </Border>
+            </Grid>
+
+            <!-- Erro -->
+            <Border IsVisible="{Binding TemErro}"
+                    BackgroundColor="{StaticResource PerigoContainer}"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 12"
+                    Padding="12,10">
+                <Grid ColumnDefinitions="20,*" ColumnSpacing="8">
+                    <Label Text="&#xf071;" FontFamily="fa" FontSize="14"
+                           TextColor="{StaticResource OnPerigoContainer}" VerticalOptions="Center" />
+                    <Label Grid.Column="1"
+                           Text="{Binding MensagemErro}"
+                           Style="{StaticResource Corpo}"
+                           TextColor="{StaticResource OnPerigoContainer}" />
+                </Grid>
+            </Border>
+        </VerticalStackLayout>
+
+        <RefreshView Grid.Row="1"
+                     Command="{Binding AtualizarCommand}"
+                     IsRefreshing="{Binding EstaCarregando}"
+                     RefreshColor="{StaticResource Primary}">
+            <ScrollView>
+                <VerticalStackLayout Padding="20,0,20,24" Spacing="18">
+
+                    <!-- Ações do evento -->
+                    <Grid ColumnDefinitions="*,*"
+                          ColumnSpacing="10"
+                          RowDefinitions="Auto,Auto"
+                          RowSpacing="10">
+                        <Button Text="Editar dados"
+                                Style="{StaticResource BotaoContorno}"
+                                HeightRequest="46"
+                                FontSize="13"
+                                Command="{Binding EditarCommand}" />
+                        <Button Grid.Column="1"
+                                Text="{Binding TextoAbrirEncerrar}"
+                                IsVisible="{Binding PodeAbrirOuEncerrar}"
+                                HeightRequest="46"
+                                FontSize="13"
+                                Command="{Binding AbrirEncerrarCommand}" />
+                        <Button Grid.Row="1"
+                                Grid.ColumnSpan="2"
+                                Text="Ver dashboard do evento"
+                                Style="{StaticResource BotaoContorno}"
+                                HeightRequest="46"
+                                FontSize="13"
+                                Command="{Binding AbrirDashboardCommand}" />
+                    </Grid>
+
+                    <!-- Setores -->
+                    <VerticalStackLayout Spacing="10">
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                            <VerticalStackLayout Spacing="2" VerticalOptions="Center">
+                                <Label Text="Setores" Style="{StaticResource SubtituloPequeno}" />
+                                <Label Text="Onde o evento vende" Style="{StaticResource LegendaPequena}" />
+                            </VerticalStackLayout>
+                            <Button Grid.Column="1"
+                                    Text="Novo"
+                                    Style="{StaticResource BotaoContorno}"
+                                    HeightRequest="36"
+                                    Padding="12,0"
+                                    FontSize="12"
+                                    VerticalOptions="Center"
+                                    Command="{Binding NovoSetorCommand}" />
+                        </Grid>
+
+                        <Label Text="Nenhum setor ainda. Crie o primeiro (ex.: Pastel, Bebidas)."
+                               Style="{StaticResource LegendaPequena}"
+                               IsVisible="{Binding SemSetores}" />
+
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding Setores}" Spacing="10">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="models:SetorItem">
+                                    <Border Style="{StaticResource Card}" Padding="14">
+                                        <Grid ColumnDefinitions="36,*,20" ColumnSpacing="10">
+                                            <Border WidthRequest="34"
+                                                    HeightRequest="34"
+                                                    StrokeThickness="0"
+                                                    StrokeShape="RoundRectangle 10"
+                                                    BackgroundColor="{StaticResource DestaqueContainer}"
+                                                    VerticalOptions="Center">
+                                                <Label Text="&#xf54e;" FontFamily="fa" FontSize="13"
+                                                       TextColor="{StaticResource OnDestaqueContainer}"
+                                                       HorizontalOptions="Center" VerticalOptions="Center" />
+                                            </Border>
+                                            <Label Grid.Column="1"
+                                                   Text="{Binding Nome}"
+                                                   Style="{StaticResource CorpoGrande}"
+                                                   VerticalOptions="Center"
+                                                   LineBreakMode="TailTruncation" />
+                                            <Label Grid.Column="2" Text="&#xf054;" FontFamily="fa" FontSize="13"
+                                                   TextColor="{StaticResource TextoMudo}" VerticalOptions="Center" />
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.AcoesSetorCommand}"
+                                                    CommandParameter="{Binding .}" />
+                                            </Border.GestureRecognizers>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+
+                    <!-- Produtos do evento -->
+                    <VerticalStackLayout Spacing="10">
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                            <VerticalStackLayout Spacing="2" VerticalOptions="Center">
+                                <Label Text="Produtos do evento" Style="{StaticResource SubtituloPequeno}" />
+                                <Label Text="Preço praticado e estoque de cada item" Style="{StaticResource LegendaPequena}" />
+                            </VerticalStackLayout>
+                            <Button Grid.Column="1"
+                                    Text="Vincular"
+                                    Style="{StaticResource BotaoContorno}"
+                                    HeightRequest="36"
+                                    Padding="12,0"
+                                    FontSize="12"
+                                    VerticalOptions="Center"
+                                    Command="{Binding VincularProdutoCommand}" />
+                        </Grid>
+
+                        <Label Text="Nenhum produto vinculado. Vincule os itens que o evento vende."
+                               Style="{StaticResource LegendaPequena}"
+                               IsVisible="{Binding SemProdutos}" />
+
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding Produtos}" Spacing="10">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="models:EventoProdutoItem">
+                                    <Border Style="{StaticResource Card}" Padding="14">
+                                        <Grid ColumnDefinitions="36,*,Auto,20" ColumnSpacing="10">
+                                            <Border WidthRequest="34"
+                                                    HeightRequest="34"
+                                                    StrokeThickness="0"
+                                                    StrokeShape="RoundRectangle 10"
+                                                    BackgroundColor="{StaticResource SucessoContainer}"
+                                                    VerticalOptions="Center">
+                                                <Label Text="&#xf02b;" FontFamily="fa" FontSize="13"
+                                                       TextColor="{StaticResource OnSucessoContainer}"
+                                                       HorizontalOptions="Center" VerticalOptions="Center" />
+                                            </Border>
+                                            <VerticalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
+                                                <Label Text="{Binding ProdutoNome}"
+                                                       Style="{StaticResource CorpoGrande}"
+                                                       LineBreakMode="TailTruncation" />
+                                                <Label Text="{Binding TextoPreco}"
+                                                       Style="{StaticResource LegendaPequena}" />
+                                            </VerticalStackLayout>
+                                            <Border Grid.Column="2"
+                                                    Style="{StaticResource Badge}"
+                                                    BackgroundColor="{Binding EstoqueFundo}"
+                                                    VerticalOptions="Center">
+                                                <Label Text="{Binding TextoEstoque}"
+                                                       Style="{StaticResource LegendaPequena}"
+                                                       FontSize="11"
+                                                       TextColor="{Binding EstoqueCor}" />
+                                            </Border>
+                                            <Label Grid.Column="3" Text="&#xf054;" FontFamily="fa" FontSize="13"
+                                                   TextColor="{StaticResource TextoMudo}" VerticalOptions="Center" />
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.AcoesProdutoCommand}"
+                                                    CommandParameter="{Binding .}" />
+                                            </Border.GestureRecognizers>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+
+                    <!-- Operadores -->
+                    <VerticalStackLayout Spacing="10">
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                            <VerticalStackLayout Spacing="2" VerticalOptions="Center">
+                                <Label Text="Operadores" Style="{StaticResource SubtituloPequeno}" />
+                                <Label Text="Quem opera cada setor" Style="{StaticResource LegendaPequena}" />
+                            </VerticalStackLayout>
+                            <Button Grid.Column="1"
+                                    Text="Designar"
+                                    Style="{StaticResource BotaoContorno}"
+                                    HeightRequest="36"
+                                    Padding="12,0"
+                                    FontSize="12"
+                                    VerticalOptions="Center"
+                                    Command="{Binding DesignarOperadorCommand}" />
+                        </Grid>
+
+                        <Label Text="Nenhum operador designado. Sem operador habilitado o setor não vende."
+                               Style="{StaticResource LegendaPequena}"
+                               IsVisible="{Binding SemOperadores}" />
+
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding Operadores}" Spacing="10">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="models:OperadorItem">
+                                    <Border Style="{StaticResource Card}" Padding="14">
+                                        <Grid ColumnDefinitions="36,*,Auto,20" ColumnSpacing="10">
+                                            <Border WidthRequest="34"
+                                                    HeightRequest="34"
+                                                    StrokeThickness="0"
+                                                    StrokeShape="RoundRectangle 10"
+                                                    BackgroundColor="{StaticResource PrimaryContainer}"
+                                                    VerticalOptions="Center">
+                                                <Label Text="{Binding Iniciais}"
+                                                       FontFamily="InterSemiBold"
+                                                       FontSize="12"
+                                                       TextColor="{StaticResource OnPrimaryContainer}"
+                                                       HorizontalOptions="Center" VerticalOptions="Center" />
+                                            </Border>
+                                            <VerticalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
+                                                <Label Text="{Binding UsuarioNome}"
+                                                       Style="{StaticResource CorpoGrande}"
+                                                       LineBreakMode="TailTruncation" />
+                                                <Label Text="{Binding SetorNome}"
+                                                       Style="{StaticResource LegendaPequena}" />
+                                            </VerticalStackLayout>
+                                            <Border Grid.Column="2"
+                                                    Style="{StaticResource Badge}"
+                                                    BackgroundColor="{Binding SituacaoFundo}"
+                                                    VerticalOptions="Center">
+                                                <Label Text="{Binding TextoSituacao}"
+                                                       Style="{StaticResource LegendaPequena}"
+                                                       FontSize="11"
+                                                       TextColor="{Binding SituacaoCor}" />
+                                            </Border>
+                                            <Label Grid.Column="3" Text="&#xf054;" FontFamily="fa" FontSize="13"
+                                                   TextColor="{StaticResource TextoMudo}" VerticalOptions="Center" />
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.AcoesOperadorCommand}"
+                                                    CommandParameter="{Binding .}" />
+                                            </Border.GestureRecognizers>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+
+                    <Border BackgroundColor="{StaticResource SuperficieTint}"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 12"
+                            Padding="12,10">
+                        <Grid ColumnDefinitions="20,*" ColumnSpacing="8">
+                            <Label Text="&#xf05a;" FontFamily="fa" FontSize="14"
+                                   TextColor="{StaticResource Primary}" VerticalOptions="Center" />
+                            <Label Grid.Column="1"
+                                   Text="Toque em um setor para escolher quais produtos ele vende; toque em um produto para o estoque; toque em um operador para trocar de setor ou bloquear."
+                                   Style="{StaticResource LegendaPequena}" />
+                        </Grid>
+                    </Border>
+                </VerticalStackLayout>
+            </ScrollView>
+        </RefreshView>
+    </Grid>
+</ContentPage>

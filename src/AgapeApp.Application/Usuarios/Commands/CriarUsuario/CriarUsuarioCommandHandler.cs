@@ -45,6 +45,7 @@ public class CriarUsuarioCommandHandler : IRequestHandler<CriarUsuarioCommand, U
             usuario.Email,
             usuario.Perfil.ToString(),
             usuario.Ativo,
-            usuario.CriadoEm);
+            usuario.CriadoEm,
+            usuario.CaminhoFoto);
     }
 }

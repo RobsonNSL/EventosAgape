@@ -1,0 +1,3 @@
+As fotos de perfil enviadas pelos usuários ficam nesta pasta (wwwroot/imagens) e são
+servidas pela API como arquivos estáticos em /imagens/{arquivo}. O banco guarda apenas o
+caminho relativo (ex.: "imagens/abc123.jpg").

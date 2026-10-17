@@ -53,6 +53,7 @@ public class AtualizarUsuarioCommandHandler : IRequestHandler<AtualizarUsuarioCo
             usuario.Email,
             usuario.Perfil.ToString(),
             usuario.Ativo,
-            usuario.CriadoEm);
+            usuario.CriadoEm,
+            usuario.CaminhoFoto);
     }
 }

@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:AgapeApp.Mobile.Models"
+             x:Class="AgapeApp.Mobile.Views.UsuariosPage"
+             Title="Usuários"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <VerticalStackLayout Grid.Row="0" Padding="20,24,20,12" Spacing="12">
+            <Grid ColumnDefinitions="44,*,Auto" ColumnSpacing="12">
+                <Border WidthRequest="40"
+                        HeightRequest="40"
+                        VerticalOptions="Start"
+                        Stroke="{StaticResource Borda}"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 12"
+                        BackgroundColor="{StaticResource Superficie}">
+                    <Label Text="&#xf060;" FontFamily="fa" FontSize="15"
+                           TextColor="{StaticResource TextoPrimario}"
+                           HorizontalOptions="Center" VerticalOptions="Center">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding VoltarCommand}" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                </Border>
+                <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                    <Label Text="Usuários" Style="{StaticResource TituloMedio}" />
+                    <Label Text="Quem entra no app" Style="{StaticResource LegendaPequena}" />
+                </VerticalStackLayout>
+                <Button Grid.Column="2"
+                        Text="Novo"
+                        Style="{StaticResource BotaoContorno}"
+                        HeightRequest="40"
+                        Padding="14,0"
+                        FontSize="13"
+                        VerticalOptions="Center"
+                        Command="{Binding NovoCommand}" />
+            </Grid>
+
+            <!-- Busca -->
+            <Border Style="{StaticResource MolduraCampo}" HeightRequest="48">
+                <Grid ColumnDefinitions="20,*" ColumnSpacing="8">
+                    <Label Text="&#xf002;" FontFamily="fa" FontSize="14"
+                           TextColor="{StaticResource TextoMudo}" VerticalOptions="Center" />
+                    <Entry Grid.Column="1"
+                           Text="{Binding Busca}"
+                           Placeholder="Buscar por nome ou e-mail"
+                           FontSize="14" />
+                </Grid>
+            </Border>
+
+            <!-- Erro -->
+            <Border IsVisible="{Binding TemErro}"
+                    BackgroundColor="{StaticResource PerigoContainer}"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 12"
+                    Padding="12,10">
+                <Grid ColumnDefinitions="20,*" ColumnSpacing="8">
+                    <Label Text="&#xf071;" FontFamily="fa" FontSize="14"
+                           TextColor="{StaticResource OnPerigoContainer}" VerticalOptions="Center" />
+                    <Label Grid.Column="1"
+                           Text="{Binding MensagemErro}"
+                           Style="{StaticResource Corpo}"
+                           TextColor="{StaticResource OnPerigoContainer}" />
+                </Grid>
+            </Border>
+        </VerticalStackLayout>
+
+        <RefreshView Grid.Row="1"
+                     Command="{Binding AtualizarCommand}"
+                     IsRefreshing="{Binding EstaCarregando}"
+                     RefreshColor="{StaticResource Primary}">
+            <CollectionView ItemsSource="{Binding Usuarios}"
+                            SelectionMode="None"
+                            VerticalScrollBarVisibility="Never"
+                            Margin="20,0">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout Padding="40,50" Spacing="10">
+                        <Label Text="&#xf0c0;" FontFamily="fa" FontSize="34"
+                               TextColor="{StaticResource TextoMudo}"
+                               HorizontalOptions="Center" />
+                        <Label Text="Nenhum usuário encontrado"
+                               Style="{StaticResource SubtituloPequeno}"
+                               HorizontalTextAlignment="Center" />
+                        <Label Text="Toque em Novo para cadastrar a equipe do app."
+                               Style="{StaticResource Corpo}"
+                               TextColor="{StaticResource TextoSecundario}"
+                               HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:UsuarioItem">
+                        <Border Style="{StaticResource Card}" Padding="14">
+                            <Grid ColumnDefinitions="44,*,20" ColumnSpacing="12">
+                                <Border WidthRequest="40"
+                                        HeightRequest="40"
+                                        StrokeThickness="0"
+                                        StrokeShape="RoundRectangle 12"
+                                        BackgroundColor="{StaticResource PrimaryContainer}"
+                                        VerticalOptions="Center">
+                                    <Label Text="{Binding Iniciais}"
+                                           FontFamily="InterSemiBold"
+                                           FontSize="14"
+                                           TextColor="{StaticResource OnPrimaryContainer}"
+                                           HorizontalOptions="Center" VerticalOptions="Center" />
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
+                                    <Label Text="{Binding Nome}"
+                                           Style="{StaticResource SubtituloPequeno}"
+                                           LineBreakMode="TailTruncation" />
+                                    <Label Text="{Binding Email}"
+                                           Style="{StaticResource LegendaPequena}"
+                                           LineBreakMode="TailTruncation" />
+                                    <HorizontalStackLayout Spacing="6">
+                                        <Border Style="{StaticResource Badge}"
+                                                BackgroundColor="{StaticResource CinzaContainer}">
+                                            <Label Text="{Binding Perfil}"
+                                                   Style="{StaticResource LegendaPequena}"
+                                                   FontSize="11"
+                                                   TextColor="{StaticResource Cinza}" />
+                                        </Border>
+                                        <Border Style="{StaticResource Badge}"
+                                                BackgroundColor="{StaticResource PerigoContainer}"
+                                                IsVisible="{Binding Inativo}">
+                                            <Label Text="Sem acesso"
+                                                   Style="{StaticResource LegendaPequena}"
+                                                   FontSize="11"
+                                                   TextColor="{StaticResource OnPerigoContainer}" />
+                                        </Border>
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+                                <Label Grid.Column="2" Text="&#xf054;" FontFamily="fa" FontSize="13"
+                                       TextColor="{StaticResource TextoMudo}" VerticalOptions="Center" />
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.AcoesCommand}"
+                                        CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+    </Grid>
+</ContentPage>

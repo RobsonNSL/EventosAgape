@@ -48,6 +48,10 @@ public class UsuarioMapping : IEntityTypeConfiguration<Usuario>
             .HasColumnName("ativo")
             .IsRequired();
 
+        builder.Property(usuario => usuario.CaminhoFoto)
+            .HasColumnName("caminho_foto")
+            .HasMaxLength(300);
+
         builder.Property(usuario => usuario.CriadoEm)
             .HasColumnName("criado_em")
             .IsRequired();

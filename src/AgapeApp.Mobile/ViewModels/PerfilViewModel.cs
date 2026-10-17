@@ -1,18 +1,25 @@
 using AgapeApp.Mobile.Helpers;
+using AgapeApp.Mobile.Models;
 using AgapeApp.Mobile.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 namespace AgapeApp.Mobile.ViewModels;
 
-/// <summary>Perfil do usuário logado: dados, biometria, troca de senha e saída.</summary>
+/// <summary>Perfil do usuário logado: dados, foto, biometria, troca de senha e saída.</summary>
 public partial class PerfilViewModel : BaseViewModel
 {
     private readonly BiometriaService _biometria;
+    private readonly FotoUsuarioService _fotos;
 
-    public PerfilViewModel(ApiClient api, SessaoService sessao, BiometriaService biometria) : base(api, sessao)
+    public PerfilViewModel(
+        ApiClient api,
+        SessaoService sessao,
+        BiometriaService biometria,
+        FotoUsuarioService fotos) : base(api, sessao)
     {
         _biometria = biometria;
+        _fotos = fotos;
         Carregar();
     }
 
@@ -28,6 +35,15 @@ public partial class PerfilViewModel : BaseViewModel
 
     [ObservableProperty]
     private string iniciais = string.Empty;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TemFoto), nameof(SemFoto))]
+    private ImageSource? foto;
+
+    /// <summary>Há foto de perfil cadastrada (mostra a imagem no lugar das iniciais).</summary>
+    public bool TemFoto => Foto is not null;
+
+    public bool SemFoto => Foto is null;
 
     [ObservableProperty]
     private bool biometriaDisponivel;
@@ -48,6 +64,10 @@ public partial class PerfilViewModel : BaseViewModel
         Iniciais = Formatos.Iniciais(Nome);
     }
 
+    /// <summary>Baixa a foto de perfil (o carregador nativo de imagens não envia token/cabeçalho do ngrok).</summary>
+    public async Task CarregarFotoAsync()
+        => Foto = await _fotos.CarregarAsync(Sessao.Usuario?.CaminhoFoto);
+
     /// <summary>Verifica se o aparelho tem biometria e se o usuário já a ativou.</summary>
     public async Task PrepararBiometriaAsync()
     {
@@ -66,6 +86,60 @@ public partial class PerfilViewModel : BaseViewModel
     {
         if (Shell.Current is not null)
             await Shell.Current.GoToAsync("trocar-senha");
+    }
+
+    /// <summary>Escolhe uma imagem no aparelho e envia como foto de perfil.</summary>
+    [RelayCommand]
+    private async Task AlterarFotoAsync()
+    {
+        await ExecutarAsync(async () =>
+        {
+            FileResult? escolhida;
+
+            try
+            {
+                // PickPhotosAsync substitui o PickPhotoAsync obsoleto; limite 1 = escolha única.
+                var escolhidas = await MediaPicker.Default.PickPhotosAsync(
+                    new MediaPickerOptions { Title = "Escolha sua foto", SelectionLimit = 1 });
+
+                escolhida = escolhidas?.FirstOrDefault();
+            }
+            catch (PermissionException)
+            {
+                MensagemErro = "Permita o acesso às fotos do aparelho para escolher sua imagem.";
+                return;
+            }
+
+            if (escolhida is null)
+                return;
+
+            await using var conteudo = await escolhida.OpenReadAsync();
+
+            var usuario = await Api.PostArquivoAsync<UsuarioDTO>(
+                "api/autenticacao/minha-foto",
+                conteudo,
+                escolhida.FileName,
+                escolhida.ContentType);
+
+            await Sessao.AtualizarFotoAsync(usuario.CaminhoFoto);
+            await CarregarFotoAsync();
+        });
+    }
+
+    /// <summary>Remove a foto de perfil (volta a mostrar as iniciais).</summary>
+    [RelayCommand]
+    private async Task RemoverFotoAsync()
+    {
+        if (SemFoto)
+            return;
+
+        await ExecutarAsync(async () =>
+        {
+            var usuario = await Api.DeleteAsync<UsuarioDTO>("api/autenticacao/minha-foto");
+
+            await Sessao.AtualizarFotoAsync(usuario.CaminhoFoto);
+            await CarregarFotoAsync();
+        });
     }
 
     [RelayCommand]

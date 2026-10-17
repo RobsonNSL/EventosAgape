@@ -64,6 +64,24 @@ public class SessaoService
         }
     }
 
+    /// <summary>Atualiza a foto de perfil do usuário na sessão (depois de trocar ou remover).</summary>
+    public async Task AtualizarFotoAsync(string? caminhoFoto)
+    {
+        if (Usuario is null)
+            return;
+
+        Usuario = Usuario with { CaminhoFoto = caminhoFoto };
+
+        try
+        {
+            await SecureStorage.Default.SetAsync(ChaveUsuario, JsonSerializer.Serialize(Usuario, Json));
+        }
+        catch
+        {
+            // Sem armazenamento seguro disponível: a foto vale só enquanto o app estiver aberto.
+        }
+    }
+
     /// <summary>Autentica com e-mail e senha e guarda a sessão.</summary>
     public async Task EntrarAsync(string email, string senha, CancellationToken ct = default)
     {

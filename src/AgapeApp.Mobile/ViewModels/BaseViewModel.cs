@@ -66,11 +66,54 @@ public abstract partial class BaseViewModel : ObservableObject
         }
     }
 
+    /// <summary>
+    /// Igual ao anterior, mas devolve o resultado da operação (ou nulo se ela falhar).
+    /// Útil nas telas de gestão, que precisam da lista antes de abrir as opções.
+    /// </summary>
+    protected async Task<T?> ExecutarAsync<T>(Func<Task<T>> operacao)
+    {
+        T? resultado = default;
+
+        await ExecutarAsync(async () => resultado = await operacao());
+
+        return resultado;
+    }
+
     /// <summary>Mensagem exibida ao usuário; saldo insuficiente ganha o saldo atual.</summary>
     protected virtual string MensagemDeErro(ApiException ex)
         => ex.SaldoAtual is decimal saldo
             ? $"{ex.Message} Saldo atual do cartão: {Formatos.Moeda(saldo)}."
             : ex.Message;
+
+    /// <summary>Mostra um aviso simples (usado pelas telas de gestão).</summary>
+    protected static Task AvisarAsync(string titulo, string mensagem)
+        => Shell.Current is null
+            ? Task.CompletedTask
+            : Shell.Current.DisplayAlertAsync(titulo, mensagem, "Ok");
+
+    /// <summary>Pede uma confirmação antes de uma ação destrutiva.</summary>
+    protected static Task<bool> ConfirmarAsync(string titulo, string mensagem, string confirmar = "Confirmar")
+        => Shell.Current is null
+            ? Task.FromResult(false)
+            : Shell.Current.DisplayAlertAsync(titulo, mensagem, confirmar, "Cancelar");
+
+    /// <summary>Navega para outra tela, ignorando o toque quando a página já saiu.</summary>
+    protected static Task NavegarAsync(string rota)
+        => Shell.Current is null ? Task.CompletedTask : Shell.Current.GoToAsync(rota);
+
+    /// <summary>Navega levando um objeto para a próxima tela (formulários de edição).</summary>
+    protected static Task NavegarAsync(string rota, string chave, object valor)
+        => NavegarAsync(rota, new Dictionary<string, object> { [chave] = valor });
+
+    /// <summary>Navega levando vários parâmetros para a próxima tela.</summary>
+    protected static Task NavegarAsync(string rota, IDictionary<string, object> parametros)
+        => Shell.Current is null ? Task.CompletedTask : Shell.Current.GoToAsync(rota, parametros);
+
+    /// <summary>Abre a folha de opções da tela; devolve a escolha do usuário.</summary>
+    protected static Task<string?> EscolherAsync(string titulo, params string[] opcoes)
+        => Shell.Current is null
+            ? Task.FromResult<string?>(null)
+            : Shell.Current.DisplayActionSheetAsync(titulo, "Cancelar", null, opcoes);
 
     [RelayCommand]
     private async Task VoltarAsync()

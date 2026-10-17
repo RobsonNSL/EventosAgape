@@ -3,7 +3,7 @@
 > Acompanha a execução do [`plano-projeto-eventos.md`](plano-projeto-eventos.md) (decisões).
 > Atualizado em: 17/10/2026
 > Legenda: `[x]` concluído · `[ ]` pendente
-> **Situação:** fases 1–4 implementadas na API (build sem avisos; 68 testes verdes). Migrations 0001–0016. App mobile (Fase 5) avançado: login (com biometria) → meus eventos → recarga/venda/saldo (QR pela câmera) → perfil → **telas do admin** (dashboard ao vivo, saldos e auditoria), com cache SQLite de leitura — tudo com o design do Google Stitch.
+> **Situação:** fases 1–4 implementadas na API (build sem avisos; 68 testes verdes). Migrations **0001–0017**. App mobile (Fase 5) com o fluxo completo: login (com biometria) → meus eventos → recarga/venda/saldo (QR pela câmera) → perfil (com foto) → telas do admin (dashboard ao vivo, saldos e auditoria) → **aba Gestão** (usuários, produtos, eventos e cartões; detalhes do evento com setores, produtos, operadores e abrir/encerrar), com cache SQLite de leitura — tudo com o design do Google Stitch. Falta validar no aparelho físico e publicar.
 
 ---
 
@@ -96,6 +96,11 @@
 - [x] Leitura do QR pela câmera (`ZXing.Net.Maui.Controls`) — lanterna e confirmação automática
 - [x] Cache SQLite de leitura (eventos, produtos do setor e últimas operações do aparelho; aviso de "dados salvos" sem internet)
 - [x] Dashboard do admin no app (resumo em tempo real via SignalR + saldos em circulação + auditoria paginada)
+- [x] **Aba Gestão** (aparece só para o administrador): usuários, produtos, eventos e cartões — criar, editar, ativar/desativar
+- [x] **Detalhes do evento** no app: setores, produtos do evento (vincular ao setor, preço e estoque com **entrada**/**baixa**) e operadores designados, com **abrir/encerrar** o evento
+- [x] Admin **opera o terminal em qualquer setor** de qualquer evento aberto (a API já permitia; o app passou a pedir o setor antes de abrir)
+- [x] **Foto de perfil**: enviar/trocar e remover — `POST`/`DELETE /api/autenticacao/minha-foto` (só o próprio usuário), coluna `caminho_foto` (**migration 0017**) e arquivos servidos em `{apiBase}/imagens/{arquivo}`; avatar no perfil e na lista de eventos
+- [x] Ícone do launcher (medalhão circular) e splash Android 12+ definitivos, com remoção dos assets antigos
 - [x] APK autônomo (assemblies embutidas) para instalar por `adb install`/arquivo
 
 ### Publicação
@@ -110,9 +115,10 @@
 
 - [ ] Contrato completo dos endpoints da API (rotas em português) — passo 4 do plano
 - [ ] Mapa de telas e fluxos (operador e admin) — passo 3 do plano
-- [ ] Validar o app em aparelho físico: câmera (QR), biometria, SignalR do dashboard e cache offline
+- [ ] Validar o app em aparelho físico: câmera (QR), biometria, SignalR do dashboard, cache offline, **foto de perfil** e as **telas de gestão** (usuários, produtos, eventos, cartões)
 - [ ] Confirmar fluxo de renovação de token no app — implementado (`SessaoService` renova sozinho); falta validar em aparelho real
 - [ ] Renomear variáveis locais dos testes para inglês (`validador` → `validator` etc.) — oferta em aberto
 - [ ] Avaliar limpeza periódica de tokens de renovação expirados
 - [x] ~~Smoke ponta a ponta das fases 2–4~~ — **concluído em 17/10/2026**: cadastros → operador → abrir evento → recarga idempotente → venda (saldo + estoque) → erros em português → relatórios → Excel. Achou e corrigiu 1 bug real (ordem de INSERT da venda no EF) e validou tudo contra o SQL Server. Estendido no mesmo dia com o **fechamento da fase 2**: editar usuário, e-mail duplicado (409), desativar a si mesmo e rebaixar o último administrador (400), desativar/reativar com login e renovação bloqueados (sessões revogadas), redefinir e trocar a própria senha com restauração dos valores originais.
+- [x] ~~Swagger parou de abrir depois dos endpoints de foto~~ — **corrigido em 17/10/2026**: `[FromForm]` explícito num parâmetro `IFormFile` quebra a geração do documento no Swashbuckle (o `/swagger/v1/swagger.json` inteiro voltava 500); o atributo foi removido e o binding `multipart/form-data` continua sendo inferido. No mesmo commit, o app trocou `FileResult.OpenReadStreamAsync()` (inexistente no MAUI 10) por `OpenReadAsync()` e o `PickPhotoAsync` obsoleto por `PickPhotosAsync` — build Android **0 erros / 0 avisos**.
 - [ ] Avaliar limitador de tentativas de login (proteção contra força bruta) — não previsto no plano ainda

@@ -66,6 +66,16 @@ public static class MensagensErro
 
     public static string EventoProdutoSemControleEstoque => Obter();
 
+    public static string FotoArquivoVazio => Obter();
+
+    public static string FotoConteudoInvalido => Obter();
+
+    public static string FotoFormatoInvalido => Obter();
+
+    public static string FotoMuitoGrande => Obter();
+
+    public static string FotoObrigatoria => Obter();
+
     public static string HashSenhaObrigatorio => Obter();
 
     public static string IdObrigatorio => Obter();

@@ -25,6 +25,9 @@ public class Usuario : BaseEntity
 
     public bool Ativo { get; private set; }
 
+    /// <summary>Caminho relativo da foto de perfil (ex.: "imagens/abc123.jpg"); nulo = sem foto.</summary>
+    public string? CaminhoFoto { get; private set; }
+
     /// <summary>
     /// Cria um novo usuário ativo.
     /// </summary>
@@ -93,6 +96,16 @@ public class Usuario : BaseEntity
     public void Desativar()
     {
         Ativo = false;
+        MarcarComoAtualizada();
+    }
+
+    /// <summary>
+    /// Define (ou limpa) a foto de perfil. O caminho é relativo à raiz pública da API
+    /// (ex.: "imagens/abc123.jpg"); nulo ou vazio remove a foto.
+    /// </summary>
+    public void DefinirFoto(string? caminhoFoto)
+    {
+        CaminhoFoto = string.IsNullOrWhiteSpace(caminhoFoto) ? null : caminhoFoto.Trim();
         MarcarComoAtualizada();
     }
 

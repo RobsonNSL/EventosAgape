@@ -7,4 +7,5 @@ public record UsuarioAutenticadoDTO(
     Guid Id,
     string Nome,
     string Email,
-    string Perfil);
+    string Perfil,
+    string? CaminhoFoto);

@@ -13,8 +13,9 @@
     TabBarUnselectedColor="{StaticResource TextoSecundario}">
 
     <Shell.Resources>
-        <!-- Ícones Font Awesome (fa-solid-900.ttf): calendário e usuário -->
+        <!-- Ícones Font Awesome (fa-solid-900.ttf): calendário, engrenagens e usuário -->
         <FontImageSource x:Key="IconeEventos" FontFamily="fa" Glyph="&#xf073;" Size="20" Color="#64748B" />
+        <FontImageSource x:Key="IconeGestao" FontFamily="fa" Glyph="&#xf085;" Size="20" Color="#64748B" />
         <FontImageSource x:Key="IconePerfil" FontFamily="fa" Glyph="&#xf007;" Size="20" Color="#64748B" />
     </Shell.Resources>
 
@@ -24,13 +25,20 @@
         ContentTemplate="{DataTemplate views:LoginPage}"
         FlyoutItemIsVisible="False" />
 
-    <!-- Área autenticada: abas Eventos e Perfil -->
+    <!-- Área autenticada: abas Eventos, Gestão (só administrador) e Perfil -->
     <TabBar Route="principal">
         <ShellContent
             Title="Eventos"
             Route="eventos"
             Icon="{StaticResource IconeEventos}"
             ContentTemplate="{DataTemplate views:MeusEventosPage}" />
+        <!-- A aba Gestão só aparece para administradores (ver AjustarAbasPorPerfil). -->
+        <ShellContent
+            x:Name="AbaGestao"
+            Title="Gestão"
+            Route="gestao"
+            Icon="{StaticResource IconeGestao}"
+            ContentTemplate="{DataTemplate views:GestaoPage}" />
         <ShellContent
             Title="Perfil"
             Route="perfil"

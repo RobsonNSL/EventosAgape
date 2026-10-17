@@ -4,7 +4,7 @@ namespace AgapeApp.Mobile.Models;
 // Nomes idênticos aos do servidor para facilitar a manutenção lado a lado.
 
 // ===== Autenticação =====
-public record UsuarioAutenticadoDTO(Guid Id, string Nome, string Email, string Perfil);
+public record UsuarioAutenticadoDTO(Guid Id, string Nome, string Email, string Perfil, string? CaminhoFoto);
 
 public record LoginResponse(
     string TokenAcesso,
@@ -21,6 +21,8 @@ public record SairRequest(string TokenRenovacao);
 public record AlterarSenhaRequest(string SenhaAtual, string NovaSenha);
 
 // ===== Eventos e setores =====
+public record SetorDTO(Guid Id, Guid EventoId, string Nome);
+
 public record MeuEventoDTO(
     Guid EventoId,
     string Nome,

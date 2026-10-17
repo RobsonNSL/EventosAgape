@@ -42,6 +42,6 @@ public class SessionService
             tokenAcesso,
             tokenRenovacao,
             expiraEm,
-            new UsuarioAutenticadoDTO(usuario.Id, usuario.Nome, usuario.Email, usuario.Perfil.ToString()));
+            new UsuarioAutenticadoDTO(usuario.Id, usuario.Nome, usuario.Email, usuario.Perfil.ToString(), usuario.CaminhoFoto));
     }
 }

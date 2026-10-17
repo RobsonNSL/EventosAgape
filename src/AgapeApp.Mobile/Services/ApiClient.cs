@@ -47,6 +47,44 @@ public class ApiClient
             throw await ApiException.DeRespostaAsync(resposta, ct);
     }
 
+    /// <summary>Envia um arquivo como multipart/form-data (campo "arquivo") e devolve a resposta.</summary>
+    public Task<T> PostArquivoAsync<T>(
+        string rota,
+        Stream conteudo,
+        string nomeArquivo,
+        string? tipoConteudo,
+        CancellationToken ct = default)
+    {
+        var formulario = new MultipartFormDataContent();
+        var arquivo = new StreamContent(conteudo);
+        arquivo.Headers.ContentType = new MediaTypeHeaderValue(
+            string.IsNullOrWhiteSpace(tipoConteudo) ? "application/octet-stream" : tipoConteudo);
+
+        formulario.Add(arquivo, "arquivo", nomeArquivo);
+
+        return EnviarAsync<T>(
+            new HttpRequestMessage(HttpMethod.Post, AppConfig.Url(rota)) { Content = formulario },
+            ct);
+    }
+
+    public Task<T> DeleteAsync<T>(string rota, CancellationToken ct = default)
+        => EnviarAsync<T>(new HttpRequestMessage(HttpMethod.Delete, AppConfig.Url(rota)), ct);
+
+    /// <summary>
+    /// Baixa uma imagem da API. Passa pelo mesmo cliente das demais chamadas
+    /// (token do usuário e cabeçalho do ngrok), diferente do carregador nativo de imagens.
+    /// </summary>
+    public async Task<byte[]> BaixarImagemAsync(string caminhoRelativo, CancellationToken ct = default)
+    {
+        using var requisicao = new HttpRequestMessage(HttpMethod.Get, AppConfig.Url(caminhoRelativo));
+        using var resposta = await ExecutarAsync(requisicao, ct);
+
+        if (!resposta.IsSuccessStatusCode)
+            throw await ApiException.DeRespostaAsync(resposta, ct);
+
+        return await resposta.Content.ReadAsByteArrayAsync(ct);
+    }
+
     private async Task<T> EnviarAsync<T>(HttpRequestMessage requisicao, CancellationToken ct)
     {
         using (requisicao)

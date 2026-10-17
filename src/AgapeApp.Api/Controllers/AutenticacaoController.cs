@@ -1,11 +1,16 @@
 using System.Security.Claims;
 using AgapeApp.Api.Extensions;
 using AgapeApp.Application.Authentication.Commands.AlterarMinhaSenha;
+using AgapeApp.Application.Authentication.Commands.DefinirMinhaFoto;
 using AgapeApp.Application.Authentication.Commands.Login;
+using AgapeApp.Application.Authentication.Commands.RemoverMinhaFoto;
 using AgapeApp.Application.Authentication.Commands.RenovarToken;
 using AgapeApp.Application.Authentication.Commands.Sair;
 using AgapeApp.Application.Authentication.Queries.UsuarioAtual;
 using AgapeApp.Application.Authentication.DTOs;
+using AgapeApp.Application.Usuarios.DTOs;
+using AgapeApp.Domain.Exceptions;
+using AgapeApp.Domain.Resources;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -86,5 +91,47 @@ public class AutenticacaoController : ControllerBase
 
         await _mediator.Send(comando, cancellationToken);
         return NoContent();
+    }
+
+    /// <summary>Troca a foto de perfil do próprio usuário autenticado (multipart/form-data, campo "arquivo").</summary>
+    [HttpPost("minha-foto")]
+    [Authorize]
+    [ProducesResponseType(typeof(UsuarioDTO), StatusCodes.Status200OK)]
+    public async Task<ActionResult<UsuarioDTO>> DefinirMinhaFoto(
+        // Sem [FromForm]: o ASP.NET Core já infere multipart/form-data para IFormFile
+        // e o Swashbuckle precisa do binding source "FormFile" para gerar o schema.
+        IFormFile? arquivo,
+        CancellationToken cancellationToken)
+    {
+        var usuarioId = User.ObterUsuarioId();
+
+        if (usuarioId is null)
+            return Unauthorized();
+
+        if (arquivo is null)
+            throw new RegraNegocioException(MensagensErro.FotoObrigatoria);
+
+        await using var conteudo = arquivo.OpenReadStream();
+
+        var usuario = await _mediator.Send(
+            new DefinirMinhaFotoCommand(usuarioId.Value, arquivo.FileName, arquivo.Length, conteudo),
+            cancellationToken);
+
+        return Ok(usuario);
+    }
+
+    /// <summary>Remove a foto de perfil do próprio usuário autenticado (idempotente).</summary>
+    [HttpDelete("minha-foto")]
+    [Authorize]
+    [ProducesResponseType(typeof(UsuarioDTO), StatusCodes.Status200OK)]
+    public async Task<ActionResult<UsuarioDTO>> RemoverMinhaFoto(CancellationToken cancellationToken)
+    {
+        var usuarioId = User.ObterUsuarioId();
+
+        if (usuarioId is null)
+            return Unauthorized();
+
+        var usuario = await _mediator.Send(new RemoverMinhaFotoCommand(usuarioId.Value), cancellationToken);
+        return Ok(usuario);
     }
 }

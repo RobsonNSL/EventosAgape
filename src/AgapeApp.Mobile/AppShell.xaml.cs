@@ -9,10 +9,13 @@ public partial class AppShell : Shell
 
     public AppShell(SessaoService sessao)
     {
-        InitializeComponent();
         _sessao = sessao;
+        InitializeComponent();
 
         RegistrarRotas();
+
+        // Por padrão a aba Gestão fica escondida; o OnNavigated a revela para administradores.
+        AbaGestao.IsVisible = _sessao.EhAdministrador;
 
         // Restaura a sessão salva (se houver) sem bloquear a abertura do app.
         Dispatcher.Dispatch(async () => await RestaurarSessaoAsync());
@@ -31,6 +34,24 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("dashboard", typeof(DashboardPage));
         Routing.RegisterRoute("saldos", typeof(SaldosPage));
         Routing.RegisterRoute("auditoria", typeof(AuditoriaPage));
+
+        // Gestão (administrador)
+        Routing.RegisterRoute("usuarios", typeof(UsuariosPage));
+        Routing.RegisterRoute("usuario-form", typeof(UsuarioFormPage));
+        Routing.RegisterRoute("produtos", typeof(ProdutosPage));
+        Routing.RegisterRoute("produto-form", typeof(ProdutoFormPage));
+        Routing.RegisterRoute("eventos-admin", typeof(EventosAdminPage));
+        Routing.RegisterRoute("evento-form", typeof(EventoFormPage));
+        Routing.RegisterRoute("evento-detalhe", typeof(EventoDetalhePage));
+        Routing.RegisterRoute("evento-produto-form", typeof(EventoProdutoFormPage));
+        Routing.RegisterRoute("cartoes", typeof(CartoesPage));
+    }
+
+    /// <summary>A aba Gestão existe só para administradores; o operador vê Eventos e Perfil.</summary>
+    protected override void OnNavigated(ShellNavigatedEventArgs args)
+    {
+        base.OnNavigated(args);
+        AbaGestao.IsVisible = _sessao.EhAdministrador;
     }
 
     private async Task RestaurarSessaoAsync()

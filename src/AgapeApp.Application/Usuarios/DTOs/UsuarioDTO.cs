@@ -9,4 +9,5 @@ public record UsuarioDTO(
     string Email,
     string Perfil,
     bool Ativo,
-    DateTimeOffset CriadoEm);
+    DateTimeOffset CriadoEm,
+    string? CaminhoFoto);

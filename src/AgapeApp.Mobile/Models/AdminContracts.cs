@@ -69,3 +69,13 @@ public record EventoDTO(
     DateOnly? DataFim,
     string Situacao,
     DateTimeOffset CriadoEm);
+
+// ===== Usuários (administração) =====
+public record UsuarioDTO(
+    Guid Id,
+    string Nome,
+    string Email,
+    string Perfil,
+    bool Ativo,
+    DateTimeOffset CriadoEm,
+    string? CaminhoFoto);

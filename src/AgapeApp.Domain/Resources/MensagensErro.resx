@@ -90,6 +90,21 @@
   <data name="EventoProdutoSemControleEstoque" xml:space="preserve">
     <value>Este produto não controla estoque.</value>
   </data>
+  <data name="FotoArquivoVazio" xml:space="preserve">
+    <value>O arquivo de imagem está vazio.</value>
+  </data>
+  <data name="FotoConteudoInvalido" xml:space="preserve">
+    <value>O arquivo enviado não parece ser uma imagem válida.</value>
+  </data>
+  <data name="FotoFormatoInvalido" xml:space="preserve">
+    <value>Envie uma imagem nos formatos JPG, PNG ou WEBP.</value>
+  </data>
+  <data name="FotoMuitoGrande" xml:space="preserve">
+    <value>A imagem é muito grande. Envie um arquivo de até 5 MB.</value>
+  </data>
+  <data name="FotoObrigatoria" xml:space="preserve">
+    <value>Selecione uma imagem para enviar.</value>
+  </data>
   <data name="HashSenhaObrigatorio" xml:space="preserve">
     <value>O hash da senha é obrigatório.</value>
   </data>

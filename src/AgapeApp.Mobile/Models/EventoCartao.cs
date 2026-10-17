@@ -19,16 +19,25 @@ public class EventoCartao
     /// <summary>Administrador pode abrir o dashboard do evento.</summary>
     public bool MostrarDashboard { get; init; }
 
+    /// <summary>Cartão da visão "todos os eventos" (administrador): ao operar, escolhe o setor.</summary>
+    public bool VisaoAdmin { get; init; }
+
     /// <summary>Há setor definido (visão "meus eventos"); sem setor, não dá para operar.</summary>
-    public bool MostrarOperar => SetorId != Guid.Empty;
+    public bool MostrarOperar => VisaoAdmin || SetorId != Guid.Empty;
 
     public bool MostrarSetor => !string.IsNullOrWhiteSpace(SetorNome);
 
-    public bool PodeOperar => MostrarOperar && Habilitado && Situacao == "Aberto";
+    /// <summary>
+    /// Operador precisa de evento aberto e designação habilitada no próprio setor;
+    /// o administrador opera em qualquer setor de um evento aberto.
+    /// </summary>
+    public bool PodeOperar => VisaoAdmin
+        ? Situacao == "Aberto"
+        : SetorId != Guid.Empty && Habilitado && Situacao == "Aberto";
 
-    public bool MostrarAvisoLiberacao => MostrarOperar && !Habilitado;
+    public bool MostrarAvisoLiberacao => !VisaoAdmin && MostrarOperar && !Habilitado;
 
-    public string TextoBotao => !Habilitado
+    public string TextoBotao => !VisaoAdmin && !Habilitado
         ? "Aguardando liberação"
         : Situacao switch
         {
@@ -62,6 +71,7 @@ public class EventoCartao
         Situacao = dto.Situacao,
         Habilitado = false,
         MostrarDashboard = true,
+        VisaoAdmin = true,
         DataTexto = Formatos.DataEvento(dto.DataInicio, dto.DataFim),
         SituacaoTexto = TextoDaSituacao(dto.Situacao),
         SituacaoFundo = FundoDaSituacao(dto.Situacao),

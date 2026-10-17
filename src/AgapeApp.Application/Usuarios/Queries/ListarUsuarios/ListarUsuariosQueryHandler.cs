@@ -26,7 +26,8 @@ public class ListarUsuariosQueryHandler : IRequestHandler<ListarUsuariosQuery, I
                 usuario.Email,
                 usuario.Perfil.ToString(),
                 usuario.Ativo,
-                usuario.CriadoEm))
+                usuario.CriadoEm,
+                usuario.CaminhoFoto))
             .ToList();
     }
 }
