@@ -1,11 +1,15 @@
+using System.Diagnostics;
 using System.Text.Json.Serialization;
 using AgapeApp.Api.Services;
 using AgapeApp.Api.ExceptionHandling;
 using AgapeApp.Application;
+using AgapeApp.Domain.Resources;
 using AgapeApp.Infrastructure;
 using AgapeApp.Infrastructure.Options;
 using AgapeApp.Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
@@ -57,6 +61,51 @@ builder.Services
             ClockSkew = TimeSpan.FromSeconds(30),
             NameClaimType = "nome",
             RoleClaimType = "perfil"
+        };
+
+        // Respostas de 401/403 do middleware em ProblemDetails/português
+        // (o padrão do JwtBearer volta sem corpo, o que confunde no Swagger).
+        options.Events = new JwtBearerEvents
+        {
+            OnChallenge = async contexto =>
+            {
+                contexto.HandleResponse();
+                contexto.Response.StatusCode = StatusCodes.Status401Unauthorized;
+
+                var detalhe = !contexto.Request.Headers.ContainsKey("Authorization")
+                    ? MensagensErro.TokenNaoInformado
+                    : contexto.AuthenticateFailure is SecurityTokenExpiredException
+                        ? MensagensErro.TokenExpirado
+                        : MensagensErro.TokenInvalido;
+
+                var problema = new ProblemDetails
+                {
+                    Status = StatusCodes.Status401Unauthorized,
+                    Title = MensagensErro.TituloNaoAutenticado,
+                    Detail = detalhe,
+                    Instance = contexto.Request.Path
+                };
+
+                problema.Extensions["traceId"] = contexto.HttpContext.TraceIdentifier;
+
+                await contexto.Response.WriteAsJsonAsync(problema, contexto.HttpContext.RequestAborted);
+            },
+            OnForbidden = async contexto =>
+            {
+                contexto.Response.StatusCode = StatusCodes.Status403Forbidden;
+
+                var problema = new ProblemDetails
+                {
+                    Status = StatusCodes.Status403Forbidden,
+                    Title = MensagensErro.TituloAcessoNegado,
+                    Detail = MensagensErro.SemPermissao,
+                    Instance = contexto.Request.Path
+                };
+
+                problema.Extensions["traceId"] = contexto.HttpContext.TraceIdentifier;
+
+                await contexto.Response.WriteAsJsonAsync(problema, contexto.HttpContext.RequestAborted);
+            }
         };
     });
 
@@ -110,6 +159,34 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(options =>
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "AgapeApp API v1"));
+
+    // A raiz leva direto para a tela do Swagger.
+    app.MapGet("/", () => Results.Redirect("/swagger")).ExcludeFromDescription();
+
+    // Abre o Swagger no navegador ao iniciar a API (desligue com Swagger:AbrirNavegador = false).
+    if (configuration.GetValue("Swagger:AbrirNavegador", true))
+    {
+        app.Lifetime.ApplicationStarted.Register(() =>
+        {
+            try
+            {
+                var endereco = app.Services.GetRequiredService<IServer>()
+                    .Features.Get<IServerAddressesFeature>()?.Addresses
+                    .FirstOrDefault(enderecoBind => enderecoBind.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
+                    ?? "http://localhost:5180";
+
+                endereco = endereco.Replace("0.0.0.0", "localhost").Replace("[::]", "localhost").TrimEnd('/');
+
+                app.Logger.LogInformation("Abrindo o Swagger no navegador: {Endereco}", endereco);
+                Process.Start(new ProcessStartInfo(endereco) { UseShellExecute = true });
+            }
+            catch (Exception excecao)
+            {
+                // Abrir o navegador é apenas uma conveniência: se falhar, a API continua normalmente.
+                app.Logger.LogWarning(excecao, "Não foi possível abrir o navegador automaticamente.");
+            }
+        });
+    }
 }
 
 // Em produção a API ficará atrás de um proxy reverso responsável pelo TLS.

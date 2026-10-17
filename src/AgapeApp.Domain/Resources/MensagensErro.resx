@@ -48,6 +48,9 @@
   <data name="RequisicaoInvalida" xml:space="preserve">
     <value>A requisição contém dados em formato inválido.</value>
   </data>
+  <data name="SemPermissao" xml:space="preserve">
+    <value>Seu perfil não tem permissão para acessar este recurso.</value>
+  </data>
   <data name="SenhaObrigatoria" xml:space="preserve">
     <value>A senha é obrigatória.</value>
   </data>
@@ -80,6 +83,15 @@
   </data>
   <data name="TituloRegraNegocioViolada" xml:space="preserve">
     <value>Regra de negócio violada.</value>
+  </data>
+  <data name="TokenExpirado" xml:space="preserve">
+    <value>O token de acesso expirou. Faça login novamente.</value>
+  </data>
+  <data name="TokenInvalido" xml:space="preserve">
+    <value>O token de acesso é inválido.</value>
+  </data>
+  <data name="TokenNaoInformado" xml:space="preserve">
+    <value>O token de acesso não foi informado no cabeçalho Authorization.</value>
   </data>
   <data name="TokenRenovacaoHashObrigatorio" xml:space="preserve">
     <value>O hash do token de renovação é obrigatório.</value>

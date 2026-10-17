@@ -38,6 +38,8 @@ public static class MensagensErro
 
     public static string RequisicaoInvalida => Obter();
 
+    public static string SemPermissao => Obter();
+
     public static string SenhaObrigatoria => Obter();
 
     public static string SenhaTamanhoMinimo => Obter();
@@ -59,6 +61,12 @@ public static class MensagensErro
     public static string TituloNaoEncontrado => Obter();
 
     public static string TituloRegraNegocioViolada => Obter();
+
+    public static string TokenExpirado => Obter();
+
+    public static string TokenInvalido => Obter();
+
+    public static string TokenNaoInformado => Obter();
 
     public static string TokenRenovacaoHashObrigatorio => Obter();
 

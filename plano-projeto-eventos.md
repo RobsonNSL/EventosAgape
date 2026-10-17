@@ -1,6 +1,6 @@
 # AgapeApp — Documento de Decisões
 
-> **Versão:** 1.4 · **Data:** 17/10/2026
+> **Versão:** 1.6 · **Data:** 17/10/2026
 >
 > Documento vivo: atualizar a cada decisão nova. Nenhuma linha de código começa antes deste documento estar fechado.
 > **Status:** domínio fechado · técnico fechado · **nome definido: AgapeApp** · estrutura + autenticação + migrations **concluídas e validadas localmente (SQL Server — banco `dbAgape`)**.
@@ -92,7 +92,7 @@ Aplicativo para a **pastoral de eventos da igreja**, baseado em **cartão pré-p
 | Banco de dados | SQL Server local: banco `dbAgape` (nuvem: a definir) |
 | Arquitetura | DDD + Clean Architecture, padrão sênior .NET |
 | Casos de uso | CQRS com MediatR |
-| Validações | **FluentValidation** em todas as entradas, com respostas de erro padronizadas |
+| Validações | **FluentValidation** em todas as entradas; mensagens de erro centralizadas em arquivo de resources (`MensagensErro.resx`) |
 | ORM | Entity Framework Core |
 | Migrations | **FluentMigrator**, executadas pela API, **uma por alteração**, **somente Up (forward-only)** — rollback manual quando necessário (sob demanda) |
 | Nomes | Estrutura/pastas e termos técnicos em **inglês** (`Domain`, `Controllers`, `UsuarioDTO`, `LoginCommand`); **domínio e métodos em português** (`Usuario`, `Criar`, `GerarTokenAcesso`); banco em português (`usuarios`, `criado_em`) |
@@ -208,3 +208,5 @@ Fluxo de dependência: `Api → Application → Domain`; `Infrastructure` e `Mob
 | 1.2 | 17/10/2026 | API v1 de autenticação concluída: solução DDD, Argon2id, JWT + refresh, FluentMigrator forward-only e seed do administrador. |
 | 1.3 | 17/10/2026 | Banco trocado para **SQL Server** local (`dbAgape`, instância `MSSQLSERVER01`); chave JWT passou a ser derivada por SHA-256 (funciona com qualquer tamanho de segredo). |
 | 1.4 | 17/10/2026 | Convenção de nomes ajustada: estrutura/pastas e sufixos técnicos em **inglês** (`Domain`, `Controllers`, `UsuarioDTO`, `LoginCommand`); domínio e métodos em **português**. |
+| 1.5 | 17/10/2026 | Mensagens de erro devolvidas ao cliente centralizadas em `MensagensErro.resx` (projeto Domain, acesso tipado). Campos ausentes e falhas de JSON/binding também respondem em português (ProblemDetails padronizado). |
+| 1.6 | 17/10/2026 | Swagger abre automaticamente no navegador em desenvolvimento (chave `Swagger:AbrirNavegador`) e a raiz redireciona para `/swagger`; respostas 401/403 do middleware em ProblemDetails/português com o motivo (token não informado, expirado ou inválido). |
