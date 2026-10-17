@@ -43,4 +43,43 @@ public class UsuarioTests
         usuario.Ativar();
         Assert.True(usuario.Ativo);
     }
+
+    [Fact]
+    public void Atualizar_DeveTrocarNomeEmailEPerfil_NormalizandoOsTextos()
+    {
+        var usuario = Usuario.Criar("Maria", "maria@exemplo.com", "hash", PerfilUsuario.Operador);
+
+        usuario.Atualizar("  Maria Souza ", "  MARIA.SOUZA@Exemplo.com ", PerfilUsuario.Administrador);
+
+        Assert.Equal("Maria Souza", usuario.Nome);
+        Assert.Equal("maria.souza@exemplo.com", usuario.Email);
+        Assert.Equal(PerfilUsuario.Administrador, usuario.Perfil);
+        Assert.True(usuario.Ativo);
+    }
+
+    [Fact]
+    public void Atualizar_SemNome_DeveLancarRegraNegocioException()
+    {
+        var usuario = Usuario.Criar("Maria", "maria@exemplo.com", "hash", PerfilUsuario.Operador);
+
+        Assert.Throws<RegraNegocioException>(() =>
+            usuario.Atualizar(" ", "maria@exemplo.com", PerfilUsuario.Operador));
+    }
+
+    [Fact]
+    public void Atualizar_SemEmail_DeveLancarRegraNegocioException()
+    {
+        var usuario = Usuario.Criar("Maria", "maria@exemplo.com", "hash", PerfilUsuario.Operador);
+
+        Assert.Throws<RegraNegocioException>(() =>
+            usuario.Atualizar("Maria", " ", PerfilUsuario.Operador));
+    }
+
+    [Fact]
+    public void AtualizarSenha_SemHash_DeveLancarRegraNegocioException()
+    {
+        var usuario = Usuario.Criar("Maria", "maria@exemplo.com", "hash", PerfilUsuario.Operador);
+
+        Assert.Throws<RegraNegocioException>(() => usuario.AtualizarSenha(" "));
+    }
 }

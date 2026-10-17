@@ -12,8 +12,41 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AjusteEstoqueInvalido" xml:space="preserve">
+    <value>A quantidade do ajuste deve ser diferente de zero.</value>
+  </data>
+  <data name="AjusteEstoqueNegativo" xml:space="preserve">
+    <value>O ajuste deixaria o estoque negativo.</value>
+  </data>
+  <data name="CartaoCodigoDuplicado" xml:space="preserve">
+    <value>Já existe um cartão cadastrado com este código.</value>
+  </data>
+  <data name="CartaoCodigoObrigatorio" xml:space="preserve">
+    <value>O código do cartão é obrigatório.</value>
+  </data>
+  <data name="CartaoCodigoTamanhoMaximo" xml:space="preserve">
+    <value>O código do cartão deve ter no máximo {MaxLength} caracteres.</value>
+  </data>
+  <data name="CartaoDesativado" xml:space="preserve">
+    <value>Este cartão está desativado e não pode ser utilizado.</value>
+  </data>
+  <data name="CartaoNaoEncontrado" xml:space="preserve">
+    <value>Cartão não encontrado.</value>
+  </data>
   <data name="CredenciaisInvalidas" xml:space="preserve">
     <value>E-mail ou senha inválidos.</value>
+  </data>
+  <data name="DataFimAnteriorInicio" xml:space="preserve">
+    <value>A data de fim não pode ser anterior à data de início.</value>
+  </data>
+  <data name="DataInicioObrigatoria" xml:space="preserve">
+    <value>A data de início é obrigatória.</value>
+  </data>
+  <data name="DesignacaoNaoEncontrada" xml:space="preserve">
+    <value>Designação de operador não encontrada.</value>
+  </data>
+  <data name="DispositivoTamanhoMaximo" xml:space="preserve">
+    <value>O dispositivo deve ter no máximo {MaxLength} caracteres.</value>
   </data>
   <data name="EmailInvalido" xml:space="preserve">
     <value>O e-mail informado é inválido.</value>
@@ -30,8 +63,47 @@
   <data name="ErroInesperado" xml:space="preserve">
     <value>Ocorreu um erro inesperado. Tente novamente mais tarde.</value>
   </data>
+  <data name="EstoqueInsuficiente" xml:space="preserve">
+    <value>Estoque insuficiente para o produto '{0}'.</value>
+  </data>
+  <data name="EstoqueNegativo" xml:space="preserve">
+    <value>A operação deixaria o estoque negativo.</value>
+  </data>
+  <data name="EventoApenasAbertoPodeEncerrar" xml:space="preserve">
+    <value>Somente eventos abertos podem ser encerrados.</value>
+  </data>
+  <data name="EventoApenasRascunhoPodeAbrir" xml:space="preserve">
+    <value>Somente eventos em rascunho podem ser abertos.</value>
+  </data>
+  <data name="EventoNaoEncontrado" xml:space="preserve">
+    <value>Evento não encontrado.</value>
+  </data>
+  <data name="EventoNaoEstaAberto" xml:space="preserve">
+    <value>O evento não está aberto para operações.</value>
+  </data>
+  <data name="EventoNaoPodeSerAlterado" xml:space="preserve">
+    <value>Este evento já foi encerrado e não pode ser alterado.</value>
+  </data>
+  <data name="EventoProdutoNaoEncontrado" xml:space="preserve">
+    <value>O produto não está vinculado a este evento.</value>
+  </data>
+  <data name="EventoProdutoSemControleEstoque" xml:space="preserve">
+    <value>Este produto não controla estoque.</value>
+  </data>
   <data name="HashSenhaObrigatorio" xml:space="preserve">
     <value>O hash da senha é obrigatório.</value>
+  </data>
+  <data name="IdObrigatorio" xml:space="preserve">
+    <value>O identificador é obrigatório.</value>
+  </data>
+  <data name="IdOperacaoObrigatoria" xml:space="preserve">
+    <value>O identificador da operação é obrigatório.</value>
+  </data>
+  <data name="NaoPodeDesativarProprioUsuario" xml:space="preserve">
+    <value>Você não pode desativar o próprio usuário.</value>
+  </data>
+  <data name="NaoPodeRemoverUltimoAdministrador" xml:space="preserve">
+    <value>O sistema precisa de ao menos um administrador ativo.</value>
   </data>
   <data name="NomeObrigatorio" xml:space="preserve">
     <value>O nome é obrigatório.</value>
@@ -42,14 +114,56 @@
   <data name="NomeUsuarioObrigatorio" xml:space="preserve">
     <value>O nome do usuário é obrigatório.</value>
   </data>
+  <data name="ObservacaoTamanhoMaximo" xml:space="preserve">
+    <value>A observação deve ter no máximo {MaxLength} caracteres.</value>
+  </data>
+  <data name="OperadorDeOutroSetor" xml:space="preserve">
+    <value>Você está designado a outro setor neste evento.</value>
+  </data>
+  <data name="OperadorJaDesignado" xml:space="preserve">
+    <value>Este operador já está designado neste evento.</value>
+  </data>
+  <data name="OperadorSemPermissaoNoEvento" xml:space="preserve">
+    <value>Você não está habilitado a operar neste evento.</value>
+  </data>
   <data name="PerfilInvalido" xml:space="preserve">
     <value>O perfil informado é inválido.</value>
+  </data>
+  <data name="PrecoInvalido" xml:space="preserve">
+    <value>O preço deve ser maior que zero.</value>
+  </data>
+  <data name="ProdutoDeOutroEvento" xml:space="preserve">
+    <value>O produto informado não pertence a este evento.</value>
+  </data>
+  <data name="ProdutoForaDoSetor" xml:space="preserve">
+    <value>O produto '{0}' não está disponível neste setor.</value>
+  </data>
+  <data name="ProdutoJaVinculadoAoEvento" xml:space="preserve">
+    <value>Este produto já está vinculado a este evento.</value>
+  </data>
+  <data name="ProdutoJaVinculadoAoSetor" xml:space="preserve">
+    <value>Este produto já está vinculado a este setor.</value>
+  </data>
+  <data name="ProdutoNaoEncontrado" xml:space="preserve">
+    <value>Produto não encontrado.</value>
+  </data>
+  <data name="QuantidadeEstoqueNegativa" xml:space="preserve">
+    <value>A quantidade de estoque não pode ser negativa.</value>
+  </data>
+  <data name="QuantidadeInvalida" xml:space="preserve">
+    <value>A quantidade deve ser maior que zero.</value>
   </data>
   <data name="RequisicaoInvalida" xml:space="preserve">
     <value>A requisição contém dados em formato inválido.</value>
   </data>
+  <data name="SaldoInsuficiente" xml:space="preserve">
+    <value>Saldo insuficiente no cartão para esta venda.</value>
+  </data>
   <data name="SemPermissao" xml:space="preserve">
     <value>Seu perfil não tem permissão para acessar este recurso.</value>
+  </data>
+  <data name="SenhaAtualIncorreta" xml:space="preserve">
+    <value>A senha atual informada está incorreta.</value>
   </data>
   <data name="SenhaObrigatoria" xml:space="preserve">
     <value>A senha é obrigatória.</value>
@@ -62,6 +176,15 @@
   </data>
   <data name="SessaoInvalida" xml:space="preserve">
     <value>Sessão inválida. Faça login novamente.</value>
+  </data>
+  <data name="SetorDeOutroEvento" xml:space="preserve">
+    <value>O setor informado não pertence a este evento.</value>
+  </data>
+  <data name="SetorJaCadastrado" xml:space="preserve">
+    <value>Já existe um setor com este nome neste evento.</value>
+  </data>
+  <data name="SetorNaoEncontrado" xml:space="preserve">
+    <value>Setor não encontrado.</value>
   </data>
   <data name="TituloAcessoNegado" xml:space="preserve">
     <value>Acesso negado.</value>
@@ -108,10 +231,25 @@
   <data name="UsuarioEmailDuplicado" xml:space="preserve">
     <value>Já existe um usuário cadastrado com este e-mail.</value>
   </data>
+  <data name="UsuarioNaoEhOperador" xml:space="preserve">
+    <value>O usuário informado não é um operador.</value>
+  </data>
   <data name="UsuarioNaoEncontrado" xml:space="preserve">
     <value>Usuário não encontrado.</value>
   </data>
   <data name="ValidacaoFalhou" xml:space="preserve">
     <value>Um ou mais campos são inválidos.</value>
+  </data>
+  <data name="ValorInvalido" xml:space="preserve">
+    <value>O valor da recarga deve ser maior que zero.</value>
+  </data>
+  <data name="VendaNaoEncontrada" xml:space="preserve">
+    <value>Venda não encontrada.</value>
+  </data>
+  <data name="VendaSemItens" xml:space="preserve">
+    <value>Informe ao menos um item para a venda.</value>
+  </data>
+  <data name="VinculoNaoEncontrado" xml:space="preserve">
+    <value>Vínculo não encontrado.</value>
   </data>
 </root>

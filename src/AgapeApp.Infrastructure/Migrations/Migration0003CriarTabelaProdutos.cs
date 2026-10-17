@@ -1,0 +1,28 @@
+using FluentMigrator;
+
+namespace AgapeApp.Infrastructure.Migrations;
+
+/// <summary>
+/// Cria a tabela de produtos (catálogo). O preço praticado fica em evento_produtos.
+/// Migrations são somente Up (forward-only): o rollback é feito manualmente quando necessário.
+/// </summary>
+[Migration(3, "Cria a tabela de produtos")]
+public class Migration0003CriarTabelaProdutos : Migration
+{
+    public override void Up()
+    {
+        Create.Table("produtos")
+            .WithColumn("id").AsGuid().PrimaryKey()
+            .WithColumn("nome").AsString(150).NotNullable()
+            .WithColumn("preco_padrao").AsDecimal(18, 2).Nullable()
+            .WithColumn("ativo").AsBoolean().NotNullable().WithDefaultValue(true)
+            .WithColumn("criado_em").AsDateTimeOffset().NotNullable()
+            .WithColumn("atualizado_em").AsDateTimeOffset().NotNullable();
+    }
+
+    // Forward-only por decisão do projeto: o Down não é implementado de propósito.
+    // Para reverter, faça manualmente no banco (ou crie uma nova migration de correção).
+    public override void Down()
+        => throw new NotSupportedException(
+            "As migrations do AgapeApp são somente Up (forward-only). O rollback é feito manualmente.");
+}

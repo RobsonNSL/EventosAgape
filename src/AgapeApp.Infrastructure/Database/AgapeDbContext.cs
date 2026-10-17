@@ -17,6 +17,32 @@ public class AgapeDbContext : DbContext
 
     public DbSet<TokenRenovacao> TokensRenovacao => Set<TokenRenovacao>();
 
+    public DbSet<Produto> Produtos => Set<Produto>();
+
+    public DbSet<Cartao> Cartoes => Set<Cartao>();
+
+    public DbSet<Evento> Eventos => Set<Evento>();
+
+    public DbSet<Setor> Setores => Set<Setor>();
+
+    public DbSet<EventoProduto> EventoProdutos => Set<EventoProduto>();
+
+    public DbSet<SetorProduto> SetorProdutos => Set<SetorProduto>();
+
+    public DbSet<EventoOperador> EventoOperadores => Set<EventoOperador>();
+
+    public DbSet<MovimentoEstoque> MovimentosEstoque => Set<MovimentoEstoque>();
+
+    public DbSet<LogAuditoria> LogsAuditoria => Set<LogAuditoria>();
+
+    public DbSet<SaldoCartaoEvento> SaldosCartaoEvento => Set<SaldoCartaoEvento>();
+
+    public DbSet<Recarga> Recargas => Set<Recarga>();
+
+    public DbSet<Venda> Vendas => Set<Venda>();
+
+    public DbSet<ItemVenda> ItensVenda => Set<ItemVenda>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.ApplyConfigurationsFromAssembly(typeof(AgapeDbContext).Assembly);

@@ -1,5 +1,7 @@
 using AgapeApp.Application.Authentication;
+using AgapeApp.Application.Auditoria;
 using AgapeApp.Application.Common.Behaviors;
+using AgapeApp.Application.Operacoes;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -23,6 +25,11 @@ public static class ApplicationDependencyInjection
         services.AddValidatorsFromAssembly(assembly, includeInternalTypes: true);
 
         services.AddScoped<SessionService>();
+
+        services.AddScoped<AuditoriaService>();
+
+        // Contexto comum das operações de caixa (recarga e venda).
+        services.AddScoped<OperacaoContextoService>();
 
         return services;
     }

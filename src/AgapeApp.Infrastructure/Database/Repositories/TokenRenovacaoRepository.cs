@@ -19,4 +19,14 @@ public class TokenRenovacaoRepository : ITokenRenovacaoRepository
     public Task<TokenRenovacao?> ObterPorHashAsync(string tokenHash, CancellationToken cancellationToken = default)
         => _context.TokensRenovacao
             .FirstOrDefaultAsync(token => token.TokenHash == tokenHash, cancellationToken);
+
+    public async Task RevogarTodosDoUsuarioAsync(Guid usuarioId, CancellationToken cancellationToken = default)
+    {
+        var tokens = await _context.TokensRenovacao
+            .Where(token => token.UsuarioId == usuarioId && token.RevogadoEm == null)
+            .ToListAsync(cancellationToken);
+
+        foreach (var token in tokens)
+            token.Revogar();
+    }
 }

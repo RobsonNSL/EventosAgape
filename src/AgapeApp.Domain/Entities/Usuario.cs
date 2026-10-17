@@ -55,6 +55,24 @@ public class Usuario : BaseEntity
     public static string NormalizarEmail(string email) => email.Trim().ToLowerInvariant();
 
     /// <summary>
+    /// Atualiza os dados cadastrais do usuário (nome, e-mail e perfil).
+    /// A situação (ativo/inativo) e a senha são alteradas pelos próprios métodos.
+    /// </summary>
+    public void Atualizar(string nome, string email, PerfilUsuario perfil)
+    {
+        if (string.IsNullOrWhiteSpace(nome))
+            throw new RegraNegocioException(MensagensErro.NomeUsuarioObrigatorio);
+
+        if (string.IsNullOrWhiteSpace(email))
+            throw new RegraNegocioException(MensagensErro.EmailUsuarioObrigatorio);
+
+        Nome = nome.Trim();
+        Email = NormalizarEmail(email);
+        Perfil = perfil;
+        MarcarComoAtualizada();
+    }
+
+    /// <summary>
     /// Define um novo hash de senha para o usuário.
     /// </summary>
     public void AtualizarSenha(string senhaHash)

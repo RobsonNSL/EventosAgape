@@ -2,6 +2,7 @@ using AgapeApp.Application.Interfaces;
 using AgapeApp.Infrastructure.Database;
 using AgapeApp.Infrastructure.Database.Repositories;
 using AgapeApp.Infrastructure.Options;
+using AgapeApp.Infrastructure.Relatorios;
 using AgapeApp.Infrastructure.Security;
 using FluentMigrator.Runner;
 using Microsoft.EntityFrameworkCore;
@@ -33,7 +34,22 @@ public static class InfrastructureDependencyInjection
         services.AddScoped<ITokenService, JwtTokenService>();
         services.AddScoped<IUsuarioRepository, UsuarioRepository>();
         services.AddScoped<ITokenRenovacaoRepository, TokenRenovacaoRepository>();
+        services.AddScoped<IProdutoRepository, ProdutoRepository>();
+        services.AddScoped<ICartaoRepository, CartaoRepository>();
+        services.AddScoped<IEventoRepository, EventoRepository>();
+        services.AddScoped<ISetorRepository, SetorRepository>();
+        services.AddScoped<IEventoProdutoRepository, EventoProdutoRepository>();
+        services.AddScoped<ISetorProdutoRepository, SetorProdutoRepository>();
+        services.AddScoped<IEventoOperadorRepository, EventoOperadorRepository>();
+        services.AddScoped<IMovimentoEstoqueRepository, MovimentoEstoqueRepository>();
+        services.AddScoped<ILogAuditoriaRepository, LogAuditoriaRepository>();
+        services.AddScoped<ISaldoCartaoEventoRepository, SaldoCartaoEventoRepository>();
+        services.AddScoped<IRecargaRepository, RecargaRepository>();
+        services.AddScoped<IVendaRepository, VendaRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        // Exportação de relatórios em Excel (ClosedXML).
+        services.AddScoped<IExportadorRelatorioEvento, ExportadorRelatorioEventoExcel>();
 
         services.AddFluentMigratorCore()
             .ConfigureRunner(runner => runner

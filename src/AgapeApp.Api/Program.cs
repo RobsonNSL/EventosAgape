@@ -1,8 +1,10 @@
 using System.Diagnostics;
 using System.Text.Json.Serialization;
+using AgapeApp.Api.Hubs;
 using AgapeApp.Api.Services;
 using AgapeApp.Api.ExceptionHandling;
 using AgapeApp.Application;
+using AgapeApp.Application.Interfaces;
 using AgapeApp.Domain.Resources;
 using AgapeApp.Infrastructure;
 using AgapeApp.Infrastructure.Options;
@@ -31,6 +33,10 @@ builder.Services
     })
     .AddJsonOptions(options =>
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+// Notificações em tempo real para o dashboard do administrador (SignalR).
+builder.Services.AddSignalR();
+builder.Services.AddScoped<INotificadorDashboard, SignalRDashboardNotificador>();
 
 // Falhas reais de binding (JSON malformado, tipo incorreto) devolvem ProblemDetails em português.
 builder.Services.Configure<ApiBehaviorOptions>(options =>
@@ -67,6 +73,20 @@ builder.Services
         // (o padrão do JwtBearer volta sem corpo, o que confunde no Swagger).
         options.Events = new JwtBearerEvents
         {
+            // SignalR: o WebSocket não permite cabeçalhos, então o token chega em ?access_token=
+            // (somente para os caminhos /hubs).
+            OnMessageReceived = contexto =>
+            {
+                var tokenDaQuery = contexto.Request.Query["access_token"];
+
+                if (!string.IsNullOrEmpty(tokenDaQuery)
+                    && contexto.HttpContext.Request.Path.StartsWithSegments("/hubs"))
+                {
+                    contexto.Token = tokenDaQuery;
+                }
+
+                return Task.CompletedTask;
+            },
             OnChallenge = async contexto =>
             {
                 contexto.HandleResponse();
@@ -194,5 +214,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Hub do dashboard do administrador (operações em tempo real).
+app.MapHub<DashboardHub>("/hubs/dashboard");
 
 app.Run();

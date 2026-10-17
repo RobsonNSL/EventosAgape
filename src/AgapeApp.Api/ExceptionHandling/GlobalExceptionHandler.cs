@@ -49,6 +49,11 @@ public class GlobalExceptionHandler : IExceptionHandler
             problema.Extensions["erros"] = excecaoValidacao.Erros;
         }
 
+        if (excecao is SaldoInsuficienteException saldoInsuficiente)
+        {
+            problema.Extensions["saldoAtual"] = saldoInsuficiente.SaldoAtual;
+        }
+
         context.Response.StatusCode = situacao;
         await context.Response.WriteAsJsonAsync(problema, cancellationToken);
 
@@ -59,6 +64,7 @@ public class GlobalExceptionHandler : IExceptionHandler
         => excecao switch
         {
             ValidacaoException => (StatusCodes.Status400BadRequest, MensagensErro.TituloDadosInvalidos, excecao.Message),
+            SaldoInsuficienteException => (StatusCodes.Status400BadRequest, MensagensErro.TituloRegraNegocioViolada, excecao.Message),
             RegraNegocioException => (StatusCodes.Status400BadRequest, MensagensErro.TituloRegraNegocioViolada, excecao.Message),
             AutenticacaoException => (StatusCodes.Status401Unauthorized, MensagensErro.TituloNaoAutenticado, excecao.Message),
             NaoAutorizadoException => (StatusCodes.Status403Forbidden, MensagensErro.TituloAcessoNegado, excecao.Message),

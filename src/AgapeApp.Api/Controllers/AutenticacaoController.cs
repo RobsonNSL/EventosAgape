@@ -1,4 +1,6 @@
 using System.Security.Claims;
+using AgapeApp.Api.Extensions;
+using AgapeApp.Application.Authentication.Commands.AlterarMinhaSenha;
 using AgapeApp.Application.Authentication.Commands.Login;
 using AgapeApp.Application.Authentication.Commands.RenovarToken;
 using AgapeApp.Application.Authentication.Commands.Sair;
@@ -64,5 +66,25 @@ public class AutenticacaoController : ControllerBase
             return Unauthorized();
 
         return Ok(await _mediator.Send(new ObterUsuarioAtualQuery(usuarioId), cancellationToken));
+    }
+
+    /// <summary>Troca a senha do próprio usuário autenticado (exige a senha atual).</summary>
+    [HttpPost("alterar-senha")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> AlterarSenha(
+        [FromBody] AlterarMinhaSenhaCommand comando,
+        CancellationToken cancellationToken)
+    {
+        var usuarioId = User.ObterUsuarioId();
+
+        if (usuarioId is null)
+            return Unauthorized();
+
+        // O identificador vem sempre do token; o corpo informa apenas as senhas.
+        comando = comando with { UsuarioId = usuarioId.Value };
+
+        await _mediator.Send(comando, cancellationToken);
+        return NoContent();
     }
 }
