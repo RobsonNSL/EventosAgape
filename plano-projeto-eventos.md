@@ -1,9 +1,9 @@
 # AgapeApp — Documento de Decisões
 
-> **Versão:** 1.2 · **Data:** 17/10/2026
+> **Versão:** 1.4 · **Data:** 17/10/2026
 >
 > Documento vivo: atualizar a cada decisão nova. Nenhuma linha de código começa antes deste documento estar fechado.
-> **Status:** domínio fechado · técnico fechado · **nome definido: AgapeApp** · estrutura + autenticação + migrations **concluídas (aguardando testes locais)**.
+> **Status:** domínio fechado · técnico fechado · **nome definido: AgapeApp** · estrutura + autenticação + migrations **concluídas e validadas localmente (SQL Server — banco `dbAgape`)**.
 
 ---
 
@@ -89,13 +89,13 @@ Aplicativo para a **pastoral de eventos da igreja**, baseado em **cartão pré-p
 | Linguagem / runtime | C# / .NET (LTS mais recente) |
 | API | ASP.NET Core Web API |
 | App mobile | .NET MAUI (Android + iPhone) |
-| Banco de dados | PostgreSQL (nuvem) |
+| Banco de dados | SQL Server local: banco `dbAgape` (nuvem: a definir) |
 | Arquitetura | DDD + Clean Architecture, padrão sênior .NET |
 | Casos de uso | CQRS com MediatR |
 | Validações | **FluentValidation** em todas as entradas, com respostas de erro padronizadas |
 | ORM | Entity Framework Core |
 | Migrations | **FluentMigrator**, executadas pela API, **uma por alteração**, **somente Up (forward-only)** — rollback manual quando necessário (sob demanda) |
-| Nomes | **Tudo em português**: código (classes, membros) e banco (tabelas, colunas) |
+| Nomes | Estrutura/pastas e termos técnicos em **inglês** (`Domain`, `Controllers`, `UsuarioDTO`, `LoginCommand`); **domínio e métodos em português** (`Usuario`, `Criar`, `GerarTokenAcesso`); banco em português (`usuarios`, `criado_em`) |
 | Autenticação | JWT + refresh token; senha com **Argon2id**; biometria no app |
 | Tempo real | SignalR (dashboard do admin) |
 | Excel | ClosedXML |
@@ -115,11 +115,11 @@ Aplicativo para a **pastoral de eventos da igreja**, baseado em **cartão pré-p
 
 ### 3.2 Convenções de nomes
 
-- **C#:** PascalCase em português — `Usuario`, `Cartao`, `RealizarVendaCommand` → `RealizarVendaComando`, `EfetuarRecargaComando`.
-- **Banco (PostgreSQL):** snake_case plural em português — `usuarios`, `cartoes`, `evento_produtos`.
+- **C#:** PascalCase — domínio em português + sufixos técnicos em inglês: `Usuario`, `Cartao`, `UsuarioController`, `UsuarioDTO`, `RealizarVendaCommand`, `EfetuarRecargaCommand`; **métodos em português** (`Criar`, `CalcularHashTokenRenovacao`).
+- **Banco (SQL Server):** snake_case plural em português — `usuarios`, `cartoes`, `evento_produtos`.
 - **Rotas da API:** em português (ex.: `/api/vendas`, `/api/recargas`).
 - **Identificadores:** `Guid` (uuid) em todas as entidades.
-- **Datas/horas:** armazenadas em UTC (`timestamptz`), exibidas no fuso local.
+- **Datas/horas:** armazenadas em UTC (`datetimeoffset`), exibidas no fuso local.
 
 ---
 
@@ -158,19 +158,19 @@ Um repositório, dois clientes (app hoje; web depois) sobre a mesma API.
 ```
 AgapeApp.slnx
 src/
-  AgapeApp.Dominio          → entidades, value objects, regras de negócio
-  AgapeApp.Aplicacao        → casos de uso (CQRS), validações (FluentValidation), DTOs, interfaces
-  AgapeApp.Infraestrutura   → EF Core, PostgreSQL, FluentMigrator, Argon2, JWT, export Excel
+  AgapeApp.Domain           → entidades, value objects, regras de negócio
+  AgapeApp.Application      → casos de uso (CQRS), validações (FluentValidation), DTOs, interfaces
+  AgapeApp.Infrastructure   → EF Core, SQL Server, FluentMigrator, Argon2, JWT, export Excel
   AgapeApp.Api              → endpoints, autenticação/autorização, SignalR, Swagger, runner de migrations
   AgapeApp.Mobile           → app MAUI (MVVM), cache SQLite, leitura de QR (fase futura)
 tests/
-  AgapeApp.Dominio.Testes
-  AgapeApp.Aplicacao.Testes
-  AgapeApp.Infraestrutura.Testes
-  AgapeApp.Api.TestesIntegracao
+  AgapeApp.Domain.Tests
+  AgapeApp.Application.Tests
+  AgapeApp.Infrastructure.Tests
+  AgapeApp.Api.IntegrationTests
 ```
 
-Fluxo de dependência: `Api → Aplicacao → Dominio`; `Infraestrutura` e `Mobile` dependem de contratos (interfaces) definidos no `Dominio`/`Aplicacao`.
+Fluxo de dependência: `Api → Application → Domain`; `Infrastructure` e `Mobile` dependem de contratos (interfaces) definidos no `Domain`/`Application`.
 
 ---
 
@@ -190,7 +190,7 @@ Fluxo de dependência: `Api → Aplicacao → Dominio`; `Infraestrutura` e `Mobi
 3. **Mapa de telas e fluxos** (operador e admin).
 4. **Detalhamento dos casos de uso / endpoints** (contrato completo da API).
 5. **Plano de implementação faseado** (cadastros → recarga → venda → relatórios).
-6. **Hospedagem**: definir provedor de nuvem (API + PostgreSQL).
+6. **Hospedagem**: definir provedor de nuvem (API + banco de dados).
 
 ### Pontos em aberto registrados
 
@@ -206,3 +206,5 @@ Fluxo de dependência: `Api → Aplicacao → Dominio`; `Infraestrutura` e `Mobi
 | 1.0 | 17/10/2026 | Criação do documento (domínio e decisões técnicas fechados). |
 | 1.1 | 17/10/2026 | Nome definido: **AgapeApp**. Estrutura inicial + autenticação + migrations em andamento. |
 | 1.2 | 17/10/2026 | API v1 de autenticação concluída: solução DDD, Argon2id, JWT + refresh, FluentMigrator forward-only e seed do administrador. |
+| 1.3 | 17/10/2026 | Banco trocado para **SQL Server** local (`dbAgape`, instância `MSSQLSERVER01`); chave JWT passou a ser derivada por SHA-256 (funciona com qualquer tamanho de segredo). |
+| 1.4 | 17/10/2026 | Convenção de nomes ajustada: estrutura/pastas e sufixos técnicos em **inglês** (`Domain`, `Controllers`, `UsuarioDTO`, `LoginCommand`); domínio e métodos em **português**. |

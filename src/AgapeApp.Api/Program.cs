@@ -1,47 +1,58 @@
-using System.Text;
 using System.Text.Json.Serialization;
-using AgapeApp.Api.Servicos;
-using AgapeApp.Api.Tratamento;
-using AgapeApp.Aplicacao;
-using AgapeApp.Infraestrutura;
-using AgapeApp.Infraestrutura.Configuracoes;
+using AgapeApp.Api.Services;
+using AgapeApp.Api.ExceptionHandling;
+using AgapeApp.Application;
+using AgapeApp.Infrastructure;
+using AgapeApp.Infrastructure.Options;
+using AgapeApp.Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 
-var construtor = WebApplication.CreateBuilder(args);
-var configuracao = construtor.Configuration;
+var builder = WebApplication.CreateBuilder(args);
+var configuration = builder.Configuration;
 
 // Serviços das camadas de Aplicação e Infraestrutura.
-construtor.Services.AdicionarAplicacao();
-construtor.Services.AdicionarInfraestrutura(configuracao);
+builder.Services.AdicionarAplicacao();
+builder.Services.AdicionarInfraestrutura(configuration);
 
 // Controladores com enums serializados como texto (ex.: "Administrador").
-construtor.Services
-    .AddControllers()
-    .AddJsonOptions(opcoes =>
-        opcoes.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+builder.Services
+    .AddControllers(options =>
+    {
+        // Campos ausentes passam pelo FluentValidation (mensagens em português do resources),
+        // em vez do 400 automático do [ApiController] ("The Email field is required.").
+        options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
+    })
+    .AddJsonOptions(options =>
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+// Falhas reais de binding (JSON malformado, tipo incorreto) devolvem ProblemDetails em português.
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+    options.InvalidModelStateResponseFactory = ModelStateProblemDetails.Criar);
 
 // Autenticação JWT.
-var secaoAutenticacao = configuracao.GetSection(OpcoesAutenticacao.SecaoConfiguracao);
-var chaveSecreta = secaoAutenticacao["ChaveSecreta"]
+var authenticationSection = configuration.GetSection(AuthenticationOptions.SecaoConfiguracao);
+var chaveSecreta = authenticationSection["ChaveSecreta"]
     ?? throw new InvalidOperationException("A configuração 'Autenticacao:ChaveSecreta' é obrigatória.");
 
-construtor.Services
+builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(opcoes =>
+    .AddJwtBearer(options =>
     {
         // Mantém os nomes originais das claims ("sub", "perfil", "nome"...).
-        opcoes.MapInboundClaims = false;
+        options.MapInboundClaims = false;
 
-        opcoes.TokenValidationParameters = new TokenValidationParameters
+        options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
-            ValidIssuer = secaoAutenticacao["Emissor"],
+            ValidIssuer = authenticationSection["Emissor"],
             ValidateAudience = true,
-            ValidAudience = secaoAutenticacao["Audiencia"],
+            ValidAudience = authenticationSection["Audiencia"],
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(chaveSecreta)),
+            // A chave é derivada via SHA-256 (JwtKeyDerivation): qualquer tamanho de segredo funciona com o HS256.
+            IssuerSigningKey = new SymmetricSecurityKey(JwtKeyDerivation.Derivar(chaveSecreta)),
             ValidateLifetime = true,
             ClockSkew = TimeSpan.FromSeconds(30),
             NameClaimType = "nome",
@@ -50,28 +61,28 @@ construtor.Services
     });
 
 // Autorização: política exclusiva de administradores.
-construtor.Services.AddAuthorization(opcoes =>
+builder.Services.AddAuthorization(options =>
 {
-    opcoes.AddPolicy("SomenteAdministrador", politica =>
-        politica.RequireRole("Administrador"));
+    options.AddPolicy("SomenteAdministrador", policy =>
+        policy.RequireRole("Administrador"));
 });
 
 // Tratamento global de exceções com ProblemDetails em português.
-construtor.Services.AddExceptionHandler<TratadorExcecoesGlobais>();
-construtor.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 // Swagger (com autenticação Bearer).
-construtor.Services.AddEndpointsApiExplorer();
-construtor.Services.AddSwaggerGen(opcoes =>
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
 {
-    opcoes.SwaggerDoc("v1", new OpenApiInfo
+    options.SwaggerDoc("v1", new OpenApiInfo
     {
         Title = "AgapeApp API",
         Version = "v1",
         Description = "API do AgapeApp — cartão pré-pago e gestão de eventos."
     });
 
-    opcoes.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
         Type = SecuritySchemeType.Http,
@@ -81,30 +92,30 @@ construtor.Services.AddSwaggerGen(opcoes =>
         Description = "Informe apenas o token JWT (sem o prefixo 'Bearer')."
     });
 
-    opcoes.AddSecurityRequirement(documento => new OpenApiSecurityRequirement
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
     {
-        [new OpenApiSecuritySchemeReference("Bearer", documento)] = new List<string>()
+        [new OpenApiSecuritySchemeReference("Bearer", document)] = new List<string>()
     });
 });
 
 // Na inicialização: aplica migrations pendentes e garante o primeiro administrador.
-construtor.Services.AddHostedService<ServicoInicializacaoBanco>();
+builder.Services.AddHostedService<DatabaseInitializationService>();
 
-var aplicacao = construtor.Build();
+var app = builder.Build();
 
-aplicacao.UseExceptionHandler();
+app.UseExceptionHandler();
 
-if (aplicacao.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
-    aplicacao.UseSwagger();
-    aplicacao.UseSwaggerUI(opcoes =>
-        opcoes.SwaggerEndpoint("/swagger/v1/swagger.json", "AgapeApp API v1"));
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "AgapeApp API v1"));
 }
 
 // Em produção a API ficará atrás de um proxy reverso responsável pelo TLS.
-aplicacao.UseAuthentication();
-aplicacao.UseAuthorization();
+app.UseAuthentication();
+app.UseAuthorization();
 
-aplicacao.MapControllers();
+app.MapControllers();
 
-aplicacao.Run();
+app.Run();

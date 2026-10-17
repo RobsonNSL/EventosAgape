@@ -6,21 +6,18 @@ As decisões do projeto (domínio e técnicas) estão em [`plano-projeto-eventos
 ## Requisitos
 
 - .NET SDK 10
-- PostgreSQL 14+
+- SQL Server local (exemplo: instância `localhost\MSSQLSERVER01`)
 
 ## Como rodar
 
-1. Crie o banco no PostgreSQL:
+1. Use o banco `dbAgape` no seu SQL Server local
+   (o exemplo aponta para a instância `localhost\MSSQLSERVER01`).
 
-   ```sql
-   CREATE DATABASE agapeapp;
-   ```
-
-2. Ajuste a conexão em `src/AgapeApp.Api/appsettings.json` (ou no `appsettings.Development.json`):
+2. Se precisar, ajuste a conexão em `src/AgapeApp.Api/appsettings.json` (ou no `appsettings.Development.json`):
 
    ```json
    "ConnectionStrings": {
-     "Postgres": "Host=localhost;Port=5432;Database=agapeapp;Username=SEU_USUARIO;Password=SUA_SENHA"
+     "SqlServer": "Server=localhost\\MSSQLSERVER01;Database=dbAgape;Trusted_Connection=True;TrustServerCertificate=True"
    }
    ```
 
@@ -73,22 +70,25 @@ dotnet test
 ```
 AgapeApp.slnx
 src/
-  AgapeApp.Dominio          → entidades e regras de negócio
-  AgapeApp.Aplicacao        → casos de uso (CQRS/MediatR), validações (FluentValidation)
-  AgapeApp.Infraestrutura   → EF Core + PostgreSQL, FluentMigrator, Argon2, JWT
-  AgapeApp.Api              → controladores, autenticação, Swagger
+  AgapeApp.Domain          → entidades e regras de negócio
+  AgapeApp.Application     → casos de uso (CQRS/MediatR), validações (FluentValidation)
+  AgapeApp.Infrastructure  → EF Core + SQL Server, FluentMigrator, Argon2, JWT
+  AgapeApp.Api             → controllers, autenticação, Swagger
 tests/
-  AgapeApp.Dominio.Testes
-  AgapeApp.Aplicacao.Testes
-  AgapeApp.Infraestrutura.Testes
-  AgapeApp.Api.TestesIntegracao
+  AgapeApp.Domain.Tests
+  AgapeApp.Application.Tests
+  AgapeApp.Infrastructure.Tests
+  AgapeApp.Api.IntegrationTests
 ```
 
 ## Observações
 
-- **Migrations:** ficam em `src/AgapeApp.Infraestrutura/Migracoes` e rodam na inicialização da API.
+- **Convenções de código:** estrutura/pastas e sufixos técnicos em inglês (`Domain`, `Controllers`, `UsuarioController`, `UsuarioDTO`, `LoginCommand`); domínio e métodos em português (`Usuario`, `Criar`, `GerarTokenAcesso`).
+- **Migrations:** ficam em `src/AgapeApp.Infrastructure/Migrations` e rodam na inicialização da API.
   São **somente Up** (por decisão do projeto); o `Down` lança `NotSupportedException` de propósito.
   Para reverter algo, faça manualmente no banco ou crie uma migration de correção.
 - **Senhas:** hash com **Argon2id** (64 MB, 3 iterações, 4 threads).
 - **Sessões:** token de acesso JWT (padrão: 30 min) + token de renovação com rotação (padrão: 7 dias).
-- **Datas:** armazenadas em UTC (`timestamptz`).
+- **Chave JWT:** o valor de `Autenticacao:ChaveSecreta` é derivado via SHA-256 para virar a chave de assinatura —
+  funciona com qualquer tamanho de segredo (em produção use um segredo longo e aleatório).
+- **Datas:** armazenadas em UTC (`datetimeoffset`).

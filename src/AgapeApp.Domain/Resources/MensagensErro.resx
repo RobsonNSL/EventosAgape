@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="CredenciaisInvalidas" xml:space="preserve">
+    <value>E-mail ou senha inválidos.</value>
+  </data>
+  <data name="EmailInvalido" xml:space="preserve">
+    <value>O e-mail informado é inválido.</value>
+  </data>
+  <data name="EmailObrigatorio" xml:space="preserve">
+    <value>O e-mail é obrigatório.</value>
+  </data>
+  <data name="EmailTamanhoMaximo" xml:space="preserve">
+    <value>O e-mail deve ter no máximo {MaxLength} caracteres.</value>
+  </data>
+  <data name="EmailUsuarioObrigatorio" xml:space="preserve">
+    <value>O e-mail do usuário é obrigatório.</value>
+  </data>
+  <data name="ErroInesperado" xml:space="preserve">
+    <value>Ocorreu um erro inesperado. Tente novamente mais tarde.</value>
+  </data>
+  <data name="HashSenhaObrigatorio" xml:space="preserve">
+    <value>O hash da senha é obrigatório.</value>
+  </data>
+  <data name="NomeObrigatorio" xml:space="preserve">
+    <value>O nome é obrigatório.</value>
+  </data>
+  <data name="NomeTamanhoMaximo" xml:space="preserve">
+    <value>O nome deve ter no máximo {MaxLength} caracteres.</value>
+  </data>
+  <data name="NomeUsuarioObrigatorio" xml:space="preserve">
+    <value>O nome do usuário é obrigatório.</value>
+  </data>
+  <data name="PerfilInvalido" xml:space="preserve">
+    <value>O perfil informado é inválido.</value>
+  </data>
+  <data name="RequisicaoInvalida" xml:space="preserve">
+    <value>A requisição contém dados em formato inválido.</value>
+  </data>
+  <data name="SenhaObrigatoria" xml:space="preserve">
+    <value>A senha é obrigatória.</value>
+  </data>
+  <data name="SenhaTamanhoMinimo" xml:space="preserve">
+    <value>A senha deve ter no mínimo {MinLength} caracteres.</value>
+  </data>
+  <data name="SessaoExpirada" xml:space="preserve">
+    <value>Sessão expirada. Faça login novamente.</value>
+  </data>
+  <data name="SessaoInvalida" xml:space="preserve">
+    <value>Sessão inválida. Faça login novamente.</value>
+  </data>
+  <data name="TituloAcessoNegado" xml:space="preserve">
+    <value>Acesso negado.</value>
+  </data>
+  <data name="TituloConflito" xml:space="preserve">
+    <value>Conflito.</value>
+  </data>
+  <data name="TituloDadosInvalidos" xml:space="preserve">
+    <value>Dados inválidos.</value>
+  </data>
+  <data name="TituloErroInterno" xml:space="preserve">
+    <value>Erro interno.</value>
+  </data>
+  <data name="TituloNaoAutenticado" xml:space="preserve">
+    <value>Não autenticado.</value>
+  </data>
+  <data name="TituloNaoEncontrado" xml:space="preserve">
+    <value>Não encontrado.</value>
+  </data>
+  <data name="TituloRegraNegocioViolada" xml:space="preserve">
+    <value>Regra de negócio violada.</value>
+  </data>
+  <data name="TokenRenovacaoHashObrigatorio" xml:space="preserve">
+    <value>O hash do token de renovação é obrigatório.</value>
+  </data>
+  <data name="TokenRenovacaoObrigatorio" xml:space="preserve">
+    <value>O token de renovação é obrigatório.</value>
+  </data>
+  <data name="TokenRenovacaoUsuarioObrigatorio" xml:space="preserve">
+    <value>O usuário do token de renovação é obrigatório.</value>
+  </data>
+  <data name="UsuarioDesativado" xml:space="preserve">
+    <value>Este usuário está desativado. Procure um administrador.</value>
+  </data>
+  <data name="UsuarioEmailDuplicado" xml:space="preserve">
+    <value>Já existe um usuário cadastrado com este e-mail.</value>
+  </data>
+  <data name="UsuarioNaoEncontrado" xml:space="preserve">
+    <value>Usuário não encontrado.</value>
+  </data>
+  <data name="ValidacaoFalhou" xml:space="preserve">
+    <value>Um ou mais campos são inválidos.</value>
+  </data>
+</root>

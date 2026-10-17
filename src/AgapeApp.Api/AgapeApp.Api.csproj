@@ -13,8 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AgapeApp.Aplicacao\AgapeApp.Aplicacao.csproj" />
-    <ProjectReference Include="..\AgapeApp.Infraestrutura\AgapeApp.Infraestrutura.csproj" />
+    <ProjectReference Include="..\AgapeApp.Application\AgapeApp.Application.csproj" />
+    <ProjectReference Include="..\AgapeApp.Infrastructure\AgapeApp.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
