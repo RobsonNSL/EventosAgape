@@ -30,6 +30,8 @@ public sealed class LeitorCartoesDialogo : DialogoBase<int>
     private string? _ultimoCodigo;
     private DateTime _ultimaLeitura = DateTime.MinValue;
     private int _cadastrados;
+    private string? _candidato;
+    private DateTime _candidatoEm = DateTime.MinValue;
 
     public LeitorCartoesDialogo(Func<string, Task<ResultadoLeitura>> aoLer)
     {
@@ -147,10 +149,10 @@ public sealed class LeitorCartoesDialogo : DialogoBase<int>
         {
             Options = new BarcodeReaderOptions
             {
-                Formats = BarcodeFormats.TwoDimensional | BarcodeFormats.OneDimensional,
+                Formats = BarcodeFormat.QrCode,
                 AutoRotate = true,
                 Multiple = false,
-                TryHarder = true
+                TryHarder = false
             }
         };
 
@@ -186,11 +188,21 @@ public sealed class LeitorCartoesDialogo : DialogoBase<int>
     {
         var codigo = CodigoCartao.Normalizar(lido);
 
-        if (_processando || string.IsNullOrWhiteSpace(codigo))
+        if (_processando || codigo.Length < 3)
             return;
 
         if (codigo == _ultimoCodigo && DateTime.UtcNow - _ultimaLeitura < RepeticaoIgnorada)
             return;
+
+        // Só cadastra quando o mesmo QR aparece duas vezes seguidas (evita leitura falsa).
+        if (codigo != _candidato || DateTime.UtcNow - _candidatoEm > TimeSpan.FromSeconds(1.5))
+        {
+            _candidato = codigo;
+            _candidatoEm = DateTime.UtcNow;
+            return;
+        }
+
+        _candidato = null;
 
         _processando = true;
 

@@ -28,94 +28,117 @@
                 </VerticalStackLayout>
             </Grid>
 
-            <!-- Câmera -->
-            <Border BackgroundColor="{StaticResource TextoPrimario}"
-                    StrokeThickness="0"
-                    StrokeShape="RoundRectangle 16"
-                    HeightRequest="280">
-                <Grid>
-                    <!-- O leitor é criado e descartado no código, para a câmera parar
-                         de verdade quando a tela sai de cena. -->
-                    <ContentView x:Name="CameraHost" />
+            <!-- Escolha: QR ou digitação -->
+            <VerticalStackLayout Spacing="12" IsVisible="{Binding MostrarEscolha}">
+                <Label Text="Como você quer identificar o cartão?" Style="{StaticResource SubtituloPequeno}" />
 
-                    <!-- Instrução -->
-                    <Border BackgroundColor="#CC0F172A"
-                            StrokeThickness="0"
-                            StrokeShape="RoundRectangle 10"
-                            Padding="10,6"
-                            Margin="12"
-                            HorizontalOptions="Center"
-                            VerticalOptions="End">
-                        <Label Text="Aponte para o QR do cartão"
-                               FontFamily="InterMedium"
-                               FontSize="12"
-                               TextColor="{StaticResource Superficie}" />
-                    </Border>
-
-                    <!-- Lanterna -->
-                    <controles:BotaoIcone x:Name="BotaoLanterna"
-                                          Glifo="&#xf0eb;"
-                                          TamanhoIcone="17"
-                                          CorIcone="White"
-                                          BackgroundColor="#CC0F172A"
-                                          StrokeThickness="0"
-                                          Margin="12"
-                                          HorizontalOptions="End"
-                                          VerticalOptions="Start"
-                                          Tocado="AoAlternarLanterna" />
-                </Grid>
-            </Border>
-
-            <Label x:Name="StatusCamera"
-                   Text="Preparando a câmera..."
-                   Style="{StaticResource LegendaPequena}"
-                   HorizontalTextAlignment="Center" />
-
-            <!-- Digitação manual -->
-            <Border Style="{StaticResource Card}">
-                <VerticalStackLayout Spacing="14">
-                    <Grid ColumnDefinitions="38,*" ColumnSpacing="10">
-                        <Border WidthRequest="36" HeightRequest="36"
+                <Border Style="{StaticResource Card}">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding UsarCameraCommand}" />
+                    </Border.GestureRecognizers>
+                    <Grid ColumnDefinitions="52,*,20" ColumnSpacing="14">
+                        <Border WidthRequest="52" HeightRequest="52"
                                 StrokeThickness="0"
-                                StrokeShape="RoundRectangle 10"
-                                BackgroundColor="{StaticResource PrimaryContainer}"
-                                VerticalOptions="Center">
-                            <Label Text="&#xf11c;" FontFamily="fa" FontSize="14"
+                                StrokeShape="RoundRectangle 15"
+                                BackgroundColor="{StaticResource SucessoContainer}">
+                            <Label Text="&#xf029;" FontFamily="fa" FontSize="22"
+                                   TextColor="{StaticResource OnSucessoContainer}"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                        <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                            <Label Text="Ler o QR code" Style="{StaticResource SubtituloPequeno}" />
+                            <Label Text="Abre a câmera; aponte para o QR do cartão" Style="{StaticResource LegendaPequena}" />
+                        </VerticalStackLayout>
+                        <Label Grid.Column="2" Text="&#xf054;" FontFamily="fa" FontSize="14"
+                               TextColor="{StaticResource TextoMudo}" VerticalOptions="Center" />
+                    </Grid>
+                </Border>
+
+                <Border Style="{StaticResource Card}">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding UsarDigitacaoCommand}" />
+                    </Border.GestureRecognizers>
+                    <Grid ColumnDefinitions="52,*,20" ColumnSpacing="14">
+                        <Border WidthRequest="52" HeightRequest="52"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 15"
+                                BackgroundColor="{StaticResource PrimaryContainer}">
+                            <Label Text="&#xf11c;" FontFamily="fa" FontSize="20"
                                    TextColor="{StaticResource OnPrimaryContainer}"
                                    HorizontalOptions="Center" VerticalOptions="Center" />
                         </Border>
                         <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
-                            <Label Text="Ou digite o código" Style="{StaticResource SubtituloPequeno}" />
-                            <Label Text="O código também está impresso no cartão."
-                                   Style="{StaticResource LegendaPequena}" />
+                            <Label Text="Digitar o código" Style="{StaticResource SubtituloPequeno}" />
+                            <Label Text="Para QR apagado ou cartão sem QR" Style="{StaticResource LegendaPequena}" />
                         </VerticalStackLayout>
+                        <Label Grid.Column="2" Text="&#xf054;" FontFamily="fa" FontSize="14"
+                               TextColor="{StaticResource TextoMudo}" VerticalOptions="Center" />
                     </Grid>
+                </Border>
+            </VerticalStackLayout>
+
+            <!-- Câmera (só liga quando escolhida) -->
+            <VerticalStackLayout Spacing="12" IsVisible="{Binding MostrarCamera}">
+                <Border BackgroundColor="{StaticResource TextoPrimario}"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 16"
+                        HeightRequest="300">
+                    <Grid>
+                        <!-- O leitor é criado e descartado no código, para a câmera parar
+                             de verdade quando sai de cena. -->
+                        <ContentView x:Name="CameraHost" />
+
+                        <Border BackgroundColor="#CC0F172A"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 10"
+                                Padding="10,6"
+                                Margin="12"
+                                HorizontalOptions="Center"
+                                VerticalOptions="End">
+                            <Label Text="Aponte para o QR do cartão"
+                                   FontFamily="InterMedium"
+                                   FontSize="12"
+                                   TextColor="{StaticResource Superficie}" />
+                        </Border>
+
+                        <controles:BotaoIcone x:Name="BotaoLanterna"
+                                              Glifo="&#xf0eb;"
+                                              TamanhoIcone="17"
+                                              CorIcone="White"
+                                              BackgroundColor="#CC0F172A"
+                                              StrokeThickness="0"
+                                              Margin="12"
+                                              HorizontalOptions="End"
+                                              VerticalOptions="Start"
+                                              Tocado="AoAlternarLanterna" />
+                    </Grid>
+                </Border>
+
+                <Label x:Name="StatusCamera"
+                       Text="Preparando a câmera..."
+                       Style="{StaticResource LegendaPequena}"
+                       HorizontalTextAlignment="Center" />
+
+                <Button Text="Digitar o código em vez disso"
+                        Style="{StaticResource BotaoContorno}"
+                        Command="{Binding UsarDigitacaoCommand}" />
+            </VerticalStackLayout>
+
+            <!-- Digitação manual -->
+            <Border Style="{StaticResource Card}" IsVisible="{Binding MostrarManual}">
+                <VerticalStackLayout Spacing="14">
+                    <Label Text="Código impresso no cartão" Style="{StaticResource SubtituloPequeno}" />
 
                     <Border Style="{StaticResource MolduraCampo}">
                         <Grid ColumnDefinitions="24,*" ColumnSpacing="10">
                             <Label Text="&#xf09d;" FontFamily="fa" FontSize="16"
                                    TextColor="{StaticResource TextoMudo}" VerticalOptions="Center" />
-                            <Entry Grid.Column="1"
+                            <Entry x:Name="CampoCodigo"
+                                   Grid.Column="1"
                                    Text="{Binding Codigo}"
-                                   Placeholder="Ex.: CART-000123"
+                                   Placeholder="Ex.: CARD-0001"
                                    ReturnType="Go"
                                    ReturnCommand="{Binding ConfirmarCommand}" />
-                        </Grid>
-                    </Border>
-
-                    <!-- Erro -->
-                    <Border IsVisible="{Binding TemErro}"
-                            BackgroundColor="{StaticResource PerigoContainer}"
-                            StrokeThickness="0"
-                            StrokeShape="RoundRectangle 12"
-                            Padding="12,10">
-                        <Grid ColumnDefinitions="20,*" ColumnSpacing="8">
-                            <Label Text="&#xf071;" FontFamily="fa" FontSize="14"
-                                   TextColor="{StaticResource OnPerigoContainer}" VerticalOptions="Center" />
-                            <Label Grid.Column="1"
-                                   Text="{Binding MensagemErro}"
-                                   Style="{StaticResource Corpo}"
-                                   TextColor="{StaticResource OnPerigoContainer}" />
                         </Grid>
                     </Border>
 
@@ -130,7 +153,27 @@
                                            VerticalOptions="Center"
                                            Margin="0,0,18,0" />
                     </Grid>
+
+                    <Button Text="Ler o QR code em vez disso"
+                            Style="{StaticResource BotaoContorno}"
+                            Command="{Binding UsarCameraCommand}" />
                 </VerticalStackLayout>
+            </Border>
+
+            <!-- Erro (vale para câmera e digitação) -->
+            <Border IsVisible="{Binding TemErro}"
+                    BackgroundColor="{StaticResource PerigoContainer}"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 12"
+                    Padding="12,10">
+                <Grid ColumnDefinitions="20,*" ColumnSpacing="8">
+                    <Label Text="&#xf071;" FontFamily="fa" FontSize="14"
+                           TextColor="{StaticResource OnPerigoContainer}" VerticalOptions="Center" />
+                    <Label Grid.Column="1"
+                           Text="{Binding MensagemErro}"
+                           Style="{StaticResource Corpo}"
+                           TextColor="{StaticResource OnPerigoContainer}" />
+                </Grid>
             </Border>
         </VerticalStackLayout>
     </ScrollView>

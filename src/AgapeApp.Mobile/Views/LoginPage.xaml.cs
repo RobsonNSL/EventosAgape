@@ -20,9 +20,20 @@ public partial class LoginPage : ContentPage
     {
         base.OnAppearing();
 
-        if (!Dialogos.Aberto)
-            await _vm.PrepararAsync();
+        if (Dialogos.Aberto)
+            return;
+
+        await _vm.PrepararAsync();
+
+        // Com a biometria ativada, já pede a digital ao abrir (uma vez; depois fica o botão).
+        if (_vm.BiometriaDisponivel && !_biometriaPedida)
+        {
+            _biometriaPedida = true;
+            await _vm.EntrarComBiometriaCommand.ExecuteAsync(null);
+        }
     }
+
+    private bool _biometriaPedida;
 
     private int _toquesBrasao;
 

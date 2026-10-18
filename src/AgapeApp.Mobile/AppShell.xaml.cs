@@ -7,10 +7,12 @@ namespace AgapeApp.Mobile;
 public partial class AppShell : Shell
 {
     private readonly SessaoService _sessao;
+    private readonly BiometriaService _biometria;
 
-    public AppShell(SessaoService sessao)
+    public AppShell(SessaoService sessao, BiometriaService biometria)
     {
         _sessao = sessao;
+        _biometria = biometria;
         InitializeComponent();
 
         RegistrarRotas();
@@ -18,8 +20,10 @@ public partial class AppShell : Shell
         // Por padrão a aba Gestão fica escondida; o OnNavigated a revela para administradores.
         AbaGestao.IsVisible = _sessao.EhAdministrador;
 
-        // Restaura a sessão salva (se houver) sem bloquear a abertura do app.
-        Dispatcher.Dispatch(async () => await RestaurarSessaoAsync());
+        // O app sempre abre no login (e-mail/senha ou biometria); nunca entra direto.
+        // Começa já no construtor: a tela de login aguarda isto antes de oferecer a biometria.
+        var abertura = _sessao.PrepararAberturaAsync(manterParaBiometria: _biometria.Ativada);
+        Dispatcher.Dispatch(async () => await MostrarErroDepoisDaAberturaAsync(abertura));
     }
 
     private static void RegistrarRotas()
@@ -55,18 +59,16 @@ public partial class AppShell : Shell
         AbaGestao.IsVisible = _sessao.EhAdministrador;
     }
 
-    private async Task RestaurarSessaoAsync()
+    private static async Task MostrarErroDepoisDaAberturaAsync(Task abertura)
     {
         try
         {
-            if (await _sessao.CarregarAsync())
-                await GoToAsync("//principal");
-
+            await abertura;
             await MostrarErroAnteriorAsync();
         }
         catch
         {
-            // Sem sessão válida: permanece na tela de login.
+            // Qualquer falha aqui só significa ficar na tela de login.
         }
     }
 

@@ -57,8 +57,7 @@ public partial class LoginViewModel : BaseViewModel
         if (!string.IsNullOrWhiteSpace(salvo))
             Email = salvo;
 
-        if (!Sessao.Autenticado)
-            await Sessao.CarregarAsync();
+        await Sessao.AguardarAberturaAsync();
 
         BiometriaDisponivel = _biometria.Ativada
                               && Sessao.TemRenovacaoSalva

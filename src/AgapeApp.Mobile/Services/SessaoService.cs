@@ -194,6 +194,35 @@ public class SessaoService
         }
     }
 
+    /// <summary>
+    /// Abertura do app: ninguém entra direto. Com biometria ativada, fica guardado só o
+    /// token de renovação (a digital troca por um acesso novo); sem biometria, a sessão
+    /// salva é apagada e o login pede e-mail e senha.
+    /// </summary>
+    public Task PrepararAberturaAsync(bool manterParaBiometria)
+        => _abertura = PrepararAberturaInternoAsync(manterParaBiometria);
+
+    /// <summary>A tela de login espera a abertura terminar antes de decidir se oferece a biometria.</summary>
+    public Task AguardarAberturaAsync() => _abertura ?? Task.CompletedTask;
+
+    private Task? _abertura;
+
+    private async Task PrepararAberturaInternoAsync(bool manterParaBiometria)
+    {
+        if (!manterParaBiometria)
+        {
+            await LimparAsync();
+            return;
+        }
+
+        await CarregarAsync();
+
+        _tokenAcesso = null;
+        _expiraEm = DateTimeOffset.MinValue;
+        RemoverSeguro(ChaveAcesso);
+        RemoverSeguro(ChaveExpiraEm);
+    }
+
     /// <summary>Apaga a sessão local.</summary>
     public Task LimparAsync()
     {
