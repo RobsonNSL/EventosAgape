@@ -48,10 +48,18 @@ public partial class LeituraQrViewModel : BaseViewModel
 
     partial void OnOrigemChanged(string value) => OnPropertyChanged(nameof(TituloAcao));
 
+    /// <summary>Prepara a tela para o próximo cartão (ao voltar de uma venda/recarga concluída).</summary>
+    public void PrepararNovaLeitura(string origem)
+    {
+        Origem = origem;
+        Codigo = string.Empty;
+        MensagemErro = null;
+    }
+
     [RelayCommand]
     private async Task ConfirmarAsync()
     {
-        var limpo = Codigo.Trim().ToUpperInvariant();
+        var limpo = (Codigo ?? string.Empty).Trim().ToUpperInvariant();
         if (string.IsNullOrWhiteSpace(limpo))
         {
             MensagemErro = "Digite o código impresso no cartão.";

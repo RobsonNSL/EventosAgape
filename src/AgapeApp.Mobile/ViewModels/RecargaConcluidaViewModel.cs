@@ -64,20 +64,13 @@ public partial class RecargaConcluidaViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    private async Task RecarregarOutroAsync()
-    {
-        if (Shell.Current is null)
-            return;
-
-        await Shell.Current.GoToAsync(
-            $"leitura?origem=recarga&eventoId={EventoId}&setorId={SetorId}" +
+    private Task RecarregarOutroAsync()
+        => Navegacao.VoltarParaLeituraAsync(
+            "recarga",
+            $"../leitura?origem=recarga&eventoId={EventoId}&setorId={SetorId}" +
             $"&eventoNome={Uri.EscapeDataString(EventoNome)}&setorNome={Uri.EscapeDataString(SetorNome)}");
-    }
 
+    /// <summary>Volta para o terminal do evento (recarga, venda e saldo).</summary>
     [RelayCommand]
-    private async Task IrParaEventosAsync()
-    {
-        if (Shell.Current is not null)
-            await Shell.Current.GoToAsync("//principal/eventos");
-    }
+    private Task IrParaOperacaoAsync() => Navegacao.VoltarParaOperacaoAsync();
 }

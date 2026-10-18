@@ -1,6 +1,7 @@
 using AgapeApp.Mobile.Helpers;
 using AgapeApp.Mobile.Models;
 using AgapeApp.Mobile.Services;
+using AgapeApp.Mobile.Views.Janelas;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -55,6 +56,8 @@ public partial class PerfilViewModel : BaseViewModel
 
     public Color CorPerfil => Perfil == "Administrador" ? Cores.AzulTexto : Cores.VerdeTexto;
 
+    public string Versao => $"AgapeApp v{AppInfo.Current.VersionString} · Paróquia Maria Imaculada";
+
     public void Carregar()
     {
         var usuario = Sessao.Usuario;
@@ -64,7 +67,7 @@ public partial class PerfilViewModel : BaseViewModel
         Iniciais = Formatos.Iniciais(Nome);
     }
 
-    /// <summary>Baixa a foto de perfil (o carregador nativo de imagens não envia token/cabeçalho do ngrok).</summary>
+    /// <summary>Foto de perfil (vem da memória quando já foi baixada nesta sessão).</summary>
     public async Task CarregarFotoAsync()
         => Foto = await _fotos.CarregarAsync(Sessao.Usuario?.CaminhoFoto);
 
@@ -82,37 +85,68 @@ public partial class PerfilViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    private async Task AlterarSenhaAsync()
-    {
-        if (Shell.Current is not null)
-            await Shell.Current.GoToAsync("trocar-senha");
-    }
+    private Task AlterarSenhaAsync() => NavegarAsync("trocar-senha");
 
-    /// <summary>Escolhe uma imagem no aparelho e envia como foto de perfil.</summary>
+    /// <summary>Opções da foto: galeria, câmera ou remover.</summary>
     [RelayCommand]
     private async Task AlterarFotoAsync()
     {
+        var opcoes = new List<OpcaoDialogo>
+        {
+            new("galeria", "Escolher da galeria", "Uma foto que já está no aparelho", "\uf03e")
+        };
+
+        if (MediaPicker.Default.IsCaptureSupported)
+            opcoes.Add(new OpcaoDialogo("camera", "Tirar foto agora", "Abre a câmera do aparelho", "\uf030", TomDialogo.Sucesso));
+
+        if (TemFoto)
+            opcoes.Add(new OpcaoDialogo("remover", "Remover foto", "Volta a mostrar as iniciais", "\uf2ed", TomDialogo.Perigo));
+
+        var escolha = await EscolherAsync("Foto de perfil", "Aparece para a equipe nas listas do app.", [.. opcoes]);
+
+        switch (escolha)
+        {
+            case "galeria":
+            case "camera":
+                await EnviarFotoAsync(escolha == "camera");
+                break;
+
+            case "remover":
+                await RemoverFotoAsync();
+                break;
+        }
+    }
+
+    private async Task EnviarFotoAsync(bool camera)
+    {
+        FileResult? escolhida;
+
+        try
+        {
+            var opcoes = FotoUsuarioService.OpcoesCaptura("Escolha sua foto");
+
+            escolhida = camera
+                ? await MediaPicker.Default.CapturePhotoAsync(opcoes)
+                : (await MediaPicker.Default.PickPhotosAsync(opcoes))?.FirstOrDefault();
+        }
+        catch (PermissionException)
+        {
+            MensagemErro = camera
+                ? "Permita o uso da câmera para tirar a foto."
+                : "Permita o acesso às fotos do aparelho para escolher sua imagem.";
+            return;
+        }
+        catch (Exception)
+        {
+            MensagemErro = "Não foi possível abrir as fotos do aparelho.";
+            return;
+        }
+
+        if (escolhida is null)
+            return;
+
         await ExecutarAsync(async () =>
         {
-            FileResult? escolhida;
-
-            try
-            {
-                // PickPhotosAsync substitui o PickPhotoAsync obsoleto; limite 1 = escolha única.
-                var escolhidas = await MediaPicker.Default.PickPhotosAsync(
-                    new MediaPickerOptions { Title = "Escolha sua foto", SelectionLimit = 1 });
-
-                escolhida = escolhidas?.FirstOrDefault();
-            }
-            catch (PermissionException)
-            {
-                MensagemErro = "Permita o acesso às fotos do aparelho para escolher sua imagem.";
-                return;
-            }
-
-            if (escolhida is null)
-                return;
-
             await using var conteudo = await escolhida.OpenReadAsync();
 
             var usuario = await Api.PostArquivoAsync<UsuarioDTO>(
@@ -121,30 +155,51 @@ public partial class PerfilViewModel : BaseViewModel
                 escolhida.FileName,
                 escolhida.ContentType);
 
+            _fotos.Limpar();
             await Sessao.AtualizarFotoAsync(usuario.CaminhoFoto);
             await CarregarFotoAsync();
+            Notificar("Foto atualizada");
         });
     }
 
-    /// <summary>Remove a foto de perfil (volta a mostrar as iniciais).</summary>
-    [RelayCommand]
     private async Task RemoverFotoAsync()
     {
-        if (SemFoto)
+        if (!await ConfirmarAsync(
+                "Remover foto?",
+                "As listas do app voltam a mostrar as suas iniciais.",
+                "Remover",
+                TomDialogo.Perigo,
+                "\uf2ed"))
+        {
             return;
+        }
 
         await ExecutarAsync(async () =>
         {
             var usuario = await Api.DeleteAsync<UsuarioDTO>("api/autenticacao/minha-foto");
 
+            _fotos.Limpar();
             await Sessao.AtualizarFotoAsync(usuario.CaminhoFoto);
             await CarregarFotoAsync();
+            Notificar("Foto removida");
         });
     }
 
     [RelayCommand]
-    public async Task SairAsync()
+    private async Task SairAsync()
     {
+        var confirmado = await ConfirmarAsync(
+            "Sair da conta?",
+            BiometriaAtiva
+                ? "Para entrar de novo você vai precisar do e-mail e da senha. A entrada por biometria também será desligada neste aparelho."
+                : "Para entrar de novo você vai precisar do e-mail e da senha.",
+            "Sair",
+            TomDialogo.Perigo,
+            "\uf2f5");
+
+        if (!confirmado)
+            return;
+
         await ExecutarAsync(async () =>
         {
             await Sessao.SairAsync();
@@ -152,6 +207,7 @@ public partial class PerfilViewModel : BaseViewModel
             // Sair da conta também desliga a entrada por biometria neste aparelho.
             _biometria.Ativada = false;
             BiometriaAtiva = false;
+            _fotos.Limpar();
 
             if (Shell.Current is not null)
                 await Shell.Current.GoToAsync("//login");

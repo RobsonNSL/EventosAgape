@@ -14,11 +14,15 @@ public class ApiException : Exception
 
     public decimal? SaldoAtual { get; }
 
+    /// <summary>A requisição nem chegou ao servidor (sem rede ou tempo esgotado).</summary>
+    public bool SemConexao { get; }
+
     public ApiException(HttpStatusCode statusCode, string mensagem, decimal? saldoAtual = null)
         : base(mensagem)
     {
         StatusCode = statusCode;
         SaldoAtual = saldoAtual;
+        SemConexao = statusCode == HttpStatusCode.ServiceUnavailable && saldoAtual is null;
     }
 
     /// <summary>Monta a exceção a partir da resposta da API (ProblemDetails).</summary>

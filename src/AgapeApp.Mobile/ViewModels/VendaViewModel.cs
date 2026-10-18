@@ -1,5 +1,4 @@
-using System.Collections.ObjectModel;
-using System.Net;
+using System.ComponentModel;
 using AgapeApp.Mobile.Config;
 using AgapeApp.Mobile.Helpers;
 using AgapeApp.Mobile.Models;
@@ -9,19 +8,23 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace AgapeApp.Mobile.ViewModels;
 
-/// <summary>Venda no setor: produtos do catálogo do setor com quantidade e total.</summary>
+/// <summary>
+/// Venda no setor: grade de produtos do setor (toque no card soma 1), total e saldo
+/// que sobra no cartão — o botão já avisa quando o saldo não cobre o pedido.
+/// </summary>
 public partial class VendaViewModel : BaseViewModel
 {
     private readonly CacheService _cache;
 
     private Guid? _idOperacao;
+    private bool _iniciado;
 
     public VendaViewModel(ApiClient api, SessaoService sessao, CacheService cache) : base(api, sessao)
     {
         _cache = cache;
     }
 
-    public ObservableCollection<ItemCarrinho> Produtos { get; } = [];
+    public ColecaoObservavel<ItemCarrinho> Produtos { get; } = [];
 
     [ObservableProperty]
     private Guid eventoId;
@@ -47,13 +50,37 @@ public partial class VendaViewModel : BaseViewModel
 
     public string TextoSaldo => SaldoAtual is null ? "—" : Formatos.Moeda(SaldoAtual.Value);
 
-    public decimal Total => Produtos.Sum(p => p.Subtotal);
+    public decimal Total { get; private set; }
+
+    public int QuantidadeItens { get; private set; }
 
     public string TextoTotal => Formatos.Moeda(Total);
 
-    public bool TemItens => Produtos.Any(p => p.Quantidade > 0);
+    public bool TemItens => QuantidadeItens > 0;
 
-    public string TextoBotao => TemItens ? $"Confirmar venda · {TextoTotal}" : "Adicione itens à venda";
+    /// <summary>Com o saldo conhecido, a venda que passa do saldo nem é enviada.</summary>
+    public bool SaldoInsuficiente => SaldoAtual is decimal saldo && Total > saldo;
+
+    public bool PodeConfirmar => TemItens && !SaldoInsuficiente;
+
+    public string TextoItens => QuantidadeItens switch
+    {
+        0 => "Nenhum item",
+        1 => "1 item",
+        _ => $"{QuantidadeItens} itens"
+    };
+
+    public string TextoRestante => SaldoAtual is decimal saldo
+        ? SaldoInsuficiente
+            ? $"Faltam {Formatos.Moeda(Total - saldo)} no cartão"
+            : $"Sobra {Formatos.Moeda(saldo - Total)} no cartão"
+        : "Saldo será conferido na confirmação";
+
+    public string TextoBotao => !TemItens
+        ? "Toque nos produtos para vender"
+        : SaldoInsuficiente
+            ? "Saldo insuficiente"
+            : $"Confirmar venda · {TextoTotal}";
 
     public void AplicarParametros(IDictionary<string, object> parametros)
     {
@@ -64,58 +91,75 @@ public partial class VendaViewModel : BaseViewModel
         SetorNome = Parametros.Texto(parametros, "setorNome");
     }
 
+    /// <summary>Carrega saldo e cardápio uma vez: voltar a esta tela não zera o carrinho.</summary>
     public async Task IniciarAsync()
     {
+        if (_iniciado)
+            return;
+
+        _iniciado = true;
+
         await ExecutarAsync(async () =>
         {
-            var semRede = false;
+            var saldoTask = BuscarSaldoAsync();
+            var produtosTask = BuscarProdutosAsync();
 
-            try
-            {
-                var saldo = await Api.GetAsync<CartaoSaldoDTO>(
-                    $"api/cartoes/{Uri.EscapeDataString(Cartao)}/saldo?eventoId={EventoId}");
-                SaldoAtual = saldo.SaldoAtual;
-            }
-            catch (ApiException ex) when (ex.StatusCode == HttpStatusCode.ServiceUnavailable)
-            {
-                semRede = true;
-                SaldoAtual = null;
-            }
+            await Task.WhenAll(saldoTask, produtosTask);
 
-            List<EventoProdutoDTO> produtos;
-            try
-            {
-                produtos = await Api.GetAsync<List<EventoProdutoDTO>>($"api/setores/{SetorId}/produtos");
-                await _cache.SalvarProdutosDoSetorAsync(SetorId, produtos);
-            }
-            catch (ApiException ex) when (ex.StatusCode == HttpStatusCode.ServiceUnavailable)
-            {
-                var salvos = await _cache.LerProdutosDoSetorAsync(SetorId);
-                if (salvos.Count == 0)
-                    throw;
+            var (produtos, cardapioSalvo) = produtosTask.Result;
+            ModoOffline = cardapioSalvo || !saldoTask.Result;
 
-                produtos = salvos.ToList();
-                semRede = true;
-            }
+            foreach (var antigo in Produtos)
+                antigo.PropertyChanged -= AoMudarItem;
 
-            ModoOffline = semRede;
+            var itens = produtos.Select(ItemCarrinho.De).ToList();
+            foreach (var item in itens)
+                item.PropertyChanged += AoMudarItem;
 
-            Produtos.Clear();
-            foreach (var dto in produtos)
-            {
-                var item = ItemCarrinho.De(dto);
-                item.PropertyChanged += (_, _) =>
-                {
-                    // Carrinho mudou: a próxima confirmação é uma nova operação.
-                    _idOperacao = null;
-                    NotificarTotais();
-                };
-                Produtos.Add(item);
-            }
-
-            NotificarTotais();
+            Produtos.Substituir(itens);
+            RecalcularTotais();
         });
     }
+
+    /// <summary>Saldo do cartão; devolve false quando não deu para consultar (sem rede).</summary>
+    private async Task<bool> BuscarSaldoAsync()
+    {
+        try
+        {
+            var saldo = await Api.GetAsync<CartaoSaldoDTO>(
+                $"api/cartoes/{Uri.EscapeDataString(Cartao)}/saldo?eventoId={EventoId}");
+            SaldoAtual = saldo.SaldoAtual;
+            return true;
+        }
+        catch (ApiException ex) when (ex.SemConexao)
+        {
+            SaldoAtual = null;
+            return false;
+        }
+    }
+
+    /// <summary>Cardápio do setor; sem rede, usa o salvo neste aparelho.</summary>
+    private async Task<(IReadOnlyList<EventoProdutoDTO> Produtos, bool DoCache)> BuscarProdutosAsync()
+    {
+        try
+        {
+            var produtos = await Api.GetAsync<List<EventoProdutoDTO>>($"api/setores/{SetorId}/produtos");
+            await _cache.SalvarProdutosDoSetorAsync(SetorId, produtos);
+            return (produtos, false);
+        }
+        catch (ApiException ex) when (ex.SemConexao)
+        {
+            var salvos = await _cache.LerProdutosDoSetorAsync(SetorId);
+            if (salvos.Count == 0)
+                throw;
+
+            return (salvos, true);
+        }
+    }
+
+    /// <summary>Toque no card do produto: soma uma unidade (grade de toque rápido).</summary>
+    [RelayCommand]
+    private void Adicionar(ItemCarrinho? item) => Aumentar(item);
 
     [RelayCommand]
     private void Aumentar(ItemCarrinho? item)
@@ -125,10 +169,13 @@ public partial class VendaViewModel : BaseViewModel
 
         if (item.ControlaEstoque && item.Quantidade >= item.Estoque)
         {
-            MensagemErro = $"Sem estoque suficiente de {item.Nome}.";
+            MensagemErro = item.Estoque <= 0
+                ? $"{item.Nome} está sem estoque."
+                : $"Só há {item.Estoque} de {item.Nome} em estoque.";
             return;
         }
 
+        MensagemErro = null;
         item.Quantidade++;
     }
 
@@ -137,6 +184,15 @@ public partial class VendaViewModel : BaseViewModel
     {
         if (item is not null && item.Quantidade > 0)
             item.Quantidade--;
+    }
+
+    [RelayCommand]
+    private void Limpar()
+    {
+        foreach (var item in Produtos)
+            item.Quantidade = 0;
+
+        MensagemErro = null;
     }
 
     [RelayCommand]
@@ -149,12 +205,18 @@ public partial class VendaViewModel : BaseViewModel
             return;
         }
 
+        if (SaldoInsuficiente)
+        {
+            MensagemErro = $"Saldo insuficiente: o cartão tem {TextoSaldo} e a venda é de {TextoTotal}.";
+            return;
+        }
+
         await ExecutarAsync(async () =>
         {
             // Retry reusa o mesmo id: a API não debita duas vezes o mesmo pedido.
             _idOperacao ??= Guid.NewGuid();
 
-            var resposta = await Api.PostAsync<VendaResponse>("api/vendas", new VendaRequest(
+            var resposta = await Api.PostIdempotenteAsync<VendaResponse>("api/vendas", new VendaRequest(
                 Cartao,
                 EventoId,
                 SetorId,
@@ -166,9 +228,19 @@ public partial class VendaViewModel : BaseViewModel
 
             await _cache.RegistrarVendaAsync(resposta, SetorNome);
 
+            try
+            {
+                HapticFeedback.Default.Perform(HapticFeedbackType.LongPress);
+            }
+            catch (Exception)
+            {
+                // Aparelho sem vibração.
+            }
+
+            // "../" troca esta tela pela confirmação: a pilha não cresce a cada cliente.
             if (Shell.Current is not null)
             {
-                await Shell.Current.GoToAsync("venda-concluida", new ShellNavigationQueryParameters
+                await Shell.Current.GoToAsync("../venda-concluida", new ShellNavigationQueryParameters
                 {
                     ["venda"] = resposta,
                     ["eventoId"] = EventoId,
@@ -180,11 +252,41 @@ public partial class VendaViewModel : BaseViewModel
         });
     }
 
-    private void NotificarTotais()
+    protected override string MensagemDeErro(ApiException ex)
     {
+        // A API devolve o saldo atual quando recusa por saldo: a tela já mostra o valor certo.
+        if (ex.SaldoAtual is decimal saldo)
+        {
+            SaldoAtual = saldo;
+            RecalcularTotais();
+        }
+
+        return base.MensagemDeErro(ex);
+    }
+
+    private void AoMudarItem(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(ItemCarrinho.Quantidade))
+            return;
+
+        // Carrinho mudou: a próxima confirmação é uma nova operação.
+        _idOperacao = null;
+        RecalcularTotais();
+    }
+
+    private void RecalcularTotais()
+    {
+        Total = Produtos.Sum(p => p.Subtotal);
+        QuantidadeItens = Produtos.Sum(p => p.Quantidade);
+
         OnPropertyChanged(nameof(Total));
+        OnPropertyChanged(nameof(QuantidadeItens));
         OnPropertyChanged(nameof(TextoTotal));
         OnPropertyChanged(nameof(TemItens));
+        OnPropertyChanged(nameof(TextoItens));
+        OnPropertyChanged(nameof(SaldoInsuficiente));
+        OnPropertyChanged(nameof(PodeConfirmar));
+        OnPropertyChanged(nameof(TextoRestante));
         OnPropertyChanged(nameof(TextoBotao));
     }
 }

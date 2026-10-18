@@ -15,6 +15,6 @@ public partial class MeusEventosPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        await _vm.CarregarAsync();
+        await _vm.IniciarAsync();
     }
 }

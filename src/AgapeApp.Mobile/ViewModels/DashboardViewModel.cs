@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using System.Net;
 using AgapeApp.Mobile.Helpers;
 using AgapeApp.Mobile.Models;
@@ -23,11 +22,11 @@ public partial class DashboardViewModel : BaseViewModel
         _tempoReal = tempoReal;
     }
 
-    public ObservableCollection<ResumoPorSetorDTO> PorSetor { get; } = [];
+    public ColecaoObservavel<ResumoPorSetorDTO> PorSetor { get; } = [];
 
-    public ObservableCollection<ResumoPorOperadorDTO> PorOperador { get; } = [];
+    public ColecaoObservavel<ResumoPorOperadorDTO> PorOperador { get; } = [];
 
-    public ObservableCollection<ResumoPorProdutoDTO> PorProduto { get; } = [];
+    public ColecaoObservavel<ResumoPorProdutoDTO> PorProduto { get; } = [];
 
     [ObservableProperty]
     private Guid eventoId;
@@ -55,6 +54,7 @@ public partial class DashboardViewModel : BaseViewModel
     private decimal totalVendas;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TextoSaldoEmCirculacao))]
     private decimal saldoEmCirculacao;
 
     [ObservableProperty]
@@ -200,17 +200,9 @@ public partial class DashboardViewModel : BaseViewModel
         TotalVendas = resumo.TotalVendas;
         SaldoEmCirculacao = resumo.SaldoEmCirculacao;
 
-        PorSetor.Clear();
-        foreach (var setor in resumo.PorSetor)
-            PorSetor.Add(setor);
-
-        PorOperador.Clear();
-        foreach (var operador in resumo.PorOperador)
-            PorOperador.Add(operador);
-
-        PorProduto.Clear();
-        foreach (var produto in resumo.PorProduto)
-            PorProduto.Add(produto);
+        PorSetor.Substituir(resumo.PorSetor.OrderByDescending(s => s.TotalVendas + s.TotalRecargas));
+        PorOperador.Substituir(resumo.PorOperador.OrderByDescending(o => o.TotalVendas + o.TotalRecargas));
+        PorProduto.Substituir(resumo.PorProduto.OrderByDescending(p => p.TotalVendido));
 
         TemPorSetor = PorSetor.Count > 0;
         TemPorOperador = PorOperador.Count > 0;

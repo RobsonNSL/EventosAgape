@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:AgapeApp.Mobile.ViewModels"
              x:Class="AgapeApp.Mobile.Views.PerfilPage"
+             x:DataType="vm:PerfilViewModel"
              Title="Perfil"
              Shell.NavBarIsVisible="False">
 
@@ -54,30 +56,13 @@
                     <Label Text="&#xf030;" FontFamily="fa" FontSize="16"
                            TextColor="{StaticResource TextoPrimario}" VerticalOptions="Center" />
                     <Label Grid.Column="1"
-                           Text="Alterar minha foto"
+                           Text="Foto de perfil"
                            Style="{StaticResource CorpoGrande}"
                            VerticalOptions="Center" />
                     <Label Grid.Column="2" Text="&#xf054;" FontFamily="fa" FontSize="13"
                            TextColor="{StaticResource TextoMudo}" VerticalOptions="Center" />
                     <Border.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding AlterarFotoCommand}" />
-                    </Border.GestureRecognizers>
-                </Grid>
-            </Border>
-
-            <Border Style="{StaticResource Card}" IsVisible="{Binding TemFoto}">
-                <Grid ColumnDefinitions="24,*,20" ColumnSpacing="12">
-                    <Label Text="&#xf2ed;" FontFamily="fa" FontSize="16"
-                           TextColor="{StaticResource Perigo}" VerticalOptions="Center" />
-                    <Label Grid.Column="1"
-                           Text="Remover minha foto"
-                           Style="{StaticResource CorpoGrande}"
-                           TextColor="{StaticResource Perigo}"
-                           VerticalOptions="Center" />
-                    <Label Grid.Column="2" Text="&#xf054;" FontFamily="fa" FontSize="13"
-                           TextColor="{StaticResource TextoMudo}" VerticalOptions="Center" />
-                    <Border.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding RemoverFotoCommand}" />
                     </Border.GestureRecognizers>
                 </Grid>
             </Border>
@@ -134,12 +119,12 @@
                     <Label Grid.Column="2" Text="&#xf054;" FontFamily="fa" FontSize="13"
                            TextColor="{StaticResource TextoMudo}" VerticalOptions="Center" />
                     <Border.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="AoSair" />
+                        <TapGestureRecognizer Command="{Binding SairCommand}" />
                     </Border.GestureRecognizers>
                 </Grid>
             </Border>
 
-            <Label Text="AgapeApp v1.0 · Paróquia Maria Imaculada"
+            <Label Text="{Binding Versao}"
                    Style="{StaticResource LegendaPequena}"
                    TextColor="{StaticResource TextoMudo}"
                    HorizontalTextAlignment="Center"

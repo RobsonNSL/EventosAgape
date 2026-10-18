@@ -80,6 +80,7 @@ public partial class ProdutoFormViewModel : BaseViewModel
             else
                 await Api.PutAsync<ProdutoDTO>($"api/produtos/{_id}", new { nome = Nome, precoPadrao = preco });
 
+            Notificar(EhNovo ? $"{Nome} cadastrado" : "Produto atualizado");
             await NavegarAsync("..");
         });
     }

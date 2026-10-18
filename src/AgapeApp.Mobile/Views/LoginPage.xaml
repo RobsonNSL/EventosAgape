@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:AgapeApp.Mobile.ViewModels"
              x:Class="AgapeApp.Mobile.Views.LoginPage"
+             x:DataType="vm:LoginViewModel"
              Title="Entrar"
              BackgroundColor="#0B0F1A"
              Shell.NavBarIsVisible="False">
@@ -49,6 +51,9 @@
                         StrokeThickness="1"
                         StrokeShape="RoundRectangle 24"
                         Padding="5">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="AoTocarBrasao" />
+                    </Border.GestureRecognizers>
                     <Border.Shadow>
                         <Shadow Brush="#000000" Offset="0,6" Radius="12" Opacity="0.35" />
                     </Border.Shadow>
@@ -205,7 +210,7 @@
                         Clicked="AoConfigurarServidor"
                         Margin="0,8,0,0" />
 
-                <Label Text="AgapeApp v1.0 · Paróquia Maria Imaculada"
+                <Label Text="{Binding Versao}"
                        Style="{StaticResource LegendaPequena}"
                        TextColor="{StaticResource LoginTextoFraco}"
                        HorizontalTextAlignment="Center"

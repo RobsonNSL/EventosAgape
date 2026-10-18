@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:AgapeApp.Mobile.ViewModels"
+             xmlns:controles="clr-namespace:AgapeApp.Mobile.Controls"
              x:Class="AgapeApp.Mobile.Views.TrocarSenhaPage"
+             x:DataType="vm:TrocarSenhaViewModel"
              Title="Alterar senha"
              Shell.NavBarIsVisible="False">
 
@@ -10,21 +13,7 @@
 
             <!-- Cabeçalho -->
             <Grid ColumnDefinitions="44,*" ColumnSpacing="12">
-                <Border WidthRequest="40"
-                        HeightRequest="40"
-                        VerticalOptions="Start"
-                        Stroke="{StaticResource Borda}"
-                        StrokeThickness="1"
-                        StrokeShape="RoundRectangle 12"
-                        BackgroundColor="{StaticResource Superficie}">
-                    <Label Text="&#xf060;" FontFamily="fa" FontSize="15"
-                           TextColor="{StaticResource TextoPrimario}"
-                           HorizontalOptions="Center" VerticalOptions="Center">
-                        <Label.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding VoltarCommand}" />
-                        </Label.GestureRecognizers>
-                    </Label>
-                </Border>
+                <controles:BotaoVoltar Command="{Binding VoltarCommand}" />
                 <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
                     <Label Text="Alterar minha senha" Style="{StaticResource TituloMedio}" />
                     <Label Text="Sua conta de operador" Style="{StaticResource LegendaPequena}" />

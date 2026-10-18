@@ -1,4 +1,5 @@
-﻿using AgapeApp.Mobile.Services;
+﻿using AgapeApp.Mobile.Helpers;
+using AgapeApp.Mobile.Services;
 using AgapeApp.Mobile.Views;
 
 namespace AgapeApp.Mobile;
@@ -60,10 +61,36 @@ public partial class AppShell : Shell
         {
             if (await _sessao.CarregarAsync())
                 await GoToAsync("//principal");
+
+            await MostrarErroAnteriorAsync();
         }
         catch
         {
             // Sem sessão válida: permanece na tela de login.
+        }
+    }
+
+    /// <summary>Se o app fechou por erro na última vez, mostra o que aconteceu (dá para copiar e enviar).</summary>
+    private static async Task MostrarErroAnteriorAsync()
+    {
+        var erro = RegistroErros.LerEApagar();
+        if (erro is null)
+            return;
+
+        var resumo = erro.Length > 700 ? erro[..700] + "…" : erro;
+
+        var copiar = await Dialogos.ConfirmarAsync(
+            "O app fechou por um erro",
+            resumo,
+            "Copiar detalhes",
+            "Fechar",
+            Views.Janelas.TomDialogo.Perigo,
+            "\uf071");
+
+        if (copiar)
+        {
+            await Clipboard.Default.SetTextAsync(erro);
+            Notificacao.Mostrar("Detalhes copiados: cole na conversa com o suporte");
         }
     }
 }

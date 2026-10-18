@@ -60,8 +60,15 @@ public partial class SaldoViewModel : BaseViewModel
         OnPropertyChanged(nameof(TextoCartao));
     }
 
+    private bool _iniciado;
+
     public async Task IniciarAsync()
     {
+        if (_iniciado)
+            return;
+
+        _iniciado = true;
+
         await ExecutarAsync(async () =>
         {
             var saldo = await Api.GetAsync<CartaoSaldoDTO>(
@@ -78,7 +85,7 @@ public partial class SaldoViewModel : BaseViewModel
             return;
 
         await Shell.Current.GoToAsync(
-            $"recarga?eventoId={EventoId}&setorId={SetorId}&cartao={Uri.EscapeDataString(Cartao)}" +
+            $"../recarga?eventoId={EventoId}&setorId={SetorId}&cartao={Uri.EscapeDataString(Cartao)}" +
             $"&eventoNome={Uri.EscapeDataString(EventoNome)}&setorNome={Uri.EscapeDataString(SetorNome)}");
     }
 
@@ -89,7 +96,7 @@ public partial class SaldoViewModel : BaseViewModel
             return;
 
         await Shell.Current.GoToAsync(
-            $"venda?eventoId={EventoId}&setorId={SetorId}&cartao={Uri.EscapeDataString(Cartao)}" +
+            $"../venda?eventoId={EventoId}&setorId={SetorId}&cartao={Uri.EscapeDataString(Cartao)}" +
             $"&eventoNome={Uri.EscapeDataString(EventoNome)}&setorNome={Uri.EscapeDataString(SetorNome)}");
     }
 

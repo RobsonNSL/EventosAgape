@@ -197,6 +197,20 @@ O APK fica em torno de **93 MB** no Debug porque leva as arquiteturas **arm64-v8
 **x86_64** (emulador) com símbolos. Com o aparelho plugado, `dotnet build src/AgapeApp.Mobile -f net10.0-android -t:Run`
 compila, instala e abre o app de uma vez.
 
+### APK para usar nos eventos: sempre o Release
+
+O Debug do Android roda **sem AOT** e com o interpretador ligado (para o Hot Reload) — no celular ele é
+visivelmente lento e engasga nas listas. Para os aparelhos dos operadores gere o **Release**, com AOT completo:
+
+```
+dotnet publish src/AgapeApp.Mobile -f net10.0-android -c Release -o publish/android
+adb install -r publish/android/com.agapeapp.mobile-Signed.apk
+```
+
+Enquanto não houver keystore própria, o Release é assinado com a chave de debug da máquina (instala por arquivo
+ou `adb` normalmente; o APK fica com ~53 MB). No Release o botão "Configurar endereço do servidor" fica escondido: toque **5 vezes no
+brasão** da tela de login para mostrá-lo.
+
 - **Design:** design system "Agape Direct" (Material 3) gerado no Google Stitch, salvo em `docs/design/stitch/`.
   Tokens aplicados em `Resources/Styles/Colors.xaml` e `Styles.xaml` (primária `#2563EB`, dinheiro `#16A34A`,
   recarga `#F59E0B`, fonte Inter, botões 52px/raio 12, cards raio 16).
@@ -223,14 +237,20 @@ compila, instala e abre o app de uma vez.
   (`AppConfig.ApiBaseUrlPadrao`, em `src/AgapeApp.Mobile/Config/AppConfig.cs`) — funciona no aparelho físico em
   qualquer rede, sem liberar firewall. Fluxo: rode a API local (`dotnet run --project src/AgapeApp.Api`) e, em
   outro terminal, `ngrok http 5180`; se o endereço do túnel mudar, atualize a constante **ou** toque em
-  **"Configurar endereço do servidor"** na tela de login (só em DEBUG), que grava a URL no aparelho.
+  **"Configurar endereço do servidor"** na tela de login (visível no Debug; no Release, 5 toques no brasão),
+  que grava a URL no aparelho.
   Sem ngrok (mesma rede): emulador Android `http://10.0.2.2:5180`, simulador iOS `http://localhost:5180`,
   aparelho físico `http://IP-DO-PC:5180` com a porta liberada:
 
   ```
   dotnet run --project src/AgapeApp.Api -- --urls "http://0.0.0.0:5180"
   ```
+- **Janelas próprias:** nenhuma tela usa `DisplayAlert`/`DisplayActionSheet`/`DisplayPromptAsync`. Confirmações,
+  listas de ações, campos de texto e seleções (com busca) abrem pela classe `Services/Dialogos.cs`
+  (implementação em `Views/Janelas/`), uma por vez; sucesso simples vira aviso rápido (`Helpers/Notificacao.cs`).
+  Os padrões de desempenho do app estão na seção 3.2 do [`plano-projeto-eventos.md`](plano-projeto-eventos.md).
 - **Idempotência:** retries de recarga e venda reenviam o mesmo `idOperacaoCliente` — nada é cobrado duas vezes.
+  O app já tenta de novo sozinho (até 3 vezes) quando a rede oscila.
 - **Pendências do app:** validar em aparelho físico (câmera, biometria, SignalR, foto de perfil e as telas de
   gestão), build iOS (requer Mac) e o painel web do administrador (futuro, mesma API).
 

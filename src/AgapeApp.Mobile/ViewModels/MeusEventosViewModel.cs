@@ -1,8 +1,8 @@
-using System.Collections.ObjectModel;
 using System.Net;
 using AgapeApp.Mobile.Helpers;
 using AgapeApp.Mobile.Models;
 using AgapeApp.Mobile.Services;
+using AgapeApp.Mobile.Views.Janelas;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -31,9 +31,9 @@ public partial class MeusEventosViewModel : BaseViewModel
         _fotos = fotos;
     }
 
-    public ObservableCollection<EventoCartao> Eventos { get; } = [];
+    public ColecaoObservavel<EventoCartao> Eventos { get; } = [];
 
-    public ObservableCollection<FiltroChip> Filtros { get; } = [];
+    public ColecaoObservavel<FiltroChip> Filtros { get; } = [];
 
     public bool EhAdministrador => Sessao.EhAdministrador;
 
@@ -74,6 +74,13 @@ public partial class MeusEventosViewModel : BaseViewModel
     public string TextoListaVazia => FonteTodos
         ? "Cadastre um evento no sistema para vê-lo aqui."
         : "Quando você for designado para um evento, ele aparece nesta lista.";
+
+    /// <summary>
+    /// Ao reaparecer, só busca de novo se algo mudou ou se a lista tem mais de 1 minuto
+    /// (o operador pode puxar a lista para atualizar na hora).
+    /// </summary>
+    public Task IniciarAsync()
+        => PrecisaRecarregar(TimeSpan.FromMinutes(1)) ? CarregarAsync() : Task.CompletedTask;
 
     public async Task CarregarAsync()
     {
@@ -116,6 +123,7 @@ public partial class MeusEventosViewModel : BaseViewModel
 
             MontarFiltros();
             AplicarFiltro();
+            MarcarComoAtualizado();
         });
     }
 
@@ -157,42 +165,41 @@ public partial class MeusEventosViewModel : BaseViewModel
         }
 
         // Administrador opera em qualquer setor: escolhe o setor antes de abrir o terminal.
-        await ExecutarAsync(async () =>
+        // A lista chega primeiro; a janela de escolha abre depois, fora do carregamento.
+        var setores = await ExecutarAsync(() => Api.GetAsync<List<SetorDTO>>($"api/eventos/{cartao.EventoId}/setores"));
+
+        if (setores is null)
+            return;
+
+        if (setores.Count == 0)
         {
-            var setores = await Api.GetAsync<List<SetorDTO>>($"api/eventos/{cartao.EventoId}/setores");
+            await AvisarAsync(
+                "Evento sem setores",
+                "Cadastre pelo menos um setor em Gestão › Eventos para operar o terminal.",
+                TomDialogo.Destaque,
+                "\uf54e");
+            return;
+        }
 
-            if (setores.Count == 0)
-            {
-                MensagemErro = "Este evento ainda não tem setores. Cadastre um setor para operar.";
-                return;
-            }
+        var setor = setores.Count == 1
+            ? setores[0]
+            : await EscolherSetorAsync(cartao.Nome, setores);
 
-            var setor = setores.Count == 1
-                ? setores[0]
-                : await EscolherSetorAsync(setores);
-
-            if (setor is null)
-                return;
-
+        if (setor is not null)
             await AbrirOperacaoAsync(cartao.EventoId, setor.Id, cartao.Nome, setor.Nome);
-        });
     }
 
-    private static async Task<SetorDTO?> EscolherSetorAsync(IReadOnlyList<SetorDTO> setores)
+    private static async Task<SetorDTO?> EscolherSetorAsync(string eventoNome, IReadOnlyList<SetorDTO> setores)
     {
-        if (Shell.Current is null)
-            return null;
-
-        var escolhido = await Shell.Current.DisplayActionSheetAsync(
+        var escolhido = await EscolherAsync(
             "Operar em qual setor?",
-            "Cancelar",
-            null,
-            setores.Select(setor => setor.Nome).ToArray());
+            eventoNome,
+            setores
+                .OrderBy(setor => setor.Nome, StringComparer.CurrentCulture)
+                .Select(setor => new OpcaoDialogo(setor.Id.ToString(), setor.Nome, null, "\uf54e", TomDialogo.Destaque))
+                .ToArray());
 
-        if (string.IsNullOrWhiteSpace(escolhido) || escolhido == "Cancelar")
-            return null;
-
-        return setores.FirstOrDefault(setor => setor.Nome == escolhido);
+        return escolhido is null ? null : setores.FirstOrDefault(setor => setor.Id.ToString() == escolhido);
     }
 
     private static Task AbrirOperacaoAsync(Guid eventoId, Guid setorId, string eventoNome, string setorNome)
@@ -227,11 +234,13 @@ public partial class MeusEventosViewModel : BaseViewModel
     {
         var cartoes = Cartoes();
 
-        Filtros.Clear();
-        Filtros.Add(FiltroChip.De("todos", "Todos", cartoes.Count, _filtro == "todos"));
-        Filtros.Add(FiltroChip.De("abertos", "Abertos", cartoes.Count(e => e.Situacao == "Aberto"), _filtro == "abertos"));
-        Filtros.Add(FiltroChip.De("preparacao", "Em preparação", cartoes.Count(e => e.Situacao == "Rascunho"), _filtro == "preparacao"));
-        Filtros.Add(FiltroChip.De("encerrados", "Encerrados", cartoes.Count(e => e.Situacao == "Encerrado"), _filtro == "encerrados"));
+        Filtros.Substituir(
+        [
+            FiltroChip.De("todos", "Todos", cartoes.Count, _filtro == "todos"),
+            FiltroChip.De("abertos", "Abertos", cartoes.Count(e => e.Situacao == "Aberto"), _filtro == "abertos"),
+            FiltroChip.De("preparacao", "Em preparação", cartoes.Count(e => e.Situacao == "Rascunho"), _filtro == "preparacao"),
+            FiltroChip.De("encerrados", "Encerrados", cartoes.Count(e => e.Situacao == "Encerrado"), _filtro == "encerrados")
+        ]);
     }
 
     private void AplicarFiltro()
@@ -249,8 +258,9 @@ public partial class MeusEventosViewModel : BaseViewModel
         if (!string.IsNullOrWhiteSpace(Busca))
             consulta = consulta.Where(e => Formatos.Contem(e.Nome, Busca) || Formatos.Contem(e.SetorNome, Busca));
 
-        Eventos.Clear();
-        foreach (var evento in consulta)
-            Eventos.Add(evento);
+        // Abertos primeiro: é o que o operador procura durante o evento.
+        Eventos.Substituir(consulta
+            .OrderBy(e => e.Situacao switch { "Aberto" => 0, "Rascunho" => 1, _ => 2 })
+            .ThenBy(e => e.Nome, StringComparer.CurrentCulture));
     }
 }

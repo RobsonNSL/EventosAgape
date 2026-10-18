@@ -91,6 +91,7 @@ public partial class EventoFormViewModel : BaseViewModel
                     $"api/eventos/{_id}",
                     new { nome = Nome, dataInicio = inicio, dataFim = fim });
 
+            Notificar(EhNovo ? "Evento criado em preparação" : "Evento atualizado");
             await NavegarAsync("..");
         });
     }

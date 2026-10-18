@@ -118,18 +118,15 @@
         <Setter Property="FontSize" Value="14" />
     </Style>
 
-    <!-- ===== Cards ===== -->
+    <!-- ===== Cards =====
+         Sem Shadow de propósito: em listas, a sombra de cada card custava caro na
+         rolagem dos aparelhos Android mais simples. A borda já separa os cards. -->
     <Style x:Key="Card" TargetType="Border">
         <Setter Property="BackgroundColor" Value="{StaticResource Superficie}" />
         <Setter Property="Stroke" Value="{StaticResource Borda}" />
         <Setter Property="StrokeThickness" Value="1" />
         <Setter Property="StrokeShape" Value="RoundRectangle 16" />
         <Setter Property="Padding" Value="16" />
-        <Setter Property="Shadow">
-            <Setter.Value>
-                <Shadow Brush="#0F172A" Offset="0,2" Radius="6" Opacity="0.06" />
-            </Setter.Value>
-        </Setter>
     </Style>
 
     <!-- ===== Campos de texto ===== -->

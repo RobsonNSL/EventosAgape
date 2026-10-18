@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:AgapeApp.Mobile.ViewModels"
              xmlns:models="clr-namespace:AgapeApp.Mobile.Models"
              x:Class="AgapeApp.Mobile.Views.MeusEventosPage"
+             x:DataType="vm:MeusEventosViewModel"
              Title="Eventos"
              Shell.NavBarIsVisible="False">
 
@@ -182,7 +184,7 @@
                             </Label>
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer
-                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelecionarFiltroCommand}"
+                                    Command="{Binding SelecionarFiltroCommand, Source={RelativeSource AncestorType={x:Type vm:MeusEventosViewModel}}, x:DataType=vm:MeusEventosViewModel}"
                                     CommandParameter="{Binding .}" />
                             </Border.GestureRecognizers>
                         </Border>
@@ -194,7 +196,7 @@
         <!-- Lista -->
         <RefreshView Grid.Row="2"
                      Command="{Binding AtualizarCommand}"
-                     IsRefreshing="{Binding EstaCarregando}"
+                     IsRefreshing="{Binding EstaCarregando, Mode=OneWay}"
                      RefreshColor="{StaticResource Primary}">
             <CollectionView ItemsSource="{Binding Eventos}"
                             SelectionMode="None"
@@ -258,13 +260,13 @@
                                     <Button Text="{Binding TextoBotao}"
                                             IsVisible="{Binding MostrarOperar}"
                                             IsEnabled="{Binding PodeOperar}"
-                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.OperarCommand}"
+                                            Command="{Binding OperarCommand, Source={RelativeSource AncestorType={x:Type vm:MeusEventosViewModel}}, x:DataType=vm:MeusEventosViewModel}"
                                             CommandParameter="{Binding .}" />
 
                                     <Button Text="Abrir dashboard"
                                             Style="{StaticResource BotaoContorno}"
                                             IsVisible="{Binding MostrarDashboard}"
-                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.AbrirDashboardCommand}"
+                                            Command="{Binding AbrirDashboardCommand, Source={RelativeSource AncestorType={x:Type vm:MeusEventosViewModel}}, x:DataType=vm:MeusEventosViewModel}"
                                             CommandParameter="{Binding .}" />
                                 </VerticalStackLayout>
                             </Grid>

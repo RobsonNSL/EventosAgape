@@ -1,7 +1,7 @@
-using System.Collections.ObjectModel;
 using AgapeApp.Mobile.Helpers;
 using AgapeApp.Mobile.Models;
 using AgapeApp.Mobile.Services;
+using AgapeApp.Mobile.Views.Janelas;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -19,17 +19,21 @@ public partial class UsuariosViewModel : BaseViewModel
     {
     }
 
-    public ObservableCollection<UsuarioItem> Usuarios { get; } = [];
+    public ColecaoObservavel<UsuarioItem> Usuarios { get; } = [];
 
     [ObservableProperty]
     private string busca = string.Empty;
 
+    [ObservableProperty]
+    private string resumo = string.Empty;
+
     partial void OnBuscaChanged(string value) => Filtrar();
 
-    public Task IniciarAsync() => ExecutarAsync(CarregarAsync);
+    public Task IniciarAsync()
+        => PrecisaRecarregar() ? ExecutarAsync(CarregarAsync) : Task.CompletedTask;
 
     [RelayCommand]
-    private Task AtualizarAsync() => IniciarAsync();
+    private Task AtualizarAsync() => ExecutarAsync(CarregarAsync);
 
     [RelayCommand]
     private Task NovoAsync() => NavegarAsync("usuario-form");
@@ -42,26 +46,25 @@ public partial class UsuariosViewModel : BaseViewModel
 
         var escolha = await EscolherAsync(
             usuario.Nome,
-            "Editar dados",
-            "Redefinir senha",
-            usuario.TextoAtivacao);
+            $"{usuario.Email} · {usuario.Perfil}",
+            new OpcaoDialogo("editar", "Editar dados", "Nome, e-mail e perfil", "\uf303"),
+            new OpcaoDialogo("senha", "Redefinir senha", "Cria uma senha nova para a pessoa", "\uf084", TomDialogo.Destaque),
+            usuario.Ativo
+                ? new OpcaoDialogo("ativacao", "Desativar acesso", "A pessoa não entra mais no app", "\uf05e", TomDialogo.Perigo)
+                : new OpcaoDialogo("ativacao", "Reativar acesso", "A pessoa volta a entrar no app", "\uf00c", TomDialogo.Sucesso));
 
         switch (escolha)
         {
-            case "Editar dados":
+            case "editar":
                 await NavegarAsync("usuario-form", "usuario", usuario);
                 break;
 
-            case "Redefinir senha":
+            case "senha":
                 await RedefinirSenhaAsync(usuario);
                 break;
 
-            case "Desativar acesso":
-                await AlterarAtivacaoAsync(usuario, ativar: false);
-                break;
-
-            case "Ativar acesso":
-                await AlterarAtivacaoAsync(usuario, ativar: true);
+            case "ativacao":
+                await AlterarAtivacaoAsync(usuario, ativar: !usuario.Ativo);
                 break;
         }
     }
@@ -75,44 +78,39 @@ public partial class UsuariosViewModel : BaseViewModel
             .OrderBy(usuario => usuario.Nome, StringComparer.CurrentCulture)
             .ToList();
 
+        var administradores = _todos.Count(u => u.EhAdministrador);
+        Resumo = $"{_todos.Count - administradores} operadores · {administradores} administradores";
+
         Filtrar();
+        MarcarComoAtualizado();
     }
 
     private void Filtrar()
     {
         var termo = Busca.Trim();
 
-        var filtrados = _todos
-            .Where(usuario => Formatos.Contem(usuario.Nome, termo) || Formatos.Contem(usuario.Email, termo))
-            .ToList();
-
-        Usuarios.Clear();
-
-        foreach (var usuario in filtrados)
-            Usuarios.Add(usuario);
+        Usuarios.Substituir(_todos
+            .Where(usuario => Formatos.Contem(usuario.Nome, termo) || Formatos.Contem(usuario.Email, termo)));
     }
 
     private async Task RedefinirSenhaAsync(UsuarioItem usuario)
     {
-        if (Shell.Current is null)
-            return;
-
-        var novaSenha = await Shell.Current.DisplayPromptAsync(
+        var novaSenha = await Dialogos.PerguntarAsync(
             "Redefinir senha",
-            $"Nova senha de {usuario.Nome} (mínimo 8 caracteres). Avise a pessoa em seguida.",
-            "Redefinir",
-            "Cancelar",
-            "Nova senha",
-            maxLength: 60);
+            $"Nova senha de {usuario.Nome}. Os aparelhos dela vão precisar entrar de novo.",
+            new OpcoesEntrada
+            {
+                Placeholder = "Mínimo de 8 caracteres",
+                Senha = true,
+                TamanhoMaximo = 60,
+                TextoConfirmar = "Redefinir",
+                Icone = "\uf084",
+                Tom = TomDialogo.Destaque,
+                Validar = texto => texto.Length < 8 ? "A senha precisa ter pelo menos 8 caracteres." : null
+            });
 
-        if (string.IsNullOrWhiteSpace(novaSenha))
+        if (novaSenha is null)
             return;
-
-        if (novaSenha.Length < 8)
-        {
-            MensagemErro = "A nova senha precisa ter pelo menos 8 caracteres.";
-            return;
-        }
 
         await ExecutarAsync(async () =>
         {
@@ -120,18 +118,22 @@ public partial class UsuariosViewModel : BaseViewModel
 
             await AvisarAsync(
                 "Senha redefinida",
-                $"A senha de {usuario.Nome} foi trocada. Os aparelhos dela vão precisar entrar de novo.");
+                $"Avise {usuario.Nome} da nova senha. As sessões abertas foram encerradas.",
+                TomDialogo.Sucesso,
+                "\uf00c");
         });
     }
 
     private async Task AlterarAtivacaoAsync(UsuarioItem usuario, bool ativar)
     {
         var confirmado = await ConfirmarAsync(
-            ativar ? "Ativar acesso" : "Desativar acesso",
+            ativar ? "Reativar acesso?" : "Desativar acesso?",
             ativar
-                ? $"{usuario.Nome} volta a entrar no app com o acesso atual."
-                : $"{usuario.Nome} não conseguirá mais entrar no app até ser reativado.",
-            ativar ? "Ativar" : "Desativar");
+                ? $"{usuario.Nome} volta a entrar no app com a senha atual."
+                : $"{usuario.Nome} não conseguirá mais entrar no app até ser reativado. Os aparelhos dela saem da conta.",
+            ativar ? "Reativar" : "Desativar",
+            ativar ? TomDialogo.Sucesso : TomDialogo.Perigo,
+            ativar ? "\uf00c" : "\uf05e");
 
         if (!confirmado)
             return;
@@ -143,6 +145,7 @@ public partial class UsuariosViewModel : BaseViewModel
                 null);
 
             await CarregarAsync();
+            Notificar(ativar ? $"{usuario.Nome} reativado" : $"{usuario.Nome} desativado");
         });
     }
 }

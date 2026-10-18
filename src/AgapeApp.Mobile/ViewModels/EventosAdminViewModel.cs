@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+using AgapeApp.Mobile.Helpers;
 using AgapeApp.Mobile.Models;
 using AgapeApp.Mobile.Services;
 using CommunityToolkit.Mvvm.Input;
@@ -12,12 +12,13 @@ public partial class EventosAdminViewModel : BaseViewModel
     {
     }
 
-    public ObservableCollection<EventoAdminItem> Eventos { get; } = [];
+    public ColecaoObservavel<EventoAdminItem> Eventos { get; } = [];
 
-    public Task IniciarAsync() => ExecutarAsync(CarregarAsync);
+    public Task IniciarAsync()
+        => PrecisaRecarregar() ? ExecutarAsync(CarregarAsync) : Task.CompletedTask;
 
     [RelayCommand]
-    private Task AtualizarAsync() => IniciarAsync();
+    private Task AtualizarAsync() => ExecutarAsync(CarregarAsync);
 
     [RelayCommand]
     private Task NovoAsync() => NavegarAsync("evento-form");
@@ -35,9 +36,12 @@ public partial class EventosAdminViewModel : BaseViewModel
     {
         var eventos = await Api.GetAsync<List<EventoDTO>>("api/eventos");
 
-        Eventos.Clear();
+        // Abertos no topo, depois em preparação e por fim os encerrados.
+        Eventos.Substituir(eventos
+            .OrderBy(item => item.Situacao switch { "Aberto" => 0, "Rascunho" => 1, _ => 2 })
+            .ThenByDescending(item => item.DataInicio)
+            .Select(EventoAdminItem.De));
 
-        foreach (var evento in eventos.OrderByDescending(item => item.CriadoEm).Select(EventoAdminItem.De))
-            Eventos.Add(evento);
+        MarcarComoAtualizado();
     }
 }

@@ -63,6 +63,8 @@
 
 		<!-- Images -->
 		<MauiImage Include="Resources\Images\*" />
+		<!-- O brasão aparece com 86px no login: reduzido no build em vez de decodificar a foto inteira no aparelho. -->
+		<MauiImage Update="Resources\Images\logo.jpg" BaseSize="96,96" />
 		
 		<!-- Custom Fonts -->
 		<MauiFont Include="Resources\Fonts\*" />
@@ -89,6 +91,17 @@
 		<PackageReference Include="sqlite-net-pcl" Version="1.11.285" />
 		<PackageReference Include="ZXing.Net.Maui.Controls" Version="0.10.4" />
 	</ItemGroup>
+
+	<!-- Release do Android (o APK para os aparelhos do evento): AOT completo — sem JIT nem
+	     interpretador, as telas abrem e rolam sem os engasgos do build Debug. O APK fica
+	     maior, o que não importa na distribuição por arquivo. Assinado com a chave de debug
+	     enquanto não houver keystore própria. -->
+	<PropertyGroup Condition="'$(Configuration)' == 'Release' And $([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+		<AndroidPackageFormat>apk</AndroidPackageFormat>
+		<RunAOTCompilation>true</RunAOTCompilation>
+		<AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
+		<AndroidLinkTool>r8</AndroidLinkTool>
+	</PropertyGroup>
 
 	<PropertyGroup>
 		<!-- Conflitos de versões transitivas do AndroidX trazidos pelo plugin de biometria:

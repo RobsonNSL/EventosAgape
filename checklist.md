@@ -103,6 +103,24 @@
 - [x] Ícone do launcher (medalhão circular) e splash Android 12+ definitivos, com remoção dos assets antigos
 - [x] APK autônomo (assemblies embutidas) para instalar por `adb install`/arquivo
 
+### App mobile — desempenho e telas próprias (v1.12)
+- [x] **Corrigido:** travamento ao designar operador no evento (caixas nativas encadeadas no Android)
+- [x] Janelas próprias no lugar de `DisplayAlert`/`DisplayActionSheet`/`DisplayPromptAsync` (confirmação, ações, campo e seleção com busca), em fila
+- [x] Avisos rápidos de sucesso (toast) no lugar de alertas com "OK"
+- [x] Designar **vários operadores** de uma vez (também a partir do setor) e marcar os **produtos do setor** em uma única lista
+- [x] Checagem antes de **abrir o evento**; confirmação em vermelho para encerrar, bloquear e desativar
+- [x] Cartões em sequência com sugestão do próximo código
+- [x] Venda: toque rápido, +/− grandes, saldo que sobra/falta e bloqueio de saldo insuficiente antes de enviar
+- [x] Recarga: valor livre na tela e **confirmação do valor antes de aplicar** (regra 2.3 do plano)
+- [x] Foto de perfil pela câmera ou galeria, já reduzida antes do envio
+- [x] Pilha de navegação do terminal sem crescer a cada cliente
+- [x] Telas só recarregam quando os dados mudaram; foto de perfil em memória; listas com uma notificação por carga
+- [x] Bindings compilados (`x:DataType`) em todas as telas; cards sem sombra; toque no quadro inteiro dos botões de ícone
+- [x] Retentativa automática idempotente em recarga/venda e timeout de 15 s
+- [x] Release do Android com AOT completo (APK de uso real)
+- [x] **Corrigido (v1.13, validado no aparelho):** recursão infinita em `ExecutarAsync<T>` (StackOverflow ao designar operador e cadastrar cartão) e Shell singleton que fechava o app ao trocar de aba após reabrir
+- [x] Cadastro de cartões pela leitura do QR (câmera contínua) e registro do último erro fatal
+
 ### Publicação
 - [ ] Painel web do admin (futuro, mesma API)
 - [ ] Deploy — IIS primeiro na igreja? depois nuvem (provedor a definir)
@@ -115,7 +133,7 @@
 
 - [ ] Contrato completo dos endpoints da API (rotas em português) — passo 4 do plano
 - [ ] Mapa de telas e fluxos (operador e admin) — passo 3 do plano
-- [ ] Validar o app em aparelho físico: câmera (QR), biometria, SignalR do dashboard, cache offline, **foto de perfil** e as **telas de gestão** (usuários, produtos, eventos, cartões)
+- [ ] Validar o app em aparelho físico **com o APK Release**: câmera (QR), biometria, SignalR do dashboard, cache offline, **foto de perfil** (galeria e câmera), **telas de gestão** e as **janelas novas** (fundo translúcido, teclado no campo de texto, botão voltar do Android fechando a janela)
 - [ ] Confirmar fluxo de renovação de token no app — implementado (`SessaoService` renova sozinho); falta validar em aparelho real
 - [ ] Renomear variáveis locais dos testes para inglês (`validador` → `validator` etc.) — oferta em aberto
 - [ ] Avaliar limpeza periódica de tokens de renovação expirados

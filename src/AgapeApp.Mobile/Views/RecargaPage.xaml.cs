@@ -20,16 +20,4 @@ public partial class RecargaPage : ContentPage, IQueryAttributable
         base.OnAppearing();
         await _vm.IniciarAsync();
     }
-
-    private async void AoPedirOutroValor(object? sender, EventArgs e)
-    {
-        var texto = await DisplayPromptAsync(
-            "Outro valor",
-            "Digite o valor da recarga (R$):",
-            placeholder: "15,50",
-            keyboard: Keyboard.Numeric);
-
-        if (!string.IsNullOrWhiteSpace(texto))
-            _vm.DefinirValorPersonalizado(texto);
-    }
 }

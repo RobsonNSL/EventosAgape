@@ -1,4 +1,4 @@
-using System.Text.Json;
+using AgapeApp.Mobile.Helpers;
 using AgapeApp.Mobile.ViewModels;
 using ZXing.Net.Maui;
 using ZXing.Net.Maui.Controls;
@@ -24,9 +24,17 @@ public partial class LeituraQrPage : ContentPage, IQueryAttributable
     public void ApplyQueryAttributes(IDictionary<string, object> query)
         => _vm.AplicarParametros(query);
 
+    /// <summary>Chamado ao voltar de uma operação concluída ("próximo cliente").</summary>
+    public void PrepararNovaLeitura(string origem) => _vm.PrepararNovaLeitura(origem);
+
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+
+        // Cada volta para esta tela é um cartão novo.
+        _vm.Codigo = string.Empty;
+        _vm.MensagemErro = null;
+
         await IniciarCameraAsync();
     }
 
@@ -123,7 +131,7 @@ public partial class LeituraQrPage : ContentPage, IQueryAttributable
 
             _ultimaLeitura = DateTime.UtcNow;
 
-            var codigo = Normalizar(lido);
+            var codigo = CodigoCartao.Normalizar(lido);
             if (string.IsNullOrWhiteSpace(codigo))
                 return;
 
@@ -148,37 +156,11 @@ public partial class LeituraQrPage : ContentPage, IQueryAttributable
 
     private void AoAlternarLanterna(object? sender, EventArgs e)
     {
-        if (_leitor is not null)
-            _leitor.IsTorchOn = !_leitor.IsTorchOn;
+        if (_leitor is null)
+            return;
+
+        _leitor.IsTorchOn = !_leitor.IsTorchOn;
+        BotaoLanterna.CorIcone = _leitor.IsTorchOn ? Color.FromArgb("#F59E0B") : Colors.White;
     }
 
-    /// <summary>
-    /// Alguns cartões podem trazer um JSON no QR ({ "codigo": "..." });
-    /// nos demais casos o próprio texto já é o código.
-    /// </summary>
-    private static string Normalizar(string valor)
-    {
-        var texto = valor.Trim();
-        if (!texto.StartsWith('{'))
-            return texto;
-
-        try
-        {
-            using var documento = JsonDocument.Parse(texto);
-            foreach (var campo in new[] { "codigo", "cartao", "card" })
-            {
-                if (documento.RootElement.TryGetProperty(campo, out var propriedade)
-                    && propriedade.ValueKind == JsonValueKind.String)
-                {
-                    return propriedade.GetString()?.Trim() ?? texto;
-                }
-            }
-        }
-        catch (JsonException)
-        {
-            // QR comum, sem JSON: usa o texto como veio.
-        }
-
-        return texto;
-    }
 }

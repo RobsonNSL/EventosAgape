@@ -1,4 +1,5 @@
 using AgapeApp.Mobile.Services;
+using AgapeApp.Mobile.Views.Janelas;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -35,13 +36,19 @@ public partial class LoginViewModel : BaseViewModel
     /// <summary>Mostra a dica "a biometria fica disponível após o primeiro login".</summary>
     public bool SemBiometria => !BiometriaDisponivel;
 
-    /// <summary>Atalho de desenvolvimento para apontar o app a outro servidor.</summary>
-    public bool MostrarConfiguracaoServidor =>
+    /// <summary>
+    /// Atalho técnico para apontar o app a outro servidor. Sempre visível no Debug;
+    /// no Release aparece depois de 5 toques no brasão (o endereço do ngrok pode mudar).
+    /// </summary>
+    [ObservableProperty]
+    private bool mostrarConfiguracaoServidor =
 #if DEBUG
         true;
 #else
         false;
 #endif
+
+    public string Versao => $"AgapeApp v{AppInfo.Current.VersionString} · Paróquia Maria Imaculada";
 
     /// <summary>Preenche o último e-mail e verifica se a biometria está pronta.</summary>
     public async Task PrepararAsync()
@@ -77,15 +84,15 @@ public partial class LoginViewModel : BaseViewModel
             Preferences.Default.Set(ChaveUltimoEmail, Email.Trim());
 
             // Primeiro login: oferece ligar a biometria para as próximas entradas.
-            if (!_biometria.Ativada
-                && await _biometria.DisponivelAsync()
-                && Shell.Current is not null)
+            if (!_biometria.Ativada && await _biometria.DisponivelAsync())
             {
-                var ativar = await Shell.Current.DisplayAlertAsync(
-                    "Entrar mais rápido",
-                    "Usar a biometria deste aparelho para entrar sem digitar a senha?",
-                    "Ativar",
-                    "Agora não");
+                var ativar = await Dialogos.ConfirmarAsync(
+                    "Entrar mais rápido?",
+                    "Use a digital ou o reconhecimento facial deste aparelho para entrar sem digitar a senha. Dá para desligar depois no Perfil.",
+                    "Ativar biometria",
+                    "Agora não",
+                    TomDialogo.Primario,
+                    "\uf577");
 
                 if (ativar)
                     _biometria.Ativada = true;

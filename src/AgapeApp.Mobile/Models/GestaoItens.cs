@@ -1,4 +1,5 @@
 using AgapeApp.Mobile.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace AgapeApp.Mobile.Models;
 
@@ -142,11 +143,17 @@ public class CartaoItem
     };
 }
 
-/// <summary>Setor do evento na tela de detalhes.</summary>
-public class SetorItem
+/// <summary>Setor do evento na tela de detalhes (com o resumo de operadores liberados).</summary>
+public partial class SetorItem : ObservableObject
 {
     public required Guid Id { get; init; }
     public required string Nome { get; init; }
+
+    [ObservableProperty]
+    private string resumo = string.Empty;
+
+    [ObservableProperty]
+    private bool semOperador;
 
     public static SetorItem De(SetorDTO dto) => new()
     {
@@ -172,6 +179,11 @@ public class EventoProdutoItem
         : QuantidadeEstoque == 0
             ? "Estoque zerado"
             : QuantidadeEstoque == 1 ? "1 unidade em estoque" : $"{QuantidadeEstoque} unidades em estoque";
+
+    /// <summary>Versão curta para o selo da lista.</summary>
+    public string TextoEstoqueCurto => !ControlaEstoque
+        ? "Livre"
+        : QuantidadeEstoque <= 0 ? "Zerado" : $"{QuantidadeEstoque} un.";
 
     public bool EstoqueZerado => ControlaEstoque && QuantidadeEstoque <= 0;
 

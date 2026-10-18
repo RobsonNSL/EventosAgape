@@ -15,6 +15,8 @@ public partial class EventoDetalhePage : ContentPage, IQueryAttributable
     public void ApplyQueryAttributes(IDictionary<string, object> query)
         => _vm.AplicarParametros(query);
 
+    // Só busca de novo quando algo mudou (ex.: voltou do formulário de produto);
+    // fechar uma janela de escolha não recarrega a tela inteira.
     protected override async void OnAppearing()
     {
         base.OnAppearing();

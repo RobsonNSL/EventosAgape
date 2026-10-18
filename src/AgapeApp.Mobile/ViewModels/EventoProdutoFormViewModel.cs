@@ -119,6 +119,7 @@ public partial class EventoProdutoFormViewModel : BaseViewModel
                     $"api/evento-produtos/{_eventoProdutoId}",
                     new { preco = valor, controlaEstoque = ControlaEstoque });
 
+            Notificar(EhNovo ? $"{ProdutoNome} vinculado ao evento" : "Produto do evento atualizado");
             await NavegarAsync("..");
         });
     }

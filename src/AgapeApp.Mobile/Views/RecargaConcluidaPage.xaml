@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:AgapeApp.Mobile.ViewModels"
              x:Class="AgapeApp.Mobile.Views.RecargaConcluidaPage"
+             x:DataType="vm:RecargaConcluidaViewModel"
              Title="Recarga concluída"
              Shell.NavBarIsVisible="False">
 
@@ -51,9 +53,9 @@
                     Command="{Binding RecarregarOutroCommand}"
                     Margin="0,8,0,0" />
 
-            <Button Text="Voltar aos meus eventos"
+            <Button Text="Voltar ao terminal"
                     Style="{StaticResource BotaoContorno}"
-                    Command="{Binding IrParaEventosCommand}" />
+                    Command="{Binding IrParaOperacaoCommand}" />
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

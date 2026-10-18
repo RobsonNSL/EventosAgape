@@ -79,20 +79,13 @@ public partial class VendaConcluidaViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    private async Task ProximoClienteAsync()
-    {
-        if (Shell.Current is null)
-            return;
-
-        await Shell.Current.GoToAsync(
-            $"leitura?origem=venda&eventoId={EventoId}&setorId={SetorId}" +
+    private Task ProximoClienteAsync()
+        => Navegacao.VoltarParaLeituraAsync(
+            "venda",
+            $"../leitura?origem=venda&eventoId={EventoId}&setorId={SetorId}" +
             $"&eventoNome={Uri.EscapeDataString(EventoNome)}&setorNome={Uri.EscapeDataString(SetorNome)}");
-    }
 
+    /// <summary>Volta para o terminal do evento (recarga, venda e saldo).</summary>
     [RelayCommand]
-    private async Task IrParaEventosAsync()
-    {
-        if (Shell.Current is not null)
-            await Shell.Current.GoToAsync("//principal/eventos");
-    }
+    private Task IrParaOperacaoAsync() => Navegacao.VoltarParaOperacaoAsync();
 }

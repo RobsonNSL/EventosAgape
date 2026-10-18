@@ -1,7 +1,7 @@
-using System.Collections.ObjectModel;
 using AgapeApp.Mobile.Helpers;
 using AgapeApp.Mobile.Models;
 using AgapeApp.Mobile.Services;
+using AgapeApp.Mobile.Views.Janelas;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -16,17 +16,18 @@ public partial class ProdutosViewModel : BaseViewModel
     {
     }
 
-    public ObservableCollection<ProdutoItem> Produtos { get; } = [];
+    public ColecaoObservavel<ProdutoItem> Produtos { get; } = [];
 
     [ObservableProperty]
     private string busca = string.Empty;
 
     partial void OnBuscaChanged(string value) => Filtrar();
 
-    public Task IniciarAsync() => ExecutarAsync(CarregarAsync);
+    public Task IniciarAsync()
+        => PrecisaRecarregar() ? ExecutarAsync(CarregarAsync) : Task.CompletedTask;
 
     [RelayCommand]
-    private Task AtualizarAsync() => IniciarAsync();
+    private Task AtualizarAsync() => ExecutarAsync(CarregarAsync);
 
     [RelayCommand]
     private Task NovoAsync() => NavegarAsync("produto-form");
@@ -37,20 +38,22 @@ public partial class ProdutosViewModel : BaseViewModel
         if (produto is null)
             return;
 
-        var escolha = await EscolherAsync(produto.Nome, "Editar produto", produto.TextoAtivacao);
+        var escolha = await EscolherAsync(
+            produto.Nome,
+            produto.TextoPreco,
+            new OpcaoDialogo("editar", "Editar produto", "Nome e preço sugerido", "\uf303"),
+            produto.Ativo
+                ? new OpcaoDialogo("ativacao", "Desativar produto", "Some das listas de novos vínculos", "\uf05e", TomDialogo.Perigo)
+                : new OpcaoDialogo("ativacao", "Reativar produto", "Volta a poder ser vinculado a eventos", "\uf00c", TomDialogo.Sucesso));
 
         switch (escolha)
         {
-            case "Editar produto":
+            case "editar":
                 await NavegarAsync("produto-form", "produto", produto);
                 break;
 
-            case "Desativar produto":
-                await AlterarAtivacaoAsync(produto, ativo: false);
-                break;
-
-            case "Ativar produto":
-                await AlterarAtivacaoAsync(produto, ativo: true);
+            case "ativacao":
+                await AlterarAtivacaoAsync(produto, ativo: !produto.Ativo);
                 break;
         }
     }
@@ -65,22 +68,28 @@ public partial class ProdutosViewModel : BaseViewModel
             .ToList();
 
         Filtrar();
+        MarcarComoAtualizado();
     }
 
     private void Filtrar()
     {
         var termo = Busca.Trim();
 
-        var filtrados = _todos.Where(produto => Formatos.Contem(produto.Nome, termo)).ToList();
-
-        Produtos.Clear();
-
-        foreach (var produto in filtrados)
-            Produtos.Add(produto);
+        Produtos.Substituir(_todos.Where(produto => Formatos.Contem(produto.Nome, termo)));
     }
 
     private async Task AlterarAtivacaoAsync(ProdutoItem produto, bool ativo)
     {
+        if (!ativo && !await ConfirmarAsync(
+                "Desativar produto?",
+                $"{produto.Nome} deixa de aparecer na lista para vincular a eventos. Dá para reativar depois.",
+                "Desativar",
+                TomDialogo.Perigo,
+                "\uf05e"))
+        {
+            return;
+        }
+
         await ExecutarAsync(async () =>
         {
             await Api.PostSemRespostaAsync(
@@ -88,6 +97,7 @@ public partial class ProdutosViewModel : BaseViewModel
                 null);
 
             await CarregarAsync();
+            Notificar(ativo ? $"{produto.Nome} reativado" : $"{produto.Nome} desativado");
         });
     }
 }

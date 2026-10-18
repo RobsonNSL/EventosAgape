@@ -13,6 +13,9 @@ namespace AgapeApp.Mobile.Services;
 public class ApiClient
 {
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);
+    private static readonly TimeSpan EsperaEntreTentativas = TimeSpan.FromMilliseconds(700);
+
+    private static long _versaoDados;
 
     private readonly HttpClient _http;
     private readonly SessaoService _sessao;
@@ -23,17 +26,36 @@ public class ApiClient
         _sessao = sessao;
     }
 
+    /// <summary>
+    /// Aumenta a cada gravação bem-sucedida (POST/PUT/DELETE). As telas comparam com a
+    /// versão que carregaram para só buscar de novo quando algo mudou.
+    /// </summary>
+    public static long VersaoDados => Interlocked.Read(ref _versaoDados);
+
+    /// <summary>Leitura: tenta de novo uma vez se a rede falhar (GET não altera nada).</summary>
     public Task<T> GetAsync<T>(string rota, CancellationToken ct = default)
-        => EnviarAsync<T>(new HttpRequestMessage(HttpMethod.Get, AppConfig.Url(rota)), ct);
+        => EnviarAsync<T>(() => new HttpRequestMessage(HttpMethod.Get, AppConfig.Url(rota)), tentativas: 2, ct);
 
     public Task<T> PostAsync<T>(string rota, object corpo, CancellationToken ct = default)
         => EnviarAsync<T>(
-            new HttpRequestMessage(HttpMethod.Post, AppConfig.Url(rota)) { Content = ConteudoJson(corpo) },
+            () => new HttpRequestMessage(HttpMethod.Post, AppConfig.Url(rota)) { Content = ConteudoJson(corpo) },
+            tentativas: 1,
+            ct);
+
+    /// <summary>
+    /// POST de operação idempotente (recarga e venda carregam o idOperacaoCliente):
+    /// com rede instável reenvia sozinho — a API nunca duplica a operação.
+    /// </summary>
+    public Task<T> PostIdempotenteAsync<T>(string rota, object corpo, CancellationToken ct = default)
+        => EnviarAsync<T>(
+            () => new HttpRequestMessage(HttpMethod.Post, AppConfig.Url(rota)) { Content = ConteudoJson(corpo) },
+            tentativas: 3,
             ct);
 
     public Task<T> PutAsync<T>(string rota, object corpo, CancellationToken ct = default)
         => EnviarAsync<T>(
-            new HttpRequestMessage(HttpMethod.Put, AppConfig.Url(rota)) { Content = ConteudoJson(corpo) },
+            () => new HttpRequestMessage(HttpMethod.Put, AppConfig.Url(rota)) { Content = ConteudoJson(corpo) },
+            tentativas: 1,
             ct);
 
     public async Task PostSemRespostaAsync(string rota, object? corpo, CancellationToken ct = default)
@@ -45,6 +67,8 @@ public class ApiClient
         using var resposta = await ExecutarAsync(requisicao, ct);
         if (!resposta.IsSuccessStatusCode)
             throw await ApiException.DeRespostaAsync(resposta, ct);
+
+        Interlocked.Increment(ref _versaoDados);
     }
 
     /// <summary>Envia um arquivo como multipart/form-data (campo "arquivo") e devolve a resposta.</summary>
@@ -55,20 +79,24 @@ public class ApiClient
         string? tipoConteudo,
         CancellationToken ct = default)
     {
-        var formulario = new MultipartFormDataContent();
-        var arquivo = new StreamContent(conteudo);
-        arquivo.Headers.ContentType = new MediaTypeHeaderValue(
-            string.IsNullOrWhiteSpace(tipoConteudo) ? "application/octet-stream" : tipoConteudo);
-
-        formulario.Add(arquivo, "arquivo", nomeArquivo);
-
         return EnviarAsync<T>(
-            new HttpRequestMessage(HttpMethod.Post, AppConfig.Url(rota)) { Content = formulario },
+            () =>
+            {
+                var formulario = new MultipartFormDataContent();
+                var arquivo = new StreamContent(conteudo);
+                arquivo.Headers.ContentType = new MediaTypeHeaderValue(
+                    string.IsNullOrWhiteSpace(tipoConteudo) ? "application/octet-stream" : tipoConteudo);
+
+                formulario.Add(arquivo, "arquivo", nomeArquivo);
+
+                return new HttpRequestMessage(HttpMethod.Post, AppConfig.Url(rota)) { Content = formulario };
+            },
+            tentativas: 1,
             ct);
     }
 
     public Task<T> DeleteAsync<T>(string rota, CancellationToken ct = default)
-        => EnviarAsync<T>(new HttpRequestMessage(HttpMethod.Delete, AppConfig.Url(rota)), ct);
+        => EnviarAsync<T>(() => new HttpRequestMessage(HttpMethod.Delete, AppConfig.Url(rota)), tentativas: 1, ct);
 
     /// <summary>
     /// Baixa uma imagem da API. Passa pelo mesmo cliente das demais chamadas
@@ -85,19 +113,32 @@ public class ApiClient
         return await resposta.Content.ReadAsByteArrayAsync(ct);
     }
 
-    private async Task<T> EnviarAsync<T>(HttpRequestMessage requisicao, CancellationToken ct)
+    private async Task<T> EnviarAsync<T>(Func<HttpRequestMessage> criarRequisicao, int tentativas, CancellationToken ct)
     {
-        using (requisicao)
+        for (var tentativa = 1; ; tentativa++)
         {
-            using var resposta = await ExecutarAsync(requisicao, ct);
+            using var requisicao = criarRequisicao();
 
-            if (!resposta.IsSuccessStatusCode)
-                throw await ApiException.DeRespostaAsync(resposta, ct);
+            try
+            {
+                using var resposta = await ExecutarAsync(requisicao, ct);
 
-            var json = await resposta.Content.ReadAsStringAsync(ct);
-            return string.IsNullOrWhiteSpace(json)
-                ? default!
-                : JsonSerializer.Deserialize<T>(json, Json)!;
+                if (!resposta.IsSuccessStatusCode)
+                    throw await ApiException.DeRespostaAsync(resposta, ct);
+
+                if (requisicao.Method != HttpMethod.Get)
+                    Interlocked.Increment(ref _versaoDados);
+
+                var json = await resposta.Content.ReadAsStringAsync(ct);
+                return string.IsNullOrWhiteSpace(json)
+                    ? default!
+                    : JsonSerializer.Deserialize<T>(json, Json)!;
+            }
+            catch (ApiException ex) when (ex.SemConexao && tentativa < tentativas && !ct.IsCancellationRequested)
+            {
+                // Rede instável: espera um instante e tenta de novo (mesmo corpo, mesmo id de operação).
+                await Task.Delay(EsperaEntreTentativas * tentativa, ct);
+            }
         }
     }
 

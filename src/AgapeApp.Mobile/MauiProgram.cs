@@ -1,4 +1,5 @@
-﻿using AgapeApp.Mobile.Services;
+﻿using AgapeApp.Mobile.Helpers;
+using AgapeApp.Mobile.Services;
 using AgapeApp.Mobile.ViewModels;
 using AgapeApp.Mobile.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,6 +13,9 @@ public static class MauiProgram
 {
 	public static MauiApp CreateMauiApp()
 	{
+		// Primeiro de tudo: qualquer erro fatal fica registrado para a próxima abertura.
+		RegistroErros.Iniciar();
+
 		var builder = MauiApp.CreateBuilder();
 		builder
 			.UseMauiApp<App>()
@@ -27,7 +31,9 @@ public static class MauiProgram
 			});
 
 		// ===== Serviços =====
-		builder.Services.AddSingleton(new HttpClient { Timeout = TimeSpan.FromSeconds(30) });
+		// Tempo curto: venda e recarga tentam de novo sozinhas (mesmo id de operação) em vez de
+		// deixar o operador 30s olhando para a tela quando a rede do evento oscila.
+		builder.Services.AddSingleton(new HttpClient { Timeout = TimeSpan.FromSeconds(15) });
 		builder.Services.AddSingleton<SessaoService>();
 		builder.Services.AddSingleton<ApiClient>();
 		builder.Services.AddSingleton<CacheService>();
@@ -35,7 +41,10 @@ public static class MauiProgram
 		builder.Services.AddSingleton<DashboardService>();
 		builder.Services.AddSingleton<IBiometric>(_ => BiometricAuthenticationService.Default);
 		builder.Services.AddSingleton<BiometriaService>();
-		builder.Services.AddSingleton<AppShell>();
+		// Transient: quando o Android recria a Activity (sair pelo voltar e reabrir, voltar da
+		// câmera...), cada janela nova ganha um Shell novo. Com Singleton, as abas antigas ficavam
+		// presas ao contexto descartado e trocar de aba fechava o app (ObjectDisposedException).
+		builder.Services.AddTransient<AppShell>();
 
 		// ===== ViewModels =====
 		builder.Services.AddTransient<LoginViewModel>();

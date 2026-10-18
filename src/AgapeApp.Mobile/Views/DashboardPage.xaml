@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:AgapeApp.Mobile.ViewModels"
+             xmlns:controles="clr-namespace:AgapeApp.Mobile.Controls"
              xmlns:helpers="clr-namespace:AgapeApp.Mobile.Helpers"
              xmlns:models="clr-namespace:AgapeApp.Mobile.Models"
              x:Class="AgapeApp.Mobile.Views.DashboardPage"
+             x:DataType="vm:DashboardViewModel"
              Title="Dashboard"
              Shell.NavBarIsVisible="False">
 
@@ -16,21 +19,7 @@
         <!-- Cabeçalho + status do tempo real -->
         <VerticalStackLayout Grid.Row="0" Padding="20,24,20,8" Spacing="12">
             <Grid ColumnDefinitions="44,*,Auto" ColumnSpacing="12">
-                <Border WidthRequest="40"
-                        HeightRequest="40"
-                        VerticalOptions="Start"
-                        Stroke="{StaticResource Borda}"
-                        StrokeThickness="1"
-                        StrokeShape="RoundRectangle 12"
-                        BackgroundColor="{StaticResource Superficie}">
-                    <Label Text="&#xf060;" FontFamily="fa" FontSize="15"
-                           TextColor="{StaticResource TextoPrimario}"
-                           HorizontalOptions="Center" VerticalOptions="Center">
-                        <Label.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding VoltarCommand}" />
-                        </Label.GestureRecognizers>
-                    </Label>
-                </Border>
+                <controles:BotaoVoltar Command="{Binding VoltarCommand}" />
                 <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
                     <Label Text="Dashboard" Style="{StaticResource TituloMedio}" />
                     <Label Text="{Binding EventoNome}"
@@ -59,7 +48,7 @@
 
         <RefreshView Grid.Row="1"
                      Command="{Binding AtualizarCommand}"
-                     IsRefreshing="{Binding EstaCarregando}"
+                     IsRefreshing="{Binding EstaCarregando, Mode=OneWay}"
                      RefreshColor="{StaticResource Primary}">
             <ScrollView>
                 <VerticalStackLayout Padding="20,4,20,24" Spacing="14">

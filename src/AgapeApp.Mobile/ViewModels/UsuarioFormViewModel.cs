@@ -91,6 +91,7 @@ public partial class UsuarioFormViewModel : BaseViewModel
                     $"api/usuarios/{_id}",
                     new { nome = Nome, email = Email, perfil });
 
+            Notificar(EhNovo ? $"{Nome} cadastrado" : "Usuário atualizado");
             await NavegarAsync("..");
         });
     }

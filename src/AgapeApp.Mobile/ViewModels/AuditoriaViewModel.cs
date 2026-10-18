@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using AgapeApp.Mobile.Helpers;
 using AgapeApp.Mobile.Models;
 using AgapeApp.Mobile.Services;
@@ -16,7 +15,7 @@ public partial class AuditoriaViewModel : BaseViewModel
     {
     }
 
-    public ObservableCollection<LogAuditoriaItem> Registros { get; } = [];
+    public ColecaoObservavel<LogAuditoriaItem> Registros { get; } = [];
 
     [ObservableProperty]
     private Guid eventoId;
@@ -58,10 +57,7 @@ public partial class AuditoriaViewModel : BaseViewModel
         await ExecutarAsync(async () =>
         {
             if (reiniciar)
-            {
                 _pagina = 0;
-                Registros.Clear();
-            }
 
             var proxima = _pagina + 1;
             var resultado = await Api.GetAsync<ResultadoPaginadoDTO<LogAuditoriaDTO>>(
@@ -70,8 +66,18 @@ public partial class AuditoriaViewModel : BaseViewModel
             _pagina = proxima;
             Total = resultado.Total;
 
-            foreach (var log in resultado.Itens)
-                Registros.Add(LogAuditoriaItem.De(log));
+            var novos = resultado.Itens.Select(LogAuditoriaItem.De);
+
+            if (reiniciar)
+            {
+                Registros.Substituir(novos);
+            }
+            else
+            {
+                // "Carregar mais" acrescenta no fim sem rolar a lista de volta ao topo.
+                foreach (var registro in novos)
+                    Registros.Add(registro);
+            }
 
             TemMais = Registros.Count < Total;
             TextoTotal = Total == 1 ? "1 registro" : $"{Total} registros";

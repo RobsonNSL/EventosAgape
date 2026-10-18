@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using AgapeApp.Mobile.Helpers;
 using AgapeApp.Mobile.Models;
 using AgapeApp.Mobile.Services;
@@ -20,7 +19,7 @@ public partial class OperacaoEventoViewModel : BaseViewModel
         _cache = cache;
     }
 
-    public ObservableCollection<OperacaoRecente> Recentes { get; } = [];
+    public ColecaoObservavel<OperacaoRecente> Recentes { get; } = [];
 
     [ObservableProperty]
     private Guid eventoId;
@@ -53,9 +52,7 @@ public partial class OperacaoEventoViewModel : BaseViewModel
 
         var recentes = await _cache.LerRecentesAsync(EventoId);
 
-        Recentes.Clear();
-        foreach (var operacao in recentes)
-            Recentes.Add(operacao);
+        Recentes.Substituir(recentes);
 
         TemRecentes = Recentes.Count > 0;
     }

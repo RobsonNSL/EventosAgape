@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using AgapeApp.Mobile.Helpers;
 using AgapeApp.Mobile.Models;
 using AgapeApp.Mobile.Services;
@@ -14,7 +13,7 @@ public partial class SaldosViewModel : BaseViewModel
     {
     }
 
-    public ObservableCollection<CartaoSaldoItem> Cartoes { get; } = [];
+    public ColecaoObservavel<CartaoSaldoItem> Cartoes { get; } = [];
 
     [ObservableProperty]
     private Guid eventoId;
@@ -49,9 +48,7 @@ public partial class SaldosViewModel : BaseViewModel
             var saldos = await Api.GetAsync<List<SaldoEmCirculacaoDTO>>(
                 $"api/eventos/{EventoId}/relatorios/saldos");
 
-            Cartoes.Clear();
-            foreach (var saldo in saldos.OrderByDescending(s => s.Saldo))
-                Cartoes.Add(CartaoSaldoItem.De(saldo));
+            Cartoes.Substituir(saldos.OrderByDescending(s => s.Saldo).Select(CartaoSaldoItem.De));
 
             Quantidade = Cartoes.Count;
             Total = saldos.Sum(s => s.Saldo);

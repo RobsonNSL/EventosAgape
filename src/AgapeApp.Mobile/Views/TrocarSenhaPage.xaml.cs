@@ -1,3 +1,4 @@
+using AgapeApp.Mobile.Helpers;
 using AgapeApp.Mobile.ViewModels;
 
 namespace AgapeApp.Mobile.Views;
@@ -15,10 +16,7 @@ public partial class TrocarSenhaPage : ContentPage
 
     private async void AoSenhaAlterada()
     {
-        await DisplayAlertAsync(
-            "Pronto!",
-            "Senha alterada com sucesso. Use a nova senha no próximo login.",
-            "OK");
+        Notificacao.Mostrar("Senha alterada. Use a nova senha no próximo login.");
 
         if (Shell.Current is not null)
             await Shell.Current.GoToAsync("..");
