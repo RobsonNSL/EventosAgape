@@ -23,7 +23,9 @@ public partial class LoginPage : ContentPage
         if (Dialogos.Aberto)
             return;
 
-        await _vm.PrepararAsync();
+        var preparo = _vm.PrepararAsync();
+        await EsconderAberturaAsync(preparo);
+        await preparo;
 
         // Com a biometria ativada, já pede a digital ao abrir (uma vez; depois fica o botão).
         if (_vm.BiometriaDisponivel && !_biometriaPedida)
@@ -34,6 +36,33 @@ public partial class LoginPage : ContentPage
     }
 
     private bool _biometriaPedida;
+
+    /// <summary>A foto de abertura só aparece uma vez por execução do app.</summary>
+    private static bool _aberturaMostrada;
+
+    private async Task EsconderAberturaAsync(Task preparo)
+    {
+        if (_aberturaMostrada || !Abertura.IsVisible)
+        {
+            Abertura.IsVisible = false;
+            return;
+        }
+
+        _aberturaMostrada = true;
+
+        try
+        {
+            // Tempo mínimo para a foto ser vista, sem segurar a pessoa além do preparo.
+            await Task.WhenAll(preparo, Task.Delay(1100));
+            await Abertura.FadeToAsync(0, 350, Easing.CubicIn);
+        }
+        catch (Exception)
+        {
+            // Sem animação: some de uma vez.
+        }
+
+        Abertura.IsVisible = false;
+    }
 
     private int _toquesBrasao;
 

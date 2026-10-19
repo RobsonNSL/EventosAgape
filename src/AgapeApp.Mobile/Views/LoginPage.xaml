@@ -65,26 +65,11 @@
                        TextColor="{StaticResource LoginTexto}"
                        HorizontalOptions="Center"
                        Margin="0,14,0,0" />
-                <Label Text="Cartão pré-pago dos eventos da igreja"
+                <Label Text="App de Eventos Maria Imaculada"
                        Style="{StaticResource CorpoGrande}"
                        TextColor="{StaticResource LoginTextoSecundario}"
                        HorizontalOptions="Center"
                        Margin="0,4,0,0" />
-
-                <Border HorizontalOptions="Center"
-                        Margin="0,16,0,0"
-                        BackgroundColor="{StaticResource LoginCampo}"
-                        Stroke="{StaticResource LoginBorda}"
-                        StrokeThickness="1"
-                        StrokeShape="RoundRectangle 12"
-                        Padding="14,9">
-                    <HorizontalStackLayout Spacing="8">
-                        <Label Text="&#xf54e;" FontFamily="fa" FontSize="14"
-                               TextColor="{StaticResource LoginIcone}" VerticalOptions="Center" />
-                        <Label Text="Terminal do operador" Style="{StaticResource Legenda}"
-                               TextColor="{StaticResource LoginTextoSecundario}" />
-                    </HorizontalStackLayout>
-                </Border>
 
                 <!-- Formulário -->
                 <Border Margin="0,28,0,0"
@@ -217,5 +202,11 @@
                        Margin="0,4,0,0" />
             </VerticalStackLayout>
         </ScrollView>
+
+        <!-- Abertura: a foto ocupando a tela inteira logo depois da abertura nativa;
+             some com um esmaecimento e revela o login (que usa a mesma foto de fundo). -->
+        <Grid x:Name="Abertura" BackgroundColor="#0B0F1A">
+            <Image Source="background.jpg" Aspect="AspectFill" />
+        </Grid>
     </Grid>
 </ContentPage>

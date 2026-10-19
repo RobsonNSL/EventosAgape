@@ -9,7 +9,7 @@
              Shell.NavBarIsVisible="False">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20,24,20,24" Spacing="16">
+        <VerticalStackLayout x:Name="Conteudo" Padding="20,24,20,24" Spacing="16">
 
             <!-- Cabeçalho -->
             <Grid ColumnDefinitions="44,*" ColumnSpacing="12">
@@ -45,7 +45,8 @@
                     <Label Text="Saldo disponível no evento"
                            Style="{StaticResource LegendaPequena}"
                            Margin="0,6,0,0" />
-                    <Label Text="{Binding TextoSaldo}"
+                    <Label x:Name="RotuloSaldo"
+                           Text="{Binding TextoSaldo}"
                            Style="{StaticResource ValorGrande}"
                            TextColor="{StaticResource Sucesso}" />
                 </VerticalStackLayout>

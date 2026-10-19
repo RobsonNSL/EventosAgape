@@ -4,7 +4,7 @@ using MediatR;
 namespace AgapeApp.Application.EventoOperadores.Commands.DesignarOperador;
 
 /// <summary>
-/// Designa um operador a um setor do evento. Somente administradores.
+/// Designa um usuário ativo (operador ou administrador) a um setor do evento. Somente administradores podem designar.
 /// O campo SolicitanteId é preenchido pela API com o usuário autenticado.
 /// </summary>
 public record DesignarOperadorCommand(

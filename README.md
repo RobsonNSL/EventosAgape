@@ -63,6 +63,7 @@ Na primeira execução a API:
 | POST · GET | `/api/produtos` | Administrador |
 | GET · PUT | `/api/produtos/{id}` | Administrador |
 | POST | `/api/produtos/{id}/ativar` · `/desativar` | Administrador |
+| POST · DELETE | `/api/produtos/{id}/imagem` | Administrador (envio `multipart/form-data`, campo `arquivo`; jpg/png/webp até 5 MB) |
 | POST · GET | `/api/cartoes` | Administrador |
 | GET | `/api/cartoes/{id}` | Administrador |
 | POST | `/api/cartoes/{id}/ativar` · `/desativar` | Administrador |
@@ -207,9 +208,32 @@ dotnet publish src/AgapeApp.Mobile -f net10.0-android -c Release -o publish/andr
 adb install -r publish/android/com.agapeapp.mobile-Signed.apk
 ```
 
-Enquanto não houver keystore própria, o Release é assinado com a chave de debug da máquina (instala por arquivo
-ou `adb` normalmente; o APK fica com ~53 MB). No Release o botão "Configurar endereço do servidor" fica escondido: toque **5 vezes no
-brasão** da tela de login para mostrá-lo.
+O APK fica com ~52 MB e roda em celulares **arm64** e **arm 32 bits** (Android 8 ou mais novo). No Release o botão
+"Configurar endereço do servidor" fica escondido: toque **5 vezes no brasão** da tela de login para mostrá-lo.
+
+### Assinatura do APK (distribuição)
+
+O Release é assinado com a **chave de produção** da paróquia (RSA 4096, esquemas v2/v3), que fica na pasta
+`assinatura/` na raiz do repositório — **fora do git** (`.gitignore`):
+
+- `assinatura/agapeapp-release.keystore` — a chave (alias `agapeapp`);
+- `assinatura/assinatura.props` — a senha, importada pelo `.csproj` só no Release.
+
+Sem essa pasta o build continua funcionando, mas sai assinado com a chave de debug da máquina.
+
+> ⚠️ **Guarde uma cópia da pasta `assinatura/` em local seguro** (pen drive, cofre de senhas, drive da paróquia).
+> O Android só instala uma atualização **por cima** se ela vier assinada com a **mesma** chave. Perdeu a chave,
+> todos os aparelhos precisam desinstalar o app para instalar a versão nova.
+
+Para cada nova versão distribuída, aumente `ApplicationVersion` (e `ApplicationDisplayVersion`) no `.csproj`.
+Conferir a assinatura de um APK:
+
+```
+java -jar "C:\Program Files (x86)\Android\android-sdk\build-tools\36.0.0\lib\apksigner.jar" verify --print-certs publish/android/com.agapeapp.mobile-Signed.apk
+```
+
+Aparelhos que já têm um APK assinado com a chave de debug precisam **desinstalar** o app uma vez antes de
+instalar o assinado (assinaturas diferentes); a partir daí as atualizações instalam por cima.
 
 - **Design:** design system "Agape Direct" (Material 3) gerado no Google Stitch, salvo em `docs/design/stitch/`.
   Tokens aplicados em `Resources/Styles/Colors.xaml` e `Styles.xaml` (primária `#2563EB`, dinheiro `#16A34A`,
@@ -253,6 +277,20 @@ brasão** da tela de login para mostrá-lo.
   O app já tenta de novo sozinho (até 3 vezes) quando a rede oscila.
 - **Pendências do app:** validar em aparelho físico (câmera, biometria, SignalR, foto de perfil e as telas de
   gestão), build iOS (requer Mac) e o painel web do administrador (futuro, mesma API).
+
+## Imagens dos produtos
+
+A coluna `produtos.caminho_imagem` (**migration 0018**) guarda o caminho relativo da imagem, servida pela API
+como arquivo estático em `{apiBase}/imagens/produtos/{arquivo}` — o banco nunca guarda URL.
+
+- **Imagens-base**: 36 fotos livres (Wikimedia Commons / Openverse) em `src/AgapeApp.Api/wwwroot/imagens/produtos/`,
+  com autor e licença de cada uma em [`CREDITOS.md`](src/AgapeApp.Api/wwwroot/imagens/produtos/CREDITOS.md).
+  Para ligá-las aos produtos do banco: [`docs/sql/imagens-produtos.sql`](docs/sql/imagens-produtos.sql).
+- **Pelo app** (Gestão › Produtos › toque no produto): colocar/trocar imagem (galeria ou câmera) e remover.
+  O envio gera um arquivo com nome GUID; ao trocar, a API apaga só arquivos gerados por ela — as imagens-base
+  nunca são removidas do disco.
+- No app as imagens aparecem no catálogo, nos produtos do evento e na grade de venda (baixadas depois da lista,
+  com cache em memória; sem imagem fica o ícone).
 
 ## Observações
 

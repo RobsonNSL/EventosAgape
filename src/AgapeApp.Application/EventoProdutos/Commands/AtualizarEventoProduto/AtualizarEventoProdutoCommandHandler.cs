@@ -57,6 +57,6 @@ public class AtualizarEventoProdutoCommandHandler
 
         await _unitOfWork.SalvarAlteracoesAsync(cancellationToken);
 
-        return eventoProduto.ParaDTO(produto?.Nome ?? string.Empty);
+        return eventoProduto.ParaDTO(produto);
     }
 }

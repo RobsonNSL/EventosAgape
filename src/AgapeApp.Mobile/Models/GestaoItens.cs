@@ -29,13 +29,23 @@ public static class SituacaoEvento
 }
 
 /// <summary>Usuário na lista de gestão (iniciais e situação prontas para exibição).</summary>
-public class UsuarioItem
+public partial class UsuarioItem : ObservableObject
 {
     public required Guid Id { get; init; }
     public required string Nome { get; init; }
     public required string Email { get; init; }
     public required string Perfil { get; init; }
     public required bool Ativo { get; init; }
+    public string? CaminhoFoto { get; init; }
+
+    /// <summary>Foto de perfil (baixada depois da lista; até lá aparecem as iniciais).</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TemFoto), nameof(SemFoto))]
+    private ImageSource? foto;
+
+    public bool TemFoto => Foto is not null;
+
+    public bool SemFoto => Foto is null;
 
     public string Iniciais => Formatos.Iniciais(Nome);
 
@@ -54,17 +64,30 @@ public class UsuarioItem
         Nome = dto.Nome,
         Email = dto.Email,
         Perfil = dto.Perfil,
-        Ativo = dto.Ativo
+        Ativo = dto.Ativo,
+        CaminhoFoto = dto.CaminhoFoto
     };
 }
 
 /// <summary>Produto do catálogo na lista de gestão.</summary>
-public class ProdutoItem
+public partial class ProdutoItem : ObservableObject, IComImagem
 {
     public required Guid Id { get; init; }
     public required string Nome { get; init; }
     public required decimal? PrecoPadrao { get; init; }
     public required bool Ativo { get; init; }
+
+    /// <summary>Caminho da imagem na API (ex.: "imagens/produtos/coxinha.jpg").</summary>
+    public string? CaminhoImagem { get; init; }
+
+    /// <summary>Imagem baixada depois da lista (até lá aparece o ícone).</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TemImagem), nameof(SemImagem))]
+    private ImageSource? imagem;
+
+    public bool TemImagem => Imagem is not null;
+
+    public bool SemImagem => Imagem is null;
 
     public string TextoPreco => PrecoPadrao is decimal preco
         ? $"Preço padrão {Formatos.Moeda(preco)}"
@@ -83,7 +106,8 @@ public class ProdutoItem
         Id = dto.Id,
         Nome = dto.Nome,
         PrecoPadrao = dto.PrecoPadrao,
-        Ativo = dto.Ativo
+        Ativo = dto.Ativo,
+        CaminhoImagem = dto.CaminhoImagem
     };
 }
 
@@ -163,7 +187,7 @@ public partial class SetorItem : ObservableObject
 }
 
 /// <summary>Produto vinculado ao evento na tela de detalhes.</summary>
-public class EventoProdutoItem
+public partial class EventoProdutoItem : ObservableObject, IComImagem
 {
     public required Guid Id { get; init; }
     public required Guid ProdutoId { get; init; }
@@ -171,6 +195,18 @@ public class EventoProdutoItem
     public required decimal Preco { get; init; }
     public required bool ControlaEstoque { get; init; }
     public required int QuantidadeEstoque { get; init; }
+
+    /// <summary>Caminho da imagem na API (ex.: "imagens/produtos/coxinha.jpg").</summary>
+    public string? CaminhoImagem { get; init; }
+
+    /// <summary>Imagem baixada depois da lista (até lá aparece o ícone).</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TemImagem), nameof(SemImagem))]
+    private ImageSource? imagem;
+
+    public bool TemImagem => Imagem is not null;
+
+    public bool SemImagem => Imagem is null;
 
     public string TextoPreco => Formatos.Moeda(Preco);
 
@@ -198,7 +234,8 @@ public class EventoProdutoItem
         ProdutoNome = dto.ProdutoNome,
         Preco = dto.Preco,
         ControlaEstoque = dto.ControlaEstoque,
-        QuantidadeEstoque = dto.QuantidadeEstoque
+        QuantidadeEstoque = dto.QuantidadeEstoque,
+        CaminhoImagem = dto.ProdutoCaminhoImagem
     };
 }
 

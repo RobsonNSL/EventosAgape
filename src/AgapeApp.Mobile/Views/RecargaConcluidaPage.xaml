@@ -8,54 +8,73 @@
              Shell.NavBarIsVisible="False">
 
     <ScrollView>
-        <VerticalStackLayout Padding="24,40,24,24" Spacing="14">
+        <VerticalStackLayout Padding="24,28,24,24" Spacing="14">
 
-            <Border WidthRequest="88"
-                    HeightRequest="88"
-                    StrokeThickness="0"
-                    StrokeShape="RoundRectangle 44"
-                    BackgroundColor="{StaticResource SucessoContainer}"
-                    HorizontalOptions="Center">
-                <Label Text="&#xf00c;" FontFamily="fa" FontSize="34"
+            <!-- Palco da comemoração: onda + círculo + confetes (adicionados no código) -->
+            <Grid x:Name="Palco" HeightRequest="170">
+                <Border x:Name="Onda"
+                        WidthRequest="96"
+                        HeightRequest="96"
+                        StrokeThickness="3"
+                        Stroke="{StaticResource Destaque}"
+                        StrokeShape="RoundRectangle 48"
+                        BackgroundColor="Transparent"
+                        Opacity="0"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center" />
+                <Border x:Name="Circulo"
+                        WidthRequest="96"
+                        HeightRequest="96"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 48"
+                        BackgroundColor="{StaticResource Sucesso}"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center">
+                    <Label x:Name="Check"
+                           Text="&#xf00c;" FontFamily="fa" FontSize="40"
+                           TextColor="{StaticResource Superficie}"
+                           HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
+            </Grid>
+
+            <VerticalStackLayout x:Name="Detalhes" Spacing="14">
+                <Label Text="Recarga concluída!"
+                       Style="{StaticResource TituloMedio}"
+                       HorizontalTextAlignment="Center" />
+
+                <Label x:Name="RotuloValor"
+                       Text="{Binding TextoValor}"
+                       Style="{StaticResource ValorGrande}"
                        TextColor="{StaticResource Sucesso}"
-                       HorizontalOptions="Center" VerticalOptions="Center" />
-            </Border>
+                       HorizontalTextAlignment="Center" />
 
-            <Label Text="Recarga concluída!"
-                   Style="{StaticResource TituloMedio}"
-                   HorizontalTextAlignment="Center"
-                   Margin="0,6,0,0" />
+                <Label Text="{Binding TextoCartao}"
+                       Style="{StaticResource LegendaPequena}"
+                       HorizontalTextAlignment="Center"
+                       Margin="0,0,0,8" />
 
-            <Label Text="{Binding TextoValor}"
-                   Style="{StaticResource ValorGrande}"
-                   TextColor="{StaticResource Sucesso}"
-                   HorizontalTextAlignment="Center" />
+                <Border Style="{StaticResource Card}">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Novo saldo no evento"
+                               Style="{StaticResource Legenda}"
+                               VerticalOptions="Center" />
+                        <Label x:Name="RotuloSaldo"
+                               Grid.Column="1"
+                               Text="{Binding TextoSaldo}"
+                               Style="{StaticResource ValorMedio}"
+                               TextColor="{StaticResource Sucesso}" />
+                    </Grid>
+                </Border>
 
-            <Label Text="{Binding TextoCartao}"
-                   Style="{StaticResource LegendaPequena}"
-                   HorizontalTextAlignment="Center"
-                   Margin="0,0,0,8" />
+                <Button Text="Recarregar outro cartão"
+                        Style="{StaticResource BotaoDestaque}"
+                        Command="{Binding RecarregarOutroCommand}"
+                        Margin="0,8,0,0" />
 
-            <Border Style="{StaticResource Card}">
-                <Grid ColumnDefinitions="*,Auto">
-                    <Label Text="Novo saldo no evento"
-                           Style="{StaticResource Legenda}"
-                           VerticalOptions="Center" />
-                    <Label Grid.Column="1"
-                           Text="{Binding TextoSaldo}"
-                           Style="{StaticResource ValorMedio}"
-                           TextColor="{StaticResource Sucesso}" />
-                </Grid>
-            </Border>
-
-            <Button Text="Recarregar outro cartão"
-                    Style="{StaticResource BotaoDestaque}"
-                    Command="{Binding RecarregarOutroCommand}"
-                    Margin="0,8,0,0" />
-
-            <Button Text="Voltar ao terminal"
-                    Style="{StaticResource BotaoContorno}"
-                    Command="{Binding IrParaOperacaoCommand}" />
+                <Button Text="Voltar ao terminal"
+                        Style="{StaticResource BotaoContorno}"
+                        Command="{Binding IrParaOperacaoCommand}" />
+            </VerticalStackLayout>
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

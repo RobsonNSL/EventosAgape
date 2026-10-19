@@ -10,7 +10,7 @@
              Shell.NavBarIsVisible="False">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20,24,20,24" Spacing="16">
+        <VerticalStackLayout x:Name="Conteudo" Padding="20,24,20,24" Spacing="16">
 
             <!-- Cabeçalho -->
             <Grid ColumnDefinitions="44,*" ColumnSpacing="12">

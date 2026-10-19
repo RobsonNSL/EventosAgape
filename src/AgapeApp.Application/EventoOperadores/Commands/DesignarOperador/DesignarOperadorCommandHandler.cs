@@ -3,7 +3,6 @@ using AgapeApp.Application.Common.Exceptions;
 using AgapeApp.Application.EventoOperadores.DTOs;
 using AgapeApp.Application.Interfaces;
 using AgapeApp.Domain.Entities;
-using AgapeApp.Domain.Enums;
 using AgapeApp.Domain.Exceptions;
 using AgapeApp.Domain.Resources;
 using MediatR;
@@ -48,9 +47,7 @@ public class DesignarOperadorCommandHandler
         var usuario = await _usuarioRepository.ObterPorIdAsync(comando.UsuarioId, cancellationToken)
             ?? throw new NaoEncontradoException(MensagensErro.UsuarioNaoEncontrado);
 
-        if (usuario.Perfil != PerfilUsuario.Operador)
-            throw new RegraNegocioException(MensagensErro.UsuarioNaoEhOperador);
-
+        // Operadores e administradores podem trabalhar no evento (o admin também se designa).
         if (!usuario.Ativo)
             throw new RegraNegocioException(MensagensErro.UsuarioDesativado);
 

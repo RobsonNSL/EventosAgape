@@ -20,12 +20,7 @@ public class ListarProdutosQueryHandler : IRequestHandler<ListarProdutosQuery, I
         var produtos = await _produtoRepository.ListarAsync(consulta.IncluirInativos, cancellationToken);
 
         return produtos
-            .Select(produto => new ProdutoDTO(
-                produto.Id,
-                produto.Nome,
-                produto.PrecoPadrao,
-                produto.Ativo,
-                produto.CriadoEm))
+            .Select(produto => produto.ParaDTO())
             .ToList();
     }
 }

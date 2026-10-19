@@ -39,8 +39,7 @@ public class ListarProdutosDoEventoQueryHandler
         var produtosPorId = produtos.ToDictionary(produto => produto.Id);
 
         return vinculos
-            .Select(vinculo => vinculo.ParaDTO(
-                produtosPorId.TryGetValue(vinculo.ProdutoId, out var produto) ? produto.Nome : string.Empty))
+            .Select(vinculo => vinculo.ParaDTO(produtosPorId.GetValueOrDefault(vinculo.ProdutoId)))
             .OrderBy(eventoProduto => eventoProduto.ProdutoNome)
             .ToList();
     }

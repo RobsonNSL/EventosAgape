@@ -73,6 +73,7 @@ public class CacheService
             Preco = (double)p.Preco,
             ControlaEstoque = p.ControlaEstoque,
             QuantidadeEstoque = p.QuantidadeEstoque,
+            CaminhoImagem = p.ProdutoCaminhoImagem,
             AtualizadoEmTicks = DateTime.UtcNow.Ticks
         }));
     });
@@ -92,7 +93,8 @@ public class CacheService
                 l.ProdutoNome,
                 (decimal)l.Preco,
                 l.ControlaEstoque,
-                l.QuantidadeEstoque)).ToList();
+                l.QuantidadeEstoque,
+                l.CaminhoImagem)).ToList();
         }, []);
 
     // ===== Últimas operações deste aparelho =====
@@ -267,6 +269,7 @@ public class CacheService
         public double Preco { get; set; }
         public bool ControlaEstoque { get; set; }
         public int QuantidadeEstoque { get; set; }
+        public string? CaminhoImagem { get; set; }
         public long AtualizadoEmTicks { get; set; }
     }
 

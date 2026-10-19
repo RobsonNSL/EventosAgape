@@ -50,7 +50,7 @@ public class DefinirMinhaFotoCommandHandler : IRequestHandler<DefinirMinhaFotoCo
         var caminho = await _armazenamentoImagens.SalvarAsync(
             conteudo,
             FotoPerfil.ExtensaoNormalizada(comando.NomeArquivo),
-            cancellationToken);
+            cancellationToken: cancellationToken);
 
         usuario.DefinirFoto(caminho);
 

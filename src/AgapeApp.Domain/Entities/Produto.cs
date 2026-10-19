@@ -23,6 +23,12 @@ public class Produto : BaseEntity
     public bool Ativo { get; private set; }
 
     /// <summary>
+    /// Imagem do produto: caminho relativo à pasta pública da API
+    /// (ex.: "imagens/produtos/coca-cola-lata.jpg"). Nulo = sem imagem.
+    /// </summary>
+    public string? CaminhoImagem { get; private set; }
+
+    /// <summary>
     /// Cria um novo produto ativo.
     /// </summary>
     public static Produto Criar(string nome, decimal? precoPadrao)
@@ -48,6 +54,13 @@ public class Produto : BaseEntity
 
         Nome = nome.Trim();
         PrecoPadrao = precoPadrao;
+        MarcarComoAtualizada();
+    }
+
+    /// <summary>Define (ou limpa, com nulo/vazio) a imagem do produto.</summary>
+    public void DefinirImagem(string? caminhoImagem)
+    {
+        CaminhoImagem = string.IsNullOrWhiteSpace(caminhoImagem) ? null : caminhoImagem.Trim();
         MarcarComoAtualizada();
     }
 

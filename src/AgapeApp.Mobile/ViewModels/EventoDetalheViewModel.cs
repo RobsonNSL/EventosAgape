@@ -18,8 +18,11 @@ public partial class EventoDetalheViewModel : BaseViewModel
     private EventoAdminItem? _evento;
     private IReadOnlyList<ProdutoDTO> _catalogo = [];
 
-    public EventoDetalheViewModel(ApiClient api, SessaoService sessao) : base(api, sessao)
+    private readonly FotoUsuarioService _imagens;
+
+    public EventoDetalheViewModel(ApiClient api, SessaoService sessao, FotoUsuarioService imagens) : base(api, sessao)
     {
+        _imagens = imagens;
     }
 
     public ColecaoObservavel<SetorItem> Setores { get; } = [];
@@ -460,28 +463,36 @@ public partial class EventoDetalheViewModel : BaseViewModel
 
         var designados = Operadores.Select(operador => operador.UsuarioId).ToHashSet();
 
+        // Operadores e administradores podem trabalhar no evento — inclusive o próprio admin.
+        // O usuário logado aparece primeiro, para se designar com um toque.
+        var eu = Sessao.Usuario?.Id;
+
         var disponiveis = usuarios
-            .Where(usuario => usuario.Ativo && usuario.Perfil == "Operador" && !designados.Contains(usuario.Id))
-            .OrderBy(usuario => usuario.Nome, StringComparer.CurrentCulture)
+            .Where(usuario => usuario.Ativo && !designados.Contains(usuario.Id))
+            .OrderByDescending(usuario => usuario.Id == eu)
+            .ThenBy(usuario => usuario.Nome, StringComparer.CurrentCulture)
             .ToList();
 
         if (disponiveis.Count == 0)
         {
             await AvisarAsync(
-                "Sem operadores disponíveis",
-                "Todos os operadores ativos já estão neste evento. Para incluir mais gente, cadastre um operador em Gestão › Usuários.",
+                "Ninguém disponível",
+                "Todos os usuários ativos já estão neste evento. Para incluir mais gente, cadastre um usuário em Gestão › Usuários.",
                 TomDialogo.Neutro,
                 "\uf0c0");
             return;
         }
 
         var escolhidos = await Dialogos.SelecionarVariosAsync(
-            "Designar operadores",
+            "Designar para o evento",
             setorSugerido is null
-                ? "Marque quem vai trabalhar no evento; depois escolha o setor."
+                ? "Marque quem vai trabalhar no evento (operadores ou administradores); depois escolha o setor."
                 : $"Marque quem vai trabalhar em {setorSugerido.Nome}.",
             disponiveis,
-            usuario => new ItemSelecao(usuario.Nome, usuario.Email, Formatos.Iniciais(usuario.Nome)),
+            usuario => new ItemSelecao(
+                usuario.Id == eu ? $"{usuario.Nome} (você)" : usuario.Nome,
+                usuario.Perfil == "Administrador" ? $"Administrador · {usuario.Email}" : usuario.Email,
+                Formatos.Iniciais(usuario.Nome)),
             textoConfirmar: "Continuar");
 
         if (escolhidos is not { Count: > 0 })
@@ -638,6 +649,8 @@ public partial class EventoDetalheViewModel : BaseViewModel
         Produtos.Substituir(produtos
             .OrderBy(item => item.ProdutoNome, StringComparer.CurrentCulture)
             .Select(EventoProdutoItem.De));
+
+        _ = _imagens.CarregarEmLoteAsync(Produtos.ToList());
 
         OnPropertyChanged(nameof(SemProdutos));
         OnPropertyChanged(nameof(ContagemProdutos));

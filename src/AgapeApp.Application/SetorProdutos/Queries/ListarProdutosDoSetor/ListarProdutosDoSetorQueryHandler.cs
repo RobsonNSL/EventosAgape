@@ -42,11 +42,10 @@ public class ListarProdutosDoSetorQueryHandler
         var produtos = await _produtoRepository
             .ObterPorIdsAsync(eventoProdutos.Select(eventoProduto => eventoProduto.ProdutoId), cancellationToken);
 
-        var nomesPorProdutoId = produtos.ToDictionary(produto => produto.Id, produto => produto.Nome);
+        var produtosPorId = produtos.ToDictionary(produto => produto.Id);
 
         return eventoProdutos
-            .Select(eventoProduto => eventoProduto.ParaDTO(
-                nomesPorProdutoId.GetValueOrDefault(eventoProduto.ProdutoId, string.Empty)))
+            .Select(eventoProduto => eventoProduto.ParaDTO(produtosPorId.GetValueOrDefault(eventoProduto.ProdutoId)))
             .OrderBy(eventoProduto => eventoProduto.ProdutoNome)
             .ToList();
     }

@@ -40,7 +40,8 @@ public record EventoProdutoDTO(
     string ProdutoNome,
     decimal Preco,
     bool ControlaEstoque,
-    int QuantidadeEstoque);
+    int QuantidadeEstoque,
+    string? ProdutoCaminhoImagem = null);
 
 // ===== Cartões =====
 public record CartaoSaldoDTO(

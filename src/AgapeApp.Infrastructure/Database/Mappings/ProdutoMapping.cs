@@ -32,6 +32,10 @@ public class ProdutoMapping : IEntityTypeConfiguration<Produto>
             .HasColumnName("ativo")
             .IsRequired();
 
+        builder.Property(produto => produto.CaminhoImagem)
+            .HasColumnName("caminho_imagem")
+            .HasMaxLength(300);
+
         builder.Property(produto => produto.CriadoEm)
             .HasColumnName("criado_em")
             .IsRequired();

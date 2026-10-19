@@ -38,7 +38,7 @@ builder.Services
 builder.Services.AddSignalR();
 builder.Services.AddScoped<INotificadorDashboard, SignalRDashboardNotificador>();
 
-// Fotos de perfil: gravadas em wwwroot/imagens e servidas como arquivos estáticos.
+// Imagens (fotos de perfil e de produtos): gravadas em wwwroot/imagens e servidas como arquivos estáticos.
 builder.Services.AddSingleton<IArmazenamentoImagens, ArmazenamentoImagens>();
 
 // Falhas reais de binding (JSON malformado, tipo incorreto) devolvem ProblemDetails em português.
@@ -177,7 +177,7 @@ var app = builder.Build();
 
 app.UseExceptionHandler();
 
-// Fotos de perfil (wwwroot/imagens) e demais arquivos estáticos.
+// Imagens (wwwroot/imagens, inclusive imagens/produtos) e demais arquivos estáticos.
 app.UseStaticFiles();
 
 if (app.Environment.IsDevelopment())

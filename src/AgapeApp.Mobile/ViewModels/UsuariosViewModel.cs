@@ -15,8 +15,11 @@ public partial class UsuariosViewModel : BaseViewModel
 {
     private IReadOnlyList<UsuarioItem> _todos = [];
 
-    public UsuariosViewModel(ApiClient api, SessaoService sessao) : base(api, sessao)
+    private readonly FotoUsuarioService _fotos;
+
+    public UsuariosViewModel(ApiClient api, SessaoService sessao, FotoUsuarioService fotos) : base(api, sessao)
     {
+        _fotos = fotos;
     }
 
     public ColecaoObservavel<UsuarioItem> Usuarios { get; } = [];
@@ -83,6 +86,38 @@ public partial class UsuariosViewModel : BaseViewModel
 
         Filtrar();
         MarcarComoAtualizado();
+
+        // A lista aparece na hora com as iniciais; as fotos chegam depois, sem travar a tela.
+        _ = CarregarFotosAsync(_todos);
+    }
+
+    /// <summary>Baixa as fotos de quem tem (3 por vez; o serviço guarda em memória).</summary>
+    private async Task CarregarFotosAsync(IReadOnlyList<UsuarioItem> usuarios)
+    {
+        try
+        {
+            using var limite = new SemaphoreSlim(3);
+
+            await Task.WhenAll(usuarios
+                .Where(usuario => !string.IsNullOrWhiteSpace(usuario.CaminhoFoto))
+                .Select(async usuario =>
+                {
+                    await limite.WaitAsync();
+                    try
+                    {
+                        var foto = await _fotos.CarregarAsync(usuario.CaminhoFoto);
+                        MainThread.BeginInvokeOnMainThread(() => usuario.Foto = foto);
+                    }
+                    finally
+                    {
+                        limite.Release();
+                    }
+                }));
+        }
+        catch (Exception)
+        {
+            // Foto é enfeite: sem ela continuam as iniciais.
+        }
     }
 
     private void Filtrar()

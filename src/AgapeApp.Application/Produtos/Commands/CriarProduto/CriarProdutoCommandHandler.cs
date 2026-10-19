@@ -25,11 +25,6 @@ public class CriarProdutoCommandHandler : IRequestHandler<CriarProdutoCommand, P
         _produtoRepository.Adicionar(produto);
         await _unitOfWork.SalvarAlteracoesAsync(cancellationToken);
 
-        return new ProdutoDTO(
-            produto.Id,
-            produto.Nome,
-            produto.PrecoPadrao,
-            produto.Ativo,
-            produto.CriadoEm);
+        return produto.ParaDTO();
     }
 }

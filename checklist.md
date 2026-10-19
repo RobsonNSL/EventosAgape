@@ -3,7 +3,7 @@
 > Acompanha a execução do [`plano-projeto-eventos.md`](plano-projeto-eventos.md) (decisões).
 > Atualizado em: 17/10/2026
 > Legenda: `[x]` concluído · `[ ]` pendente
-> **Situação:** fases 1–4 implementadas na API (build sem avisos; 68 testes verdes). Migrations **0001–0017**. App mobile (Fase 5) com o fluxo completo: login (com biometria) → meus eventos → recarga/venda/saldo (QR pela câmera) → perfil (com foto) → telas do admin (dashboard ao vivo, saldos e auditoria) → **aba Gestão** (usuários, produtos, eventos e cartões; detalhes do evento com setores, produtos, operadores e abrir/encerrar), com cache SQLite de leitura — tudo com o design do Google Stitch. Falta validar no aparelho físico e publicar.
+> **Situação:** fases 1–4 implementadas na API (build sem avisos; 68 testes verdes). Migrations **0001–0018**. App mobile (Fase 5) com o fluxo completo: login (com biometria) → meus eventos → recarga/venda/saldo (QR pela câmera) → perfil (com foto) → telas do admin (dashboard ao vivo, saldos e auditoria) → **aba Gestão** (usuários, produtos, eventos e cartões; detalhes do evento com setores, produtos, operadores e abrir/encerrar), com cache SQLite de leitura — tudo com o design do Google Stitch. Falta validar no aparelho físico e publicar.
 
 ---
 
@@ -120,6 +120,12 @@
 - [x] Release do Android com AOT completo (APK de uso real)
 - [x] **Corrigido (v1.13, validado no aparelho):** recursão infinita em `ExecutarAsync<T>` (StackOverflow ao designar operador e cadastrar cartão) e Shell singleton que fechava o app ao trocar de aba após reabrir
 - [x] Cadastro de cartões pela leitura do QR (câmera contínua) e registro do último erro fatal
+
+### Imagens dos produtos (v1.14)
+- [x] Coluna `produtos.caminho_imagem` (migration 0018) — arquivo no diretório da API, não URL
+- [x] `POST`/`DELETE /api/produtos/{id}/imagem` (admin) e DTOs com o caminho da imagem
+- [x] 36 imagens-base livres em `wwwroot/imagens/produtos` + `CREDITOS.md` + `docs/sql/imagens-produtos.sql`
+- [x] App: imagens no catálogo, no evento e na venda; admin coloca/troca/remove pela galeria ou câmera
 
 ### Publicação
 - [ ] Painel web do admin (futuro, mesma API)

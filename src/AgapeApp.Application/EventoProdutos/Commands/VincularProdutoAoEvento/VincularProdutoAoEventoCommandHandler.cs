@@ -82,6 +82,6 @@ public class VincularProdutoAoEventoCommandHandler
 
         await _unitOfWork.SalvarAlteracoesAsync(cancellationToken);
 
-        return eventoProduto.ParaDTO(produto.Nome);
+        return eventoProduto.ParaDTO(produto);
     }
 }

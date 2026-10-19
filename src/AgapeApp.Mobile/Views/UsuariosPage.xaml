@@ -89,14 +89,20 @@
                                 <Border WidthRequest="40"
                                         HeightRequest="40"
                                         StrokeThickness="0"
-                                        StrokeShape="RoundRectangle 12"
+                                        StrokeShape="RoundRectangle 20"
                                         BackgroundColor="{StaticResource PrimaryContainer}"
                                         VerticalOptions="Center">
-                                    <Label Text="{Binding Iniciais}"
-                                           FontFamily="InterSemiBold"
-                                           FontSize="14"
-                                           TextColor="{StaticResource OnPrimaryContainer}"
-                                           HorizontalOptions="Center" VerticalOptions="Center" />
+                                    <Grid>
+                                        <Label Text="{Binding Iniciais}"
+                                               IsVisible="{Binding SemFoto}"
+                                               FontFamily="InterSemiBold"
+                                               FontSize="14"
+                                               TextColor="{StaticResource OnPrimaryContainer}"
+                                               HorizontalOptions="Center" VerticalOptions="Center" />
+                                        <Image Source="{Binding Foto}"
+                                               IsVisible="{Binding TemFoto}"
+                                               Aspect="AspectFill" />
+                                    </Grid>
                                 </Border>
                                 <VerticalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
                                     <Label Text="{Binding Nome}"

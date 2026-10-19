@@ -1,3 +1,4 @@
+using AgapeApp.Mobile.Helpers;
 using AgapeApp.Mobile.ViewModels;
 
 namespace AgapeApp.Mobile.Views;
@@ -18,6 +19,19 @@ public partial class SaldoPage : ContentPage, IQueryAttributable
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+
+        if (_animado)
+            return;
+
+        _animado = true;
+        _ = Animacoes.CascataAsync(Conteudo);
+
         await _vm.IniciarAsync();
+
+        // Saldo "sobe" até o valor consultado.
+        if (_vm.SaldoAtual is decimal saldo)
+            await Animacoes.ContarAsync(RotuloSaldo, saldo, 800);
     }
+
+    private bool _animado;
 }

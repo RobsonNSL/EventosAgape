@@ -7,12 +7,13 @@ namespace AgapeApp.Application.EventoProdutos.DTOs;
 /// </summary>
 public static class EventoProdutoDTOExtensions
 {
-    public static EventoProdutoDTO ParaDTO(this EventoProduto eventoProduto, string produtoNome) => new(
+    public static EventoProdutoDTO ParaDTO(this EventoProduto eventoProduto, Produto? produto) => new(
         eventoProduto.Id,
         eventoProduto.EventoId,
         eventoProduto.ProdutoId,
-        produtoNome,
+        produto?.Nome ?? string.Empty,
         eventoProduto.Preco,
         eventoProduto.ControlaEstoque,
-        eventoProduto.QuantidadeEstoque);
+        eventoProduto.QuantidadeEstoque,
+        produto?.CaminhoImagem);
 }

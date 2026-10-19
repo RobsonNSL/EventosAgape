@@ -1,3 +1,5 @@
+using AgapeApp.Mobile.Models;
+
 namespace AgapeApp.Mobile.Services;
 
 /// <summary>
@@ -46,6 +48,39 @@ public class FotoUsuarioService
         {
             // Foto indisponível (offline ou arquivo ausente): as iniciais continuam valendo.
             return null;
+        }
+    }
+
+    /// <summary>
+    /// Preenche as imagens de uma lista já exibida (3 downloads por vez, com cache em memória):
+    /// a lista aparece na hora com o ícone e as imagens chegam em seguida, sem travar a tela.
+    /// </summary>
+    public async Task CarregarEmLoteAsync(IEnumerable<IComImagem> itens)
+    {
+        try
+        {
+            using var limite = new SemaphoreSlim(3);
+
+            await Task.WhenAll(itens
+                .Where(item => item.Imagem is null && !string.IsNullOrWhiteSpace(item.CaminhoImagem))
+                .Select(async item =>
+                {
+                    await limite.WaitAsync();
+                    try
+                    {
+                        var imagem = await CarregarAsync(item.CaminhoImagem);
+                        if (imagem is not null)
+                            MainThread.BeginInvokeOnMainThread(() => item.Imagem = imagem);
+                    }
+                    finally
+                    {
+                        limite.Release();
+                    }
+                }));
+        }
+        catch (Exception)
+        {
+            // Imagem é enfeite: sem ela continua o ícone.
         }
     }
 

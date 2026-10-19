@@ -19,9 +19,12 @@ public partial class VendaViewModel : BaseViewModel
     private Guid? _idOperacao;
     private bool _iniciado;
 
-    public VendaViewModel(ApiClient api, SessaoService sessao, CacheService cache) : base(api, sessao)
+    private readonly FotoUsuarioService _imagens;
+
+    public VendaViewModel(ApiClient api, SessaoService sessao, CacheService cache, FotoUsuarioService imagens) : base(api, sessao)
     {
         _cache = cache;
+        _imagens = imagens;
     }
 
     public ColecaoObservavel<ItemCarrinho> Produtos { get; } = [];
@@ -118,6 +121,9 @@ public partial class VendaViewModel : BaseViewModel
 
             Produtos.Substituir(itens);
             RecalcularTotais();
+
+            // Fotos dos produtos chegam depois (sem rede, a grade segue com os ícones).
+            _ = _imagens.CarregarEmLoteAsync(itens);
         });
     }
 

@@ -20,11 +20,6 @@ public class ObterProdutoQueryHandler : IRequestHandler<ObterProdutoQuery, Produ
         var produto = await _produtoRepository.ObterPorIdAsync(consulta.Id, cancellationToken)
             ?? throw new NaoEncontradoException(MensagensErro.ProdutoNaoEncontrado);
 
-        return new ProdutoDTO(
-            produto.Id,
-            produto.Nome,
-            produto.PrecoPadrao,
-            produto.Ativo,
-            produto.CriadoEm);
+        return produto.ParaDTO();
     }
 }

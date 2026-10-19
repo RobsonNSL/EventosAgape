@@ -9,7 +9,8 @@ public record ProdutoDTO(
     string Nome,
     decimal? PrecoPadrao,
     bool Ativo,
-    DateTimeOffset CriadoEm);
+    DateTimeOffset CriadoEm,
+    string? CaminhoImagem = null);
 
 // ===== Cartões =====
 public record CartaoDTO(

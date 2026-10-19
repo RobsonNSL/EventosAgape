@@ -1,9 +1,13 @@
 using AgapeApp.Application.Produtos.Commands.AlterarAtivacaoProduto;
 using AgapeApp.Application.Produtos.Commands.AtualizarProduto;
 using AgapeApp.Application.Produtos.Commands.CriarProduto;
+using AgapeApp.Application.Produtos.Commands.DefinirImagemProduto;
+using AgapeApp.Application.Produtos.Commands.RemoverImagemProduto;
 using AgapeApp.Application.Produtos.DTOs;
 using AgapeApp.Application.Produtos.Queries.ListarProdutos;
 using AgapeApp.Application.Produtos.Queries.ObterProduto;
+using AgapeApp.Domain.Exceptions;
+using AgapeApp.Domain.Resources;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -73,4 +77,29 @@ public class ProdutosController : ControllerBase
     [ProducesResponseType(typeof(ProdutoDTO), StatusCodes.Status200OK)]
     public async Task<ActionResult<ProdutoDTO>> Desativar(Guid id, CancellationToken cancellationToken)
         => Ok(await _mediator.Send(new AlterarAtivacaoProdutoCommand(id, false), cancellationToken));
+
+    /// <summary>Envia (ou troca) a imagem do produto: jpg/jpeg/png/webp até 5 MB (multipart, campo "arquivo").</summary>
+    [HttpPost("{id:guid}/imagem")]
+    [ProducesResponseType(typeof(ProdutoDTO), StatusCodes.Status200OK)]
+    public async Task<ActionResult<ProdutoDTO>> DefinirImagem(
+        Guid id,
+        // Sem [FromForm]: o binding multipart é inferido (com o atributo o Swagger quebra).
+        IFormFile? arquivo,
+        CancellationToken cancellationToken)
+    {
+        if (arquivo is null)
+            throw new RegraNegocioException(MensagensErro.FotoObrigatoria);
+
+        await using var conteudo = arquivo.OpenReadStream();
+
+        return Ok(await _mediator.Send(
+            new DefinirImagemProdutoCommand(id, arquivo.FileName, arquivo.Length, conteudo),
+            cancellationToken));
+    }
+
+    /// <summary>Remove a imagem do produto.</summary>
+    [HttpDelete("{id:guid}/imagem")]
+    [ProducesResponseType(typeof(ProdutoDTO), StatusCodes.Status200OK)]
+    public async Task<ActionResult<ProdutoDTO>> RemoverImagem(Guid id, CancellationToken cancellationToken)
+        => Ok(await _mediator.Send(new RemoverImagemProdutoCommand(id), cancellationToken));
 }
